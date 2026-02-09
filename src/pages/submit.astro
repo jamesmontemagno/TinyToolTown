@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 ---
 
-<BaseLayout title="Submit a Tool — Tiny Tool Town 🏘️" description="Add your tiny tool to the town! Submit via GitHub PR or Issue.">
+<BaseLayout title="Submit a Tool — Tiny Tool Town 🏘️" description="Add your tiny tool to the town! Just fill out a quick GitHub Issue.">
   <Header />
 
   <main class="container">
@@ -13,80 +13,39 @@ import Footer from '../components/Footer.astro';
       <p class="subtitle">Got a tiny tool the world needs to see? Add it to the town!</p>
 
       <div class="methods">
-        <!-- Method 1: PR -->
         <div class="method-card primary">
           <div class="method-header">
-            <span class="method-icon">🛠️</span>
-            <h2>Option 1: Pull Request</h2>
-            <span class="method-badge">Recommended</span>
+            <span class="method-icon">📝</span>
+            <h2>Submit via GitHub Issue</h2>
           </div>
-          <p>Fork the repo, add a markdown file, submit a PR. You know the drill.</p>
+          <p>Just fill out a quick form — no forking, no PRs, no fuss. We'll take care of the rest!</p>
 
           <div class="steps">
             <div class="step">
               <span class="step-num">1</span>
               <div>
-                <strong>Fork the repo</strong>
-                <p><a href="https://github.com/shanselman/TinyToolTown/fork" target="_blank" rel="noopener">github.com/shanselman/TinyToolTown</a></p>
+                <strong>Click the button below</strong>
+                <p>It opens a pre-filled GitHub Issue template</p>
               </div>
             </div>
             <div class="step">
               <span class="step-num">2</span>
               <div>
-                <strong>Create a new file</strong>
-                <p>Add <code>src/content/tools/your-tool-name.md</code></p>
+                <strong>Fill in your tool's details</strong>
+                <p>Name, description, GitHub repo URL, and a few tags</p>
               </div>
             </div>
             <div class="step">
               <span class="step-num">3</span>
               <div>
-                <strong>Use this template</strong>
+                <strong>We review and add it! 🏘️</strong>
+                <p>Your tool shows up on the site with a screenshot pulled from your README</p>
               </div>
             </div>
           </div>
 
-          <div class="code-block">
-            <div class="code-header">
-              <span>your-tool-name.md</span>
-              <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('template-code').textContent || '')">📋 Copy</button>
-            </div>
-            <pre id="template-code"><code>---
-name: "Your Tool Name"
-tagline: "A one-line description of what it does"
-author: "Your Name"
-author_github: "your-github-username"
-github_url: "https://github.com/you/your-tool"
-website_url: "https://your-tool-demo.com"
-tags: ["cli", "fun", "tiny"]
-language: "Python"
-license: "MIT"
-date_added: "2026-02-09"
-featured: false
----
-
-Write a few sentences about your tool here.
-What does it do? Why did you build it?
-Why is it delightful?</code></pre>
-          </div>
-
-          <div class="step">
-            <span class="step-num">4</span>
-            <div>
-              <strong>Submit your PR</strong>
-              <p>We'll review it and welcome your tool to the town! 🏘️</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Method 2: Issue -->
-        <div class="method-card">
-          <div class="method-header">
-            <span class="method-icon">📝</span>
-            <h2>Option 2: GitHub Issue</h2>
-          </div>
-          <p>Not comfortable with PRs? No worries! Just fill out a quick form and we'll add it for you.</p>
-          <a href="https://github.com/shanselman/TinyToolTown/issues/new?template=submit-tool.yml" class="btn btn-secondary" target="_blank" rel="noopener">
-            Open an Issue →
+          <a href="https://github.com/shanselman/TinyToolTown/issues/new?template=submit-tool.yml" class="btn btn-primary" target="_blank" rel="noopener">
+            Submit Your Tool →
           </a>
         </div>
       </div>
@@ -308,6 +267,19 @@ Why is it delightful?</code></pre>
     font-size: 0.95rem;
     text-decoration: none;
     transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-bg);
+    font-size: 1.1rem;
+    padding: 0.9rem 2rem;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(255, 137, 6, 0.3);
+    color: var(--color-bg);
   }
 
   .btn-secondary {
