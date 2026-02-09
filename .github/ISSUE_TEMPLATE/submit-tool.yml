@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         ## Welcome to Tiny Tool Town! 🏘️
-        Fill out this form and we'll add your tool to the town. You can also [submit a PR](https://tinytooltown.com/submit/) if you prefer.
+        Fill out this form and we'll review your tool. Once approved, it'll show up on the site automatically!
 
   - type: input
     id: name

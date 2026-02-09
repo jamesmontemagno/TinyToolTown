@@ -1,0 +1,105 @@
+name: Approve Tool Submission
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  add-tool:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse issue and create tool file
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+
+            // Parse form fields from GitHub Issue form
+            const getField = (label) => {
+              const regex = new RegExp(`### ${label}\\s*\\n\\s*([\\s\\S]*?)(?=\\n###|\\n\\n###|$)`);
+              const match = body.match(regex);
+              return match ? match[1].trim() : '';
+            };
+
+            const name = getField('Tool Name');
+            const tagline = getField('One-line description');
+            const description = getField('Tell us about your tool');
+            const github_url = getField('GitHub Repository URL');
+            const website_url = getField('Website or Demo URL \\(optional\\)');
+            const author = getField('Your Name');
+            const author_github = getField('Your GitHub Username');
+            const tagsRaw = getField('Tags \\(comma-separated\\)');
+            const language = getField('Primary Programming Language');
+            const license = getField('License');
+
+            // Build tags array
+            const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+
+            // Generate slug from tool name
+            const slug = name.toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '');
+
+            // Build frontmatter
+            const today = new Date().toISOString().split('T')[0];
+            let frontmatter = `---\nname: "${name.replace(/"/g, '\\"')}"\ntagline: "${tagline.replace(/"/g, '\\"')}"\nauthor: "${author.replace(/"/g, '\\"')}"\nauthor_github: "${author_github}"\ngithub_url: "${github_url}"`;
+            if (website_url && website_url !== '_No response_') {
+              frontmatter += `\nwebsite_url: "${website_url}"`;
+            }
+            frontmatter += `\ntags: [${tags.map(t => `"${t}"`).join(', ')}]`;
+            if (language && language !== '_No response_') {
+              frontmatter += `\nlanguage: "${language}"`;
+            }
+            if (license && license !== '_No response_') {
+              frontmatter += `\nlicense: "${license}"`;
+            }
+            frontmatter += `\ndate_added: "${today}"\nfeatured: false\n---\n\n${description}`;
+
+            const filePath = `src/content/tools/${slug}.md`;
+
+            // Check if file already exists
+            const fs = require('fs');
+            if (fs.existsSync(filePath)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `⚠️ A tool with slug \`${slug}\` already exists. Please rename and re-submit.`
+              });
+              return;
+            }
+
+            // Write the file
+            fs.writeFileSync(filePath, frontmatter);
+
+            // Git commit and push
+            const { execSync } = require('child_process');
+            execSync('git config user.name "Tiny Tool Town Bot"');
+            execSync('git config user.email "bot@tinytooltown.com"');
+            execSync(`git add "${filePath}"`);
+            execSync(`git commit -m "🏠 Add ${name} (from issue #${issue.number})"`);
+            execSync('git push');
+
+            // Close the issue with a comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `🏘️ **Welcome to Tiny Tool Town!**\n\n**${name}** has been added and will be live on [tinytooltown.com](https://www.tinytooltown.com/tools/${slug}/) once the site rebuilds (about 1 minute).\n\nThanks for sharing your tool! ✨`
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              state: 'closed'
+            });
+
+            console.log(`✅ Added ${name} as ${filePath}`);
