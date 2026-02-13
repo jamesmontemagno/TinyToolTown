@@ -4,7 +4,7 @@ tagline: "A tiny CLI to access your WHOOP data for you and your favorite agent."
 author: "Muin Momin"
 author_github: "muinmomin"
 github_url: "https://github.com/MuinMomin/whoop-cli"
-tags: ["cli", "bun", "health", "fitness", "whoop", "skill", "openclaw"]
+tags: ["cli", "bun", "health", "fitness", "whoop"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-13"

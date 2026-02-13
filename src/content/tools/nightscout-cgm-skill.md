@@ -5,7 +5,7 @@ author: "Scott Hanselman"
 author_github: "shanselman"
 github_url: "https://github.com/shanselman/nightscout-cgm-skill"
 thumbnail: "/thumbnails/nightscout-cgm-skill.png"
-tags: ["copilot", "health", "diabetes", "ai", "python"]
+tags: ["copilot", "health", "diabetes", "ai"]
 language: "Python"
 license: "MIT"
 date_added: "2026-02-09"

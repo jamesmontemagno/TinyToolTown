@@ -5,7 +5,7 @@ author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/ohmyposh-configurator"
 website_url: "https://jamesmontemagno.github.io/ohmyposh-configurator/"
-tags: ["terminal", "prompt", "oh-my-posh", "configurator", "themes", "drag-and-drop", "react", "typescript", "vite", "tailwind", "client-side"]
+tags: ["terminal", "prompt", "oh-my-posh", "configurator", "themes"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-11"

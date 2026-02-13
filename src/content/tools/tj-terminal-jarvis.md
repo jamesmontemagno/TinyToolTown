@@ -5,7 +5,7 @@ author: "Brandon Calderon-Morales"
 author_github: "BA-CalderonMorales"
 github_url: "https://github.com/BA-CalderonMorales/terminal-jarvis"
 thumbnail: "/thumbnails/tj-terminal-jarvis.gif"
-tags: ["cli", "rust", "npm", "crates", "homebrew", "productivity", "research"]
+tags: ["cli", "npm", "crates", "homebrew", "productivity"]
 language: "Rust, Python, JavaScript, Bash"
 license: "MIT"
 date_added: "2026-02-12"

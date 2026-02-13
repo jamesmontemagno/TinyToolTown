@@ -4,7 +4,7 @@ tagline: "Archive your Twitter/X bookmarks to markdown with AI-powered analysis 
 author: "Alex Hillman"
 author_github: "alexknowshtml"
 github_url: "https://github.com/alexknowshtml/smaug"
-tags: ["cli", "twitter", "bookmarks", "ai", "archiving", "markdown"]
+tags: ["cli", "twitter", "bookmarks", "ai", "archiving"]
 language: "JavaScript"
 license: "MIT"
 date_added: "2026-02-13"

@@ -4,7 +4,7 @@ tagline: "Inspect SSL certificates and DNS for any webpage's request tree"
 author: "Scott Hanselman"
 author_github: "shanselman"
 github_url: "https://github.com/shanselman/cert-inspector"
-tags: ["web", "security", "ssl", "dns", "devtools"]
+tags: ["web", "security", "ssl", "dns", "developer-tools"]
 language: "JavaScript"
 license: "MIT"
 date_added: "2026-02-09"

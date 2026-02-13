@@ -6,7 +6,7 @@ author_github: "Timmoth"
 github_url: "https://github.com/Timmoth/RackPeek"
 thumbnail: "/thumbnails/rackpeek.gif"
 website_url: "https://timmoth.github.io/RackPeek/"
-tags: ["cli", "crossplatform", "webui", "homelab", "selfhosted", "infrastructure"]
+tags: ["cli", "crossplatform", "webui", "homelab", "selfhosted"]
 language: "C#"
 license: "AGPL-3.0 license"
 date_added: "2026-02-13"

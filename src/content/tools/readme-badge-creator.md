@@ -5,7 +5,7 @@ author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/mcp-badge-creator"
 website_url: "https://jamesmontemagno.github.io/mcp-badge-creator/"
-tags: ["mcp", "badges", "readme", "markdown", "vscode", "extensions", "shields.io", "github", "typescript", "react", "vite"]
+tags: ["mcp", "badges", "readme", "markdown", "vscode"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-11"

@@ -6,7 +6,7 @@ author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/pdf-diff"
 thumbnail: "/thumbnails/pdf-diff.png"
 website_url: "https://www.pdf-diff.com"
-tags: ["pdf", "diff", "compare", "privacy", "client-side", "web", "cli", "npx", "typescript", "react"]
+tags: ["pdf", "diff", "compare", "privacy", "client-side"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-10"

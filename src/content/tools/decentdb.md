@@ -6,7 +6,7 @@ author_github: "sphildreth"
 github_url: "https://github.com/sphildreth/decentdb"
 thumbnail: "/thumbnails/decentdb.png"
 website_url: "https://decentdb.org"
-tags: ["database", "embedded", "sqlite", "orm", "dapper", "adonet"]
+tags: ["database", "embedded", "sqlite", "orm", "dapper"]
 language: "Nim"
 license: "Apache-2.0"
 date_added: "2026-02-13"

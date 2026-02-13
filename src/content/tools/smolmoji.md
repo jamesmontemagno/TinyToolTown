@@ -5,7 +5,7 @@ author: "KC Lemson"
 author_github: "kclemson"
 github_url: "https://github.com/kclemson/smolmoji/"
 website_url: "https://smolmoji.com/"
-tags: ["icons", "emoji", "silly", "pixelated"]
+tags: ["icons", "emoji", "fun", "pixelated"]
 language: "react, typescript"
 license: "MIT"
 date_added: "2026-02-13"

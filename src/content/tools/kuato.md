@@ -4,7 +4,7 @@ tagline: "Session recall for Claude Code — remember what you discussed, decide
 author: "Alex Hillman"
 author_github: "alexknowshtml"
 github_url: "https://github.com/alexknowshtml/kuato"
-tags: ["cli", "ai", "claude-code", "developer-tools", "productivity", "session-management"]
+tags: ["cli", "ai", "claude-code", "developer-tools", "productivity"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-13"

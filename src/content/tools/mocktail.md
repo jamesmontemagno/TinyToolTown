@@ -4,7 +4,7 @@ tagline: "Mock any HTTP endpoint in seconds — fast, free, and container-ready.
 author: "Huseyin Nurbaki"
 author_github: "Huseyinnurbaki"
 github_url: "https://github.com/Huseyinnurbaki/mocktail"
-tags: ["mock-api", "developer-tools", "mock", "demo", "rest", "json", "mcp"]
+tags: ["mock-api", "developer-tools", "mock", "demo", "rest"]
 language: "Go, JS"
 license: "MIT"
 date_added: "2026-02-13"

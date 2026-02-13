@@ -5,7 +5,7 @@ author: "Charly Koch"
 author_github: "ckob"
 github_url: "https://github.com/ckob/lazydotnet"
 thumbnail: "/thumbnails/lazydotnet.png"
-tags: ["tui", "dotnet", "csharp", "nuget", "developer-tools", "cli"]
+tags: ["tui", "dotnet", "nuget", "developer-tools", "cli"]
 language: "C#"
 license: "MIT"
 date_added: "2026-02-13"

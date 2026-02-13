@@ -4,7 +4,7 @@ tagline: "AI-powered typo fixer for Raycast/macOS — hit a hotkey, get clean te
 author: "Alex Hillman"
 author_github: "alexknowshtml"
 github_url: "https://github.com/alexknowshtml/unmumble"
-tags: ["macos", "raycast", "ai", "typos", "productivity", "tiny"]
+tags: ["macos", "raycast", "ai", "typos", "productivity"]
 language: "Shell"
 license: "MIT"
 date_added: "2026-02-13"

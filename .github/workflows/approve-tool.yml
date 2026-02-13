@@ -105,8 +105,23 @@ jobs:
               } catch { return '.png'; }
             };
 
-            // Build tags array
-            const tags = tagsRaw.split(',').map(t => sanitize(t).toLowerCase()).filter(Boolean);
+            // Build tags array — split on commas or semicolons, normalize
+            const tagSynonyms = {
+              'devtools': 'developer-tools', 'dev-tools': 'developer-tools',
+              'system tray': 'system-tray', 'ui': 'web', 'webapp': 'web',
+              'funny': 'fun', 'silly': 'fun', 'trains': 'train',
+              'games': 'game', 'presentations': 'presentation',
+              'audio profiles': 'audio', 'internet radio': 'radio',
+              'key bindings': 'keyboard', 'copilot cli': 'copilot',
+            };
+            const langTags = ['c#', 'csharp', 'c++', 'rust', 'typescript', 'javascript',
+              'python', 'powershell', 'go', 'ruby', 'java', 'swift', 'nim',
+              'html', 'css', 'xaml', 'shell', 'bash', 'ts', 'js'];
+            const tags = tagsRaw.split(/[,;]+/).map(t => {
+              let tag = sanitize(t).toLowerCase();
+              if (tagSynonyms[tag]) tag = tagSynonyms[tag];
+              return tag;
+            }).filter(t => t && !langTags.includes(t)).slice(0, 5);
 
             // Generate slug from tool name (only alphanumeric + hyphens)
             const slug = sanitize(name).toLowerCase()
