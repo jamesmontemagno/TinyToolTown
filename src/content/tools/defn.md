@@ -6,7 +6,7 @@ author_github: "shrayasr"
 github_url: "https://github.com/shrayasr/Defn"
 thumbnail: "/thumbnails/defn.jpg"
 website_url: "https://shrayas.com/tools/defn"
-tags: ["funny", "client-side"]
+tags: ["fun", "client-side"]
 language: "Javascript"
 license: "MIT"
 date_added: "2026-02-12"

@@ -6,7 +6,7 @@ author_github: "scaryrawr"
 github_url: "https://github.com/scaryrawr/sl"
 thumbnail: "/thumbnails/sl.gif"
 website_url: "https://scaryrawr.github.io/sl/embed"
-tags: ["cli", "trains", "steam locomotive"]
+tags: ["cli", "train", "fun"]
 language: "rust"
 date_added: "2026-02-13"
 featured: false

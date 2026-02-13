@@ -156,7 +156,7 @@ jobs:
                 }
 
                 // Build frontmatter
-                const tags = tagsRaw.split(',').map(t => sanitize(t)).filter(Boolean);
+                const tags = tagsRaw.split(',').map(t => sanitize(t).toLowerCase()).filter(Boolean);
                 const today = new Date().toISOString().split('T')[0];
                 const lines = [
                   '---',

@@ -5,7 +5,7 @@ author: "Pablo Echavarria"
 author_github: "pechavarriaa"
 github_url: "https://github.com/pechavarriaa/CrossPlatformAudioToggle"
 thumbnail: "/thumbnails/toggle-audio-profiles-cross-platform.png"
-tags: ["audio profiles"]
+tags: ["audio"]
 language: "Python, Powershell, Bash"
 license: "MIT"
 date_added: "2026-02-13"

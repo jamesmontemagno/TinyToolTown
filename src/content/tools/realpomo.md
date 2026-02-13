@@ -5,7 +5,7 @@ author: "Rohan Malpani"
 author_github: "romalpani"
 github_url: "https://github.com/romalpani/realpomo"
 website_url: "https://romalpani.github.io/realpomo/index.html"
-tags: ["MacOS", "Windows", "Fun", "Designer", "Vibe-coded"]
+tags: ["macos", "windows", "fun", "designer", "vibe-coded"]
 date_added: "2026-02-13"
 featured: false
 ---

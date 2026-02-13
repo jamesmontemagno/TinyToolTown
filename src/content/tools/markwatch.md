@@ -4,7 +4,7 @@ tagline: "Beautiful analog stopwatch timer for timed presentations"
 author: "Scott Hanselman"
 author_github: "shanselman"
 github_url: "https://github.com/shanselman/markwatch"
-tags: ["web", "timer", "presentations", "speaking"]
+tags: ["web", "timer", "presentation", "speaking"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-09"

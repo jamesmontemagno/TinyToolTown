@@ -106,7 +106,7 @@ jobs:
             };
 
             // Build tags array
-            const tags = tagsRaw.split(',').map(t => sanitize(t)).filter(Boolean);
+            const tags = tagsRaw.split(',').map(t => sanitize(t).toLowerCase()).filter(Boolean);
 
             // Generate slug from tool name (only alphanumeric + hyphens)
             const slug = sanitize(name).toLowerCase()

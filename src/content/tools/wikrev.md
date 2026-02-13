@@ -5,7 +5,7 @@ author: "Petr Houška"
 author_github: "petrroll"
 github_url: "https://github.com/petrroll/wikrev"
 thumbnail: "/thumbnails/wikrev.png"
-tags: ["wiki", "git", "copilot cli"]
+tags: ["wiki", "git", "copilot"]
 language: "python"
 license: "MIT"
 date_added: "2026-02-13"

@@ -5,7 +5,7 @@ author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/switch-library"
 website_url: "https://myswitchlibrary.com/"
-tags: ["pwa", "nintendo", "switch", "games", "collection", "react", "typescript", "vite", "supabase", "offline", "friends"]
+tags: ["pwa", "nintendo", "switch", "game", "collection", "react", "typescript", "vite", "supabase", "offline", "friends"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-10"

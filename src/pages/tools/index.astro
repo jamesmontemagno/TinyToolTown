@@ -11,7 +11,7 @@ const tools = allTools.sort((a, b) =>
   new Date(b.data.date_added).getTime() - new Date(a.data.date_added).getTime()
 );
 
-const allTags = [...new Set(tools.flatMap(t => t.data.tags))].sort();
+const allTags = [...new Set(tools.flatMap(t => t.data.tags.map(tag => tag.toLowerCase())))].sort();
 ---
 
 <BaseLayout title="Browse Tools — Tiny Tool Town 🏘️" description="Explore all the tiny, delightful, open source tools in Tiny Tool Town.">

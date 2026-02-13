@@ -5,7 +5,7 @@ author: "Claton Hendricks"
 author_github: "clatonhendricks"
 github_url: "https://github.com/clatonhendricks/CrashDetectorwithAI"
 thumbnail: "/thumbnails/windows-crash-assist-with-ai.png"
-tags: ["Windows", "Crash"]
+tags: ["windows", "crash"]
 language: "C#"
 license: "GPL-3.0"
 date_added: "2026-02-13"

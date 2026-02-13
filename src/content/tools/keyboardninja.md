@@ -4,7 +4,7 @@ tagline: "KeyboardNinja is a lightweight, powerful utility with vi-like keybindi
 author: "Michał Czerwiński"
 author_github: "michalczerwinski"
 github_url: "https://github.com/michalczerwinski/KeyboardNinja"
-tags: ["windows", "keyboard", "vi", "vim", "shortcuts", "key bindings"]
+tags: ["windows", "keyboard", "vi", "vim", "shortcuts"]
 language: "c#"
 date_added: "2026-02-13"
 featured: false

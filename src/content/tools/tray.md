@@ -6,7 +6,7 @@ author_github: "TheJoeFin"
 github_url: "https://github.com/TheJoeFin/Trdo"
 thumbnail: "/thumbnails/tray.png"
 website_url: "https://trdo.net/"
-tags: ["Windows", "internet radio", "system tray", "music"]
+tags: ["windows", "radio", "system-tray", "music"]
 language: "C#"
 license: "MIT"
 date_added: "2026-02-13"

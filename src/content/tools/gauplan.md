@@ -5,7 +5,7 @@ author: "Yusuf Kaka"
 author_github: "yusufk"
 github_url: "https://github.com/yusufk/gautrain-schedule"
 website_url: "https://yusuf.kaka.co.za/gautrain-schedule/"
-tags: ["Johannesburg", "Travel", "train"]
+tags: ["johannesburg", "travel", "train"]
 language: "React"
 date_added: "2026-02-13"
 featured: false
