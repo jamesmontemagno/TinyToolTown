@@ -2,7 +2,7 @@
 name: "URL shortener"
 tagline: "A simple HTTP server application for shortening URI addresses."
 author: "Vítězslav Šimon"
-author_github: "httpsgithubcomVitSimon"
+author_github: "VitSimon"
 github_url: "https://github.com/VitSimon/urlshort"
 tags: ["web;server;url;uri;shortener;shortened"]
 language: "Go"

@@ -2,7 +2,7 @@
 name: "Rabbithole"
 tagline: "A beautiful TUI for consuming and inspecting RabbitMQ messages"
 author: "Emilio Palmerini"
-author_github: "emil_io"
+author_github: "emiliopalmerini"
 github_url: "https://github.com/emiliopalmerini/rabbithole"
 tags: ["cli", "tui", "rabbitmq", "developer-tools"]
 language: "GO"
