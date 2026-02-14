@@ -59,10 +59,20 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
         class="author-avatar"
         loading="lazy"
       />
-      <span class="author-name">{author}</span>
+      <span class="author-name" data-author-search={author.toLowerCase()}>{author}</span>
     </div>
   </div>
 </a>
+
+<script>
+  document.querySelectorAll('.author-name[data-author-search]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      window.location.href = `/tools/?q=${encodeURIComponent((el as HTMLElement).dataset.authorSearch!)}`;
+    });
+  });
+</script>
 
 <style>
   .tool-card {
@@ -203,5 +213,11 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
   .author-name {
     font-size: 0.8rem;
     color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  .author-name:hover {
+    text-decoration: underline;
+    color: var(--color-primary);
   }
 </style>

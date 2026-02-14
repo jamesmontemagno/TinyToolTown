@@ -59,7 +59,7 @@ const langColor = tool.data.language ? langColors[tool.data.language] || '#8b949
                 class="author-avatar"
               />
               <div>
-                <a href={`https://github.com/${tool.data.author_github}`} class="author-name" target="_blank" rel="noopener">{tool.data.author}</a>
+                <a href={`/tools/?q=${encodeURIComponent(tool.data.author.toLowerCase())}`} class="author-name">{tool.data.author}</a>
               </div>
             </div>
 

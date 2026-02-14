@@ -149,6 +149,13 @@ const moreTags = [...tagCounts.entries()]
     noResults.style.display = visible === 0 ? 'block' : 'none';
   }
 
+  // Pre-fill search from ?q= URL parameter
+  const urlQ = new URLSearchParams(window.location.search).get('q');
+  if (urlQ) {
+    search.value = urlQ;
+    filterTools();
+  }
+
   search.addEventListener('input', filterTools);
 
   // Handle tag clicks (both popular and expanded)
