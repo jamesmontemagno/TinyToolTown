@@ -1,0 +1,18 @@
+---
+name: "Stillness"
+tagline: "Coloring through Stress"
+author: "LadyNaggaga"
+author_github: "LadyNaggaga"
+github_url: "https://github.com/LadyNaggaga/Stillness"
+thumbnail: "/thumbnails/stillness.png"
+website_url: "https://ladynaggaga.github.io/Stillness/"
+tags: ["calm", "color", "click", "web"]
+language: "HTML, JS"
+date_added: "2026-02-14"
+featured: false
+---
+
+🌿 Breathe. Click. Color.
+A meditative browser-based coloring book with intricate patterns, ambient sounds, and a dark-mode Zen UI. No installs, no
+  accounts, just stillness.
+<img width="1145" height="667" alt="image" src="https://github.com/user-attachments/assets/4eb2074a-fea4-46c8-9665-94f887206ab2" />
