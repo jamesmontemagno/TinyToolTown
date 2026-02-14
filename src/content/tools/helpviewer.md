@@ -6,7 +6,7 @@ author_github: "VitSimon"
 github_url: "https://github.com/HelpViewer/HelpViewer/"
 thumbnail: "/thumbnails/HVMainPage.png"
 website_url: "https://helpviewer.github.io/"
-tags: ["web", "static", "help", "manual", "markdown", "viewer", "reader"]
+tags: ["web", "static", "help", "manual", "markdown"]
 language: "JavaScript"
 license: "MIT"
 date_added: "2026-02-13"
