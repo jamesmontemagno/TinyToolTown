@@ -5,6 +5,10 @@ on:
     - cron: '0 4 * * 0'  # Sunday 4am UTC
   workflow_dispatch:
 
+concurrency:
+  group: refresh-thumbnails
+  cancel-in-progress: false
+
 permissions:
   contents: write
   issues: read
@@ -26,8 +30,20 @@ jobs:
             const TOOLS_DIR = 'src/content/tools';
             const THUMBS_DIR = 'public/thumbnails';
             const MIN_IMAGE_SIZE = 10 * 1024;
+            const FETCH_TIMEOUT = 15000;
 
-            const badgeHosts = ['img.shields.io', 'badge.fury.io', 'badgen.net', 'badges.', 'coveralls.io', 'codecov.io', 'travis-ci.', 'ci.appveyor.com', 'github.com/workflows'];
+            // Fetch with timeout helper
+            async function fetchWithTimeout(url, opts = {}) {
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+              try {
+                return await fetchWithTimeout(url, { ...opts, signal: controller.signal });
+              } finally {
+                clearTimeout(timeout);
+              }
+            }
+
+            const badgeHosts= ['img.shields.io', 'badge.fury.io', 'badgen.net', 'badges.', 'coveralls.io', 'codecov.io', 'travis-ci.', 'ci.appveyor.com', 'github.com/workflows'];
             const isBadge = (u) => badgeHosts.some(h => u.includes(h)) || u.includes('/badge');
             const safeExt = (urlStr) => {
               const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
@@ -84,6 +100,7 @@ jobs:
 
               let bestImageUrl = null;
               let imageSource = '';
+              let readmeBuffer = null;
 
               // 1. Check issue comments for uploaded images
               const issueNum = issueMap.get(slug);
@@ -116,7 +133,7 @@ jobs:
               if (!bestImageUrl) {
                 for (const branch of ['main', 'master']) {
                   try {
-                    const readmeRes = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/README.md`);
+                    const readmeRes = await fetchWithTimeout(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/README.md`);
                     if (!readmeRes.ok) continue;
                     const readme = await readmeRes.text();
 
@@ -134,7 +151,7 @@ jobs:
                         if (!imgPath.startsWith('http')) {
                           imgUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/${imgPath.replace(/^\.\//, '')}`;
                         }
-                        const imgRes = await fetch(imgUrl);
+                        const imgRes = await fetchWithTimeout(imgUrl);
                         if (!imgRes.ok) continue;
                         const buf = Buffer.from(await imgRes.arrayBuffer());
                         if (buf.length >= MIN_IMAGE_SIZE && (!biggest || buf.length > biggest.size)) {
@@ -149,8 +166,7 @@ jobs:
                       console.log(`  📸 Found image in README (${(biggest.size / 1024).toFixed(1)} KB)`);
                       // Store buffer for direct write
                       biggest._stored = true;
-                      // Attach to outer scope
-                      var readmeBuffer = biggest.buffer;
+                      readmeBuffer = biggest.buffer;
                     }
                     break;
                   } catch {}
@@ -174,7 +190,7 @@ jobs:
                   buf = readmeBuffer;
                   readmeBuffer = null;
                 } else {
-                  const imgRes = await fetch(bestImageUrl);
+                  const imgRes = await fetchWithTimeout(bestImageUrl);
                   if (!imgRes.ok) { console.log(`  ❌ Download failed: ${imgRes.status}`); continue; }
                   buf = Buffer.from(await imgRes.arrayBuffer());
                 }

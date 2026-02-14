@@ -84,6 +84,42 @@
   transform: rotate(-2deg) scale(1.05);
 }
 
+/* Shared button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.btn-primary:hover {
+  background: #ffa033;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(255, 137, 6, 0.4);
+  color: var(--color-bg);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 [data-theme="geocities"] .btn-primary {
   background: #ff0000 !important;
   color: #ffff00 !important;
