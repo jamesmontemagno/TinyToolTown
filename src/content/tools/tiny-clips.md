@@ -4,6 +4,7 @@ tagline: "Tiny macOS app to record videos/gif/screenshots and edit them."
 author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/tiny-clips-mac"
+website_url: "https://tinyclips.app"
 thumbnail: "/thumbnails/tiny-clips.png"
 tags: ["video", "macos", "screenshot"]
 language: "Swift"
