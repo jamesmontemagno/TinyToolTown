@@ -50,6 +50,29 @@ import Footer from '../components/Footer.astro';
         </div>
       </div>
 
+      <!-- TinyToolSubmitter CLI -->
+      <div class="method-card cli-card">
+        <div class="method-header">
+          <span class="method-icon">🤖</span>
+          <h2>Submit with TinyToolSubmitter CLI</h2>
+        </div>
+        <p>Use the <a href="https://github.com/jamesmontemagno/TinyToolSubmitter" target="_blank" rel="noopener">TinyToolSubmitter</a> CLI to auto-generate your submission using GitHub Copilot! Just point it at your repo and it pre-fills everything for you.</p>
+
+        <div class="cli-commands">
+          <div class="cli-option">
+            <strong>Run directly with dnx:</strong>
+            <pre><code>dnx TinyToolSubmitter</code></pre>
+          </div>
+          <div class="cli-option">
+            <strong>Or install as a global tool:</strong>
+            <pre><code>dotnet tool install --global TinyToolSubmitter
+tiny-tool-submit [path-to-repo]</code></pre>
+          </div>
+        </div>
+
+        <p class="cli-note">Requires .NET 10 SDK and <a href="https://docs.github.com/en/copilot/github-copilot-in-the-cli" target="_blank" rel="noopener">GitHub Copilot CLI</a> installed on your PATH.</p>
+      </div>
+
       <!-- Guidelines -->
       <div class="guidelines">
         <h2>What makes a great Tiny Tool? 🤔</h2>
@@ -199,6 +222,47 @@ import Footer from '../components/Footer.astro';
     padding: 0.15rem 0.4rem;
     border-radius: 4px;
     font-size: 0.85rem;
+  }
+
+  .cli-card {
+    margin-top: 1.5rem;
+    border-color: rgba(99, 179, 237, 0.3);
+  }
+
+  .cli-commands {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .cli-option strong {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+  }
+
+  .cli-option pre {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    margin: 0;
+  }
+
+  .cli-option code {
+    font-size: 0.85rem;
+    color: var(--color-primary);
+  }
+
+  .cli-note {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: 0.5rem;
+  }
+
+  .cli-note a {
+    color: var(--color-primary);
   }
 
   .guidelines h2 {
