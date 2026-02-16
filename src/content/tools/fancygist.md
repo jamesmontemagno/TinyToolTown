@@ -10,7 +10,7 @@ language: "TypeScript"
 license: "MIT"
 theme: "minimal"
 date_added: "2026-02-16"
-featured: false
+featured: true
 ai_summary: "Dive into distraction-free markdown magic that saves your docs as GitHub Gists with effortless sharing and editing — all wrapped in a sleek, minimal interface! It’s like your favorite notebook got a tech upgrade and a social life."
 ai_features: ["🎨 Minimalist clean editor for focused writing", "🔐 Seamless GitHub Gist integration to save and manage docs", "🔗 Shareable URLs for easy collaboration and sharing", "🍴 Automatic gist forking when editing others’ work"]
 ---
