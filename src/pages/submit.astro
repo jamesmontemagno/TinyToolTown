@@ -56,21 +56,35 @@ import Footer from '../components/Footer.astro';
           <span class="method-icon">🤖</span>
           <h2>Submit with TinyToolSubmitter CLI</h2>
         </div>
-        <p>Use the <a href="https://github.com/jamesmontemagno/TinyToolSubmitter" target="_blank" rel="noopener">TinyToolSubmitter</a> CLI to auto-generate your submission using GitHub Copilot! Just point it at your repo and it pre-fills everything for you.</p>
+        <p>Use the <a href="https://github.com/jamesmontemagno/TinyToolSubmitter" target="_blank" rel="noopener">TinyToolSubmitter</a> CLI to auto-generate your submission using GitHub Copilot! Install via npm (<a href="https://www.npmjs.com/package/tiny-tool-submitter" target="_blank" rel="noopener">tiny-tool-submitter</a>) or use the .NET tool.</p>
 
-        <div class="cli-commands">
-          <div class="cli-option">
-            <strong>Run directly with dnx:</strong>
-            <pre><code>dnx TinyToolSubmitter</code></pre>
-          </div>
-          <div class="cli-option">
-            <strong>Or install as a global tool:</strong>
-            <pre><code>dotnet tool install --global TinyToolSubmitter
+        <div class="cli-segmented" aria-label="TinyToolSubmitter install method">
+          <input type="radio" name="cli-mode" id="cli-mode-npm" checked />
+          <label for="cli-mode-npm">npm</label>
+
+          <input type="radio" name="cli-mode" id="cli-mode-dotnet" />
+          <label for="cli-mode-dotnet">.NET</label>
+
+          <div class="cli-commands">
+            <div class="cli-option cli-panel-npm" id="cli-panel-npm">
+              <strong>Install and run with npm:</strong>
+              <pre><code>npm i -g tiny-tool-submitter
 tiny-tool-submit [path-to-repo]</code></pre>
+              <strong>Or run once with npx (no install):</strong>
+              <pre><code>npx tiny-tool-submitter [path-to-repo]</code></pre>
+              <p class="cli-note cli-note-inline">Requires <a href="https://docs.github.com/en/copilot/github-copilot-in-the-cli" target="_blank" rel="noopener">GitHub Copilot CLI</a> on your PATH and Node.js/npm installed.</p>
+            </div>
+
+            <div class="cli-option cli-panel-dotnet" id="cli-panel-dotnet">
+              <strong>Install and run with .NET:</strong>
+              <pre><code>dotnet tool install --global TinyToolSubmitter
+tiny-tool-submit [path-to-repo]</code></pre>
+              <strong>Or run directly with dnx:</strong>
+              <pre><code>dnx TinyToolSubmitter</code></pre>
+              <p class="cli-note cli-note-inline">Requires <a href="https://docs.github.com/en/copilot/github-copilot-in-the-cli" target="_blank" rel="noopener">GitHub Copilot CLI</a> on your PATH and .NET 10 SDK installed.</p>
+            </div>
           </div>
         </div>
-
-        <p class="cli-note">Requires .NET 10 SDK and <a href="https://docs.github.com/en/copilot/github-copilot-in-the-cli" target="_blank" rel="noopener">GitHub Copilot CLI</a> installed on your PATH.</p>
       </div>
 
       <!-- Guidelines -->
@@ -230,9 +244,54 @@ tiny-tool-submit [path-to-repo]</code></pre>
   }
 
   .cli-commands {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    grid-column: 1 / -1;
+    margin-bottom: 1rem;
+  }
+
+  .cli-segmented {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .cli-segmented input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cli-segmented label {
+    text-align: center;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--color-bg-card);
+    color: var(--color-text-muted);
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+  }
+
+  #cli-mode-npm:checked + label,
+  #cli-mode-dotnet:checked + label {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+    background: rgba(255, 137, 6, 0.1);
+  }
+
+  .cli-panel-npm,
+  .cli-panel-dotnet {
+    display: none;
+  }
+
+  #cli-mode-npm:checked ~ .cli-commands .cli-panel-npm,
+  #cli-mode-dotnet:checked ~ .cli-commands .cli-panel-dotnet {
+    display: block;
+  }
+
+  .cli-panel-dotnet {
     margin-bottom: 1rem;
   }
 
@@ -243,7 +302,8 @@ tiny-tool-submit [path-to-repo]</code></pre>
   }
 
   .cli-option pre {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--color-bg-hover);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius);
     padding: 0.75rem 1rem;
     overflow-x: auto;
@@ -252,13 +312,17 @@ tiny-tool-submit [path-to-repo]</code></pre>
 
   .cli-option code {
     font-size: 0.85rem;
-    color: var(--color-primary);
+    color: var(--color-text);
   }
 
   .cli-note {
     font-size: 0.85rem;
     color: var(--color-text-muted);
     margin-top: 0.5rem;
+  }
+
+  .cli-note-inline {
+    margin-top: 0.85rem;
   }
 
   .cli-note a {
