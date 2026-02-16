@@ -12,6 +12,8 @@ license: "MIT"
 theme: "None"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Say hello to your new pocket-sized desktop buddy that loves touchscreens and plays nicely with stylus and mouse alike, making Windows 11 feel smarter and more fun to interact with! It’s like having a friendly robot helper right at your fingertips."
+ai_features: ["🔥 Always-on-top draggable round UI button", "⚡ Full support for touch, stylus, and mouse inputs", "🎤 Quick voice input and AI Copilot voice chat integration", "📝 Instant real-time captioning with Windows 11 features"]
 ---
 
 ## 🚀 Features

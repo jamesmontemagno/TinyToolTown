@@ -9,6 +9,8 @@ language: "Go"
 license: "MIT"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Dive into smooth sailing with this golang-powered data pipeline that treats every element as data and lets it flow effortlessly through pipes, making your command-line data wrangling a breeze! It’s like Nushell’s cool cousin who speaks Go and loves piping data around."
+ai_features: ["🔥 Inspired by Nushell for seamless data flow", "⚡ Customizable field and line delimiters for flexible input parsing", "🎯 Interactive mode plus powerful column filtering by name or index", "💾 Output redirection to files or stdout for easy data export"]
 ---
 
 ## Usage

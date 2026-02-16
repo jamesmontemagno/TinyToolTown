@@ -9,6 +9,8 @@ language: "Go"
 license: "MIT"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Dive into speedy downloads with this command-line manager that splits files into chunks and grabs them all at once—because waiting is so last century! It’s like having a download party right in your terminal."
+ai_features: ["🔥 Concurrent chunked downloads for turbocharged speed", "⚡ Supports multiple URLs via arguments or piping", "🎯 Bandwidth limiting keeps your network happy", "⏩ Resume support so interrupted downloads don’t cramp your style"]
 ---
 
 ## Features

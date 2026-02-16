@@ -10,6 +10,8 @@ language: "C#"
 license: "MIT"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Tired of juggling a million windows for your AI coding buddies? This nifty tool corrals all your Copilot agents into one slick taskbar icon so you can switch sessions like a pro without losing your mind or your context!"
+ai_features: ["🔥 Manage multiple parallel Copilot agents with isolated terminals, IDEs, and browsers", "⚡ Click-to-focus instantly on any session’s terminal, IDE, or Edge workspace", "🎯 Persistent sessions and terminals survive app restarts for seamless workflow continuity"]
 ---
 
 Modern AI-assisted development isn't one task at a time — it's multiple Copilot agents running simultaneously across repos, branches, and contexts. But hunting through dozens of terminals and browser windows to find the right one? That's the productivity tax nobody asked for.

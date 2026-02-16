@@ -9,6 +9,8 @@ language: "Go"
 license: "MIT"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Tired of waiting forever for your virtualenvwrapper to show your environments? This speedy little CLI tool zips through your virtualenvs with style and color, making your life way easier and way more fun!"
+ai_features: ["🚀 Lightning-fast listing of virtual environments", "🌈 Optional colored output for easy scanning", "🔢 Add handy index numbers to your env list", "🧰 Simple CLI install via Go or Homebrew"]
 ---
 
 ## Usage
