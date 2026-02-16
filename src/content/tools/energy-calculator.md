@@ -10,6 +10,8 @@ license: "MIT"
 theme: "None"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Want to turn your energy bills into a fun little game of “who’s eating the most juice”? This handy app lets you track and calculate the cost of running your appliances with ease and style!"
+ai_features: ["🔥 Dashboard shows all appliances with total monthly cost", "⚡ Two calculation modes for flexible energy tracking", "🎯 Customize electricity rates for accurate cost estimates", "💾 Persistent local storage keeps your data safe and sound"]
 ---
 
 Kilowatt-hours are an amount, not a time.  Kilowatts are a rate, not an amount.  

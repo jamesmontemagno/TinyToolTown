@@ -10,6 +10,8 @@ license: "MIT"
 theme: "None"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Dive into an interactive terminal playground that turns JSON and YAML wrangling into a breeze with real-time query magic and AI-powered smarts! Say goodbye to trial-and-error and hello to smooth, keyboard-friendly data manipulation that feels like wizardry in your shell."
+ai_features: ["🔄 Real-time query execution as you type", "🤖 AI-powered query generation with OpenAI", "📁 Visual file picker for loading and saving files", "⌨️ Full keyboard navigation with responsive layout"]
 ---
 
 # XQ-UI - Interactive TUI Playground for jq/yq

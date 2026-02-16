@@ -10,6 +10,8 @@ language: "C#, WinUI"
 license: "MIT"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Dive into network diagnostics with a sleek, modern ping tool that brings classic connection testing to your Windows desktop with flair and real-time insights. It’s like having a network doctor on call, but way cooler and less pokey!"
+ai_features: ["📡 Live ping testing with real-time updates", "🎯 Monitor up to 8 hosts simultaneously", "🛤️ Hop-by-hop traceroute for detailed path analysis", "🔔 Drop notifications to alert you instantly on connection issues"]
 ---
 
 ## Ping-Legacy

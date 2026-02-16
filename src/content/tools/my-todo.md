@@ -10,6 +10,8 @@ language: "Rust"
 license: "MIT"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Manage your tasks like a pro right from your terminal with a snappy Rust-powered interface that groups, sorts, and colors your to-dos for max clarity and speed. It's like task management with a turbo boost, no mouse required but totally supported!"
+ai_features: ["📁 Group tasks logically for neat organization", "🔥 Color-coded priorities with easy cycling", "🔀 Sort and reorder tasks on the fly", "🖱️ Full mouse support with clicks and scrolls"]
 ---
 
 ✨ Features
