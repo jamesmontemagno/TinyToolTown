@@ -2,6 +2,24 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+
+const toolThemes = [
+  'None (site default)',
+  'terminal',
+  'neon',
+  'minimal',
+  'pastel',
+  'matrix',
+  'sunset',
+  'ocean',
+  'forest',
+  'candy',
+  'synthwave',
+  'newspaper',
+  'retro',
+];
+
+const issueBaseUrl = 'https://github.com/shanselman/TinyToolTown/issues/new?template=submit-tool.yml';
 ---
 
 <BaseLayout title="Submit a Tool — Tiny Tool Town 🏘️" description="Add your tiny tool to the town! Just fill out a quick GitHub Issue.">
@@ -44,7 +62,31 @@ import Footer from '../components/Footer.astro';
             </div>
           </div>
 
-          <a href="https://github.com/shanselman/TinyToolTown/issues/new?template=submit-tool.yml" class="btn btn-primary" target="_blank" rel="noopener">
+          <div class="theme-preview-picker" aria-label="Optional page theme picker">
+            <label for="issue-theme-select">Page theme preview (optional)</label>
+            <div class="theme-picker-row">
+              <select id="issue-theme-select" name="theme">
+                {toolThemes.map((theme) => (
+                  <option value={theme}>{theme}</option>
+                ))}
+              </select>
+            </div>
+
+            <div class="theme-preview" id="theme-preview-card">
+              <p class="theme-preview-label">Live preview</p>
+              <div class="theme-preview-inner">
+                <h3>Tiny Tool Page</h3>
+                <p>See how your tool page colors will look with this theme.</p>
+                <div class="theme-preview-tags">
+                  <span class="theme-preview-tag">cli</span>
+                  <span class="theme-preview-tag">fun</span>
+                </div>
+                <button type="button" class="theme-preview-btn">View on GitHub</button>
+              </div>
+            </div>
+          </div>
+
+          <a href={issueBaseUrl} class="btn btn-primary" id="submit-issue-link" target="_blank" rel="noopener">
             Submit Your Tool →
           </a>
         </div>
@@ -231,6 +273,94 @@ tiny-tool-submit [path-to-repo]</code></pre>
     margin-top: 0.2rem;
   }
 
+  .theme-preview-picker {
+    margin-bottom: 1.25rem;
+  }
+
+  .theme-preview-picker label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .theme-picker-row {
+    margin-bottom: 0.75rem;
+  }
+
+  .theme-picker-row select {
+    width: 100%;
+    max-width: 260px;
+    padding: 0.5rem 0.7rem;
+    background: var(--color-bg-card);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+  }
+
+  .theme-preview {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-card);
+    padding: 0.75rem;
+    max-width: 420px;
+  }
+
+  .theme-preview-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+
+  .theme-preview-inner {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: calc(var(--radius) - 2px);
+    padding: 0.75rem;
+  }
+
+  .theme-preview-inner h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    color: var(--color-text);
+  }
+
+  .theme-preview-inner p {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.6rem;
+  }
+
+  .theme-preview-tags {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .theme-preview-tag {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .theme-preview-btn {
+    appearance: none;
+    border: none;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    background: var(--color-primary);
+    color: var(--color-bg);
+  }
+
   .step code {
     background: rgba(255, 255, 255, 0.1);
     padding: 0.15rem 0.4rem;
@@ -362,3 +492,27 @@ tiny-tool-submit [path-to-repo]</code></pre>
     font-size: 0.9rem;
   }
 </style>
+
+<script>
+  const select = document.getElementById('issue-theme-select');
+  const preview = document.getElementById('theme-preview-card');
+  const submitLink = document.getElementById('submit-issue-link');
+  const issueBaseUrl = 'https://github.com/shanselman/TinyToolTown/issues/new?template=submit-tool.yml';
+
+  function applyThemePreview() {
+    if (!(select instanceof HTMLSelectElement) || !(preview instanceof HTMLElement) || !(submitLink instanceof HTMLAnchorElement)) return;
+
+    const selected = select.value;
+    const normalized = selected === 'None (site default)' ? '' : selected;
+
+    if (normalized) preview.setAttribute('data-theme', normalized);
+    else preview.removeAttribute('data-theme');
+
+    submitLink.href = normalized
+      ? `${issueBaseUrl}&theme=${encodeURIComponent(normalized)}`
+      : issueBaseUrl;
+  }
+
+  applyThemePreview();
+  select?.addEventListener('change', applyThemePreview);
+</script>
