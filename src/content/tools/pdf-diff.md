@@ -11,6 +11,7 @@ language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-10"
 featured: false
+theme: "newspaper"
 ai_summary: "Compare PDF documents without ever uploading them anywhere — this privacy-first diff tool runs entirely in your browser or via npx, showing exactly what changed between two versions with color-coded visual clarity."
 ai_features: ["🔒 100% client-side processing means your PDFs never leave your device", "📊 Multiple view modes including side-by-side, unified, additions-only, and removals-only", "💻 CLI via npx with CI-friendly --fail-on-diff for automated pipelines", "📄 Export beautiful HTML and PDF diff reports for sharing"]
 ---
