@@ -10,6 +10,7 @@ language: "TypeScript"
 license: "MIT"
 date_added: "2026-02-11"
 featured: false
+theme: "neon"
 ai_summary: "Finally, a way to craft gorgeous Oh My Posh terminal prompts without wrestling with JSON files — just drag, drop, and watch your dream prompt come to life with instant previews right in your browser."
 ai_features: ["🎨 103+ segments organized across 8 categories from git status to Spotify", "🖱️ Drag-and-drop visual editor with real-time live preview", "📦 Export to JSON, YAML, or TOML formats", "🔒 100% client-side so your configs never leave your browser"]
 ---

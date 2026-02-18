@@ -10,6 +10,7 @@ language: "C#"
 license: "MIT"
 date_added: "2026-02-16"
 featured: false
+theme: "terminal"
 ai_summary: "Submit your tiny tools to the town square with a swift CLI that makes publishing a breeze—get your gems featured faster than you can say open source! It’s like a magic wand for tool submissions, powered by Copilot wizardry."
 ai_features: ["🤖 GitHub Copilot integration for smart submission prompts", "🚀 Simple CLI commands to submit from any repo path", "🎩 Headless mode to skip prompts and speed things up", "📦 Automated release workflow publishing to NuGet and GitHub"]
 ---
