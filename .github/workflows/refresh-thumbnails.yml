@@ -34,7 +34,13 @@ jobs:
 
             // Fetch with timeout helper
             async function fetchWithTimeout(url, opts = {}) {
-              return await fetch(url, opts);
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+              try {
+                return await fetch(url, { ...opts, signal: controller.signal });
+              } finally {
+                clearTimeout(timeout);
+              }
             }
 
             const badgeHosts= ['img.shields.io', 'badge.fury.io', 'badgen.net', 'badges.', 'coveralls.io', 'codecov.io', 'travis-ci.', 'ci.appveyor.com', 'github.com/workflows'];

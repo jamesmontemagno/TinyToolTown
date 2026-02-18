@@ -493,11 +493,10 @@ tiny-tool-submit [path-to-repo]</code></pre>
   }
 </style>
 
-<script>
+<script define:vars={{ issueBaseUrl }}>
   const select = document.getElementById('issue-theme-select');
   const preview = document.getElementById('theme-preview-card');
   const submitLink = document.getElementById('submit-issue-link');
-  const issueBaseUrl = 'https://github.com/shanselman/TinyToolTown/issues/new?template=submit-tool.yml';
 
   function applyThemePreview() {
     if (!(select instanceof HTMLSelectElement) || !(preview instanceof HTMLElement) || !(submitLink instanceof HTMLAnchorElement)) return;
