@@ -34,13 +34,7 @@ jobs:
 
             // Fetch with timeout helper
             async function fetchWithTimeout(url, opts = {}) {
-              const controller = new AbortController();
-              const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-              try {
-                return await fetch(url, { ...opts, signal: controller.signal });
-              } finally {
-                clearTimeout(timeout);
-              }
+              return await fetch(url, opts);
             }
 
             const badgeHosts= ['img.shields.io', 'badge.fury.io', 'badgen.net', 'badges.', 'coveralls.io', 'codecov.io', 'travis-ci.', 'ci.appveyor.com', 'github.com/workflows'];
@@ -82,6 +76,7 @@ jobs:
 
             const files = fs.readdirSync(TOOLS_DIR).filter(f => f.endsWith('.md'));
             let updated = 0;
+            let fetchErrors = 0;
 
             for (const file of files) {
               const slug = file.replace(/\.md$/, '');
@@ -157,7 +152,7 @@ jobs:
                         if (buf.length >= MIN_IMAGE_SIZE && (!biggest || buf.length > biggest.size)) {
                           biggest = { url: imgUrl, size: buf.length, buffer: buf };
                         }
-                      } catch {}
+                      } catch (e) { fetchErrors++; }
                     }
 
                     if (biggest) {
@@ -169,7 +164,7 @@ jobs:
                       readmeBuffer = biggest.buffer;
                     }
                     break;
-                  } catch {}
+                  } catch (e) { fetchErrors++; }
                 }
               }
 
@@ -230,6 +225,12 @@ jobs:
             }
 
             console.log(`\n✅ Done! Updated ${updated} thumbnails.`);
+            if (fetchErrors > 0) {
+              console.log(`⚠️ ${fetchErrors} fetch errors occurred during processing.`);
+            }
+            if (updated === 0 && fetchErrors > files.length) {
+              core.setFailed(`All thumbnail fetches failed (${fetchErrors} errors). Check runner environment.`);
+            }
 
       - name: Commit and push changes
         run: |
