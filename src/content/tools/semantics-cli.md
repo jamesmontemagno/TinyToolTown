@@ -4,6 +4,7 @@ tagline: "Unified interface for media intelligence  - Extract meaning, not just 
 author: "Filipe Rosa"
 author_github: "famda"
 github_url: "https://github.com/famda/semantics"
+thumbnail: "/thumbnails/semantics-cli.gif"
 tags: ["ai", "video analysis", "audio analysis"]
 language: "Python"
 license: "MIT"

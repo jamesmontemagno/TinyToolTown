@@ -4,6 +4,7 @@ tagline: "Open source mission control for your AI coding agents 🦞"
 author: "Gonzalo Gorbalan"
 author_github: "wolverin0"
 github_url: "https://github.com/wolverin0/clawtrol"
+thumbnail: "/thumbnails/clawtrol.jpg"
 website_url: "https://github.com/wolverin0/clawtrol"
 tags: ["ai", "agents", "dashboard", "kanban", "rails", "mission-control", "claude", "codex", "devtools"]
 language: "Ruby"

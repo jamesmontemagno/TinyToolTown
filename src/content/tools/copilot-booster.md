@@ -4,7 +4,7 @@ tagline: "One taskbar icon to manage all your parallel Copilot CLI agents — se
 author: "Roger Barreto"
 author_github: "rogerbarreto"
 github_url: "https://github.com/rogerbarreto/copilot-booster"
-thumbnail: "/thumbnails/copilot-booster.png"
+thumbnail: "/thumbnails/copilot-booster.gif"
 tags: ["cli", "windows", "copilot", "productivity", "developer-tools"]
 language: "C#"
 license: "MIT"

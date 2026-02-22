@@ -4,6 +4,7 @@ tagline: "Drag, drop, preview & export Oh My Posh terminal prompts (JSON/YAML/TO
 author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/ohmyposh-configurator"
+thumbnail: "/thumbnails/oh-my-posh-visual-configurator.png"
 website_url: "https://jamesmontemagno.github.io/ohmyposh-configurator/"
 tags: ["terminal", "prompt", "oh-my-posh", "configurator", "themes"]
 language: "TypeScript"
