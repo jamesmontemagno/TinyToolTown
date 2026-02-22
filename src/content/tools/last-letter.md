@@ -4,6 +4,7 @@ tagline: "Hangman but kid friendly"
 author: "Ust Oldfield"
 author_github: "ustdoestech"
 github_url: "https://github.com/UstDoesTech/last-letter"
+thumbnail: "/thumbnails/last-letter.png"
 website_url: "https://last-letter.app/"
 tags: ["fun", "children", "words", "game"]
 language: "JavaScript, HTML"

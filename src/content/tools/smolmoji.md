@@ -4,6 +4,7 @@ tagline: "Easily create and edit pixel art emojis or icons with AI"
 author: "KC Lemson"
 author_github: "kclemson"
 github_url: "https://github.com/kclemson/smolmoji/"
+thumbnail: "/thumbnails/smolmoji.png"
 website_url: "https://smolmoji.com/"
 tags: ["icons", "emoji", "fun", "pixelated"]
 language: "react, typescript"

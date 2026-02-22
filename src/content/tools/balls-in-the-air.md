@@ -4,6 +4,7 @@ tagline: "A visual task management tool where tasks grow over time until you \"b
 author: "Kristian Dupont"
 author_github: "kristiandupont"
 github_url: "https://github.com/kristiandupont/balls-in-the-air"
+thumbnail: "/thumbnails/balls-in-the-air.png"
 website_url: "https://kristiandupont.github.io/balls-in-the-air/"
 tags: ["productivity", "recurring tasks"]
 language: "Typescript"

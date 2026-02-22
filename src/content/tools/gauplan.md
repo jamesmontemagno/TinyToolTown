@@ -4,6 +4,7 @@ tagline: "A trip planner for Gautrain"
 author: "Yusuf Kaka"
 author_github: "yusufk"
 github_url: "https://github.com/yusufk/gautrain-schedule"
+thumbnail: "/thumbnails/gauplan.png"
 website_url: "https://yusuf.kaka.co.za/gautrain-schedule/"
 tags: ["johannesburg", "travel", "train"]
 language: "React"

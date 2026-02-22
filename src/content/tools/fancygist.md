@@ -4,6 +4,7 @@ tagline: "Clean markdown GitHub Gists"
 author: "Cassidy Williams"
 author_github: "cassidoo"
 github_url: "https://github.com/cassidoo/fancygist"
+thumbnail: "/thumbnails/fancygist.png"
 website_url: "https://fancygist.com"
 tags: ["markdown", "web"]
 language: "TypeScript"

@@ -4,6 +4,7 @@ tagline: "Ariadne's thread for safely finding your way in neverending project to
 author: "Emmanuel Duchene"
 author_github: "dotnetemmanuel"
 github_url: "https://github.com/dotnetemmanuel/StickyScroll"
+thumbnail: "/thumbnails/sticky-scroll.png"
 tags: ["jetbrains", "plugin", "labyrinth", "lifehack"]
 language: "Kotlin"
 date_added: "2026-02-13"

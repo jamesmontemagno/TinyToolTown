@@ -4,6 +4,7 @@ tagline: "SSH connection manager with WOL and up-status"
 author: "Alex Wichmann"
 author_github: "visualbean"
 github_url: "https://github.com/VisualBean/turbo-waffle"
+thumbnail: "/thumbnails/turbowaffle.png"
 tags: ["ssh", "connections", "manager"]
 language: "Rust"
 license: "Apache-2.0"

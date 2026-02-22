@@ -4,6 +4,7 @@ tagline: "A lightweight tool for running retrospectives with small teams."
 author: "Yoann Chaudet"
 author_github: "yoannchaudet"
 github_url: "https://github.com/yoannchaudet/delta-board"
+thumbnail: "/thumbnails/delta-board.png"
 website_url: "https://delta-board.mavensoul.studio"
 tags: ["retrospective", "team collaboration", "agile", "privacy-first", "minimalist"]
 language: "C#, JavaScript"

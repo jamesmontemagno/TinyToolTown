@@ -4,6 +4,7 @@ tagline: "Copilot Bar A Powerful Control Panel for Your Mac, Right from Your Men
 author: "Md Atiquzzaman Soikat"
 author_github: "azs06"
 github_url: "https://github.com/azs06/copilot-bar"
+thumbnail: "/thumbnails/copilot-bar.png"
 tags: ["mac", "menubar", "utility", "document analysis", "screenshot"]
 language: "TypeScript, JavaScript"
 license: "MIT"

@@ -4,6 +4,7 @@ tagline: "A Windows utility that finds and kills orphaned dev server processes h
 author: "Andy Bochmann"
 author_github: "andybochmann"
 github_url: "https://github.com/andybochmann/DevKill"
+thumbnail: "/thumbnails/devkill.png"
 tags: ["windows", "cli"]
 language: "C#"
 license: "MIT"
