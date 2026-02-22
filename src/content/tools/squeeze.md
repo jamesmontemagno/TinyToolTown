@@ -12,6 +12,8 @@ license: "MIT"
 theme: "sunset"
 date_added: "2026-02-19"
 featured: false
+ai_summary: "Want to shrink your videos down to the perfect file size without sacrificing quality? This clever browser tool squeezes your vids right on your machine, no uploads needed, making video compression feel like a breeze!"
+ai_features: ["🍊 Set target file size for optimal bitrate", "🎥 Two-pass encoding with lanczos downscaling for crisp quality", "🖥️ In-browser compression with no data leaving your device", "📦 Supports huge files up to 2GB+ with smart zero-copy mounting"]
 ---
 
 Squeeze is a browser-based video compressor. You set a target file size (like 9MB), drop a video, and it gives you back a compressed file that fits under your limit. That's it.

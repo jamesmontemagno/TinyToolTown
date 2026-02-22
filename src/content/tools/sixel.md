@@ -12,6 +12,8 @@ license: "MIT"
 theme: "terminal"
 date_added: "2026-02-16"
 featured: false
+ai_summary: "Turn your terminal into a mini art gallery by displaying images right where you code—no GUI needed! It’s like giving your console a splash of color and personality with just a few commands."
+ai_features: ["🎨 Convert a wide range of image formats including bmp gif jpeg png and more", "🚀 Supports multiple display protocols like Sixel Inline Images and Kitty Graphics", "💻 Compatible with PowerShell 5.1 7.4 and popular terminals like Windows Terminal and VSCode", "🧰 Includes handy examples and assets to get you started fast"]
 ---
 
 Sixel PowerShell module

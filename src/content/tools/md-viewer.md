@@ -11,6 +11,8 @@ license: "MIT"
 theme: "None"
 date_added: "2026-02-18"
 featured: false
+ai_summary: "Say goodbye to bulky markdown apps and hello to a feather-light viewer that renders your docs cleanly and beautifully on macOS, with zero distractions or bloat! Perfect for quick previews with automatic Dark Mode that just gets you."
+ai_features: ["🔥 GitHub-flavored markdown rendering for perfect previews", "🌙 Automatic and manual Dark Mode switching", "🔍 Zoom in and out with persistent levels", "🚀 Ultra-lightweight under 500 KB with blazing fast startup"]
 ---
 
 **Read markdown, nothing else.**
