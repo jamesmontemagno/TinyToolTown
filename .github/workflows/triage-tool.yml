@@ -120,10 +120,10 @@ jobs:
             const hasLicense = (license && license.length > 1 && license !== '_No response_') || hasRepoLicense;
 
             // Build label list
-            if (repoExists) labelsToAdd.push('✅ repo-verified');
-            if (hasLicense) labelsToAdd.push('✅ has-license');
-            if (hasReadme) labelsToAdd.push('✅ has-readme');
-            if (hasImage) labelsToAdd.push('📸 has-image');
+            if (repoExists) labelsToAdd.push('repo-verified');
+            if (hasLicense) labelsToAdd.push('has-license');
+            if (hasReadme) labelsToAdd.push('has-readme');
+            if (hasImage) labelsToAdd.push('has-image');
 
             if (!repoExists || !hasLicense) {
               needsAttention = true;
