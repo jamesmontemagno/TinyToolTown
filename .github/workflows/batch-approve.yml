@@ -28,19 +28,12 @@ jobs:
             // --- Shared helpers ---
             const sanitize = (s) => s.replace(/[\r\n]+/g, ' ').replace(/[^\x20-\x7E\xA0-\uFFFF]/g, '').trim();
             const yamlStr = (s) => `"${sanitize(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+            // Strip ALL HTML tags from descriptions to prevent XSS
             const sanitizeHtml = (s) => s
-              .replace(/<script[\s>][\s\S]*?<\/script>/gi, '')
-              .replace(/<iframe[\s>][\s\S]*?<\/iframe>/gi, '')
-              .replace(/<object[\s>][\s\S]*?<\/object>/gi, '')
-              .replace(/<embed[^>]*>/gi, '')
-              .replace(/<link[^>]*>/gi, '')
-              .replace(/<style[\s>][\s\S]*?<\/style>/gi, '')
-              .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, '')
-              .replace(/\bon\w+\s*=\s*\S+/gi, '')
-              .replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"')
-              .replace(/src\s*=\s*["']javascript:[^"']*["']/gi, 'src="#"');
+              .replace(/<[^>]*>/g, '')
+              .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/<[^>]*>/g, '');
             const safeImageExt = (urlStr) => {
-              const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'];
+              const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
               try {
                 const ext = path.extname(new URL(urlStr).pathname).split('?')[0].toLowerCase();
                 return allowed.includes(ext) ? ext : '.png';
