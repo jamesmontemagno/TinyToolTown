@@ -90,7 +90,7 @@ jobs:
                 const tagsRaw = getField(body, 'Tags \\(comma-separated\\)');
                 const language = getField(body, 'Primary Programming Language');
                 const license = getField(body, 'License');
-
+                const theme = getField(body, 'Page Theme \\(optional\\)');
                 // Validate required fields
                 if (!name || !tagline || !github_url || !author || !author_github) {
                   console.log(`⏭️ #${issue.number}: missing required fields, skipping`);
@@ -203,6 +203,9 @@ jobs:
                 }
                 if (license && license !== '_No response_') {
                   lines.push(`license: "${sanitize(license).replace(/"/g, '')}"`);
+                }
+                if (theme && theme !== '_No response_' && theme !== 'None (site default)') {
+                  lines.push(`theme: "${sanitize(theme).replace(/"/g, '')}"`);
                 }
                 lines.push(`date_added: "${today}"`);
                 lines.push('featured: false');
