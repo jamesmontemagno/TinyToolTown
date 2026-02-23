@@ -1,0 +1,152 @@
+name: Triage Tool Submission
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    if: contains(github.event.issue.labels.*.name, 'new-tool')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Triage submission
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+            const issueNum = issue.number;
+
+            // Parse form fields
+            const getField = (label) => {
+              const regex = new RegExp(`### ${label}\\s*\\n\\s*([\\s\\S]*?)(?=\\n###|\\n\\n###|$)`);
+              const match = body.match(regex);
+              return match ? match[1].trim() : '';
+            };
+
+            const name = getField('Tool Name');
+            const github_url = getField('GitHub Repository URL');
+            const license = getField('License');
+            const labelsToAdd = [];
+            const labelsToRemove = [];
+            let needsAttention = false;
+
+            console.log(`🔍 Triaging: ${name || issue.title} (#${issueNum})`);
+
+            // Check 1: Required fields present
+            const author = getField('Your Name');
+            const author_github = getField('Your GitHub Username');
+            const tagline = getField('One-line description');
+
+            if (!name || !tagline || !github_url || !author || !author_github) {
+              console.log('  ⚠️ Missing required fields');
+              needsAttention = true;
+            }
+
+            // Check 2: GitHub repo accessible
+            let repoExists = false;
+            let repoData = null;
+            let hasReadme = false;
+            let hasRepoLicense = false;
+            let hasImage = false;
+
+            const repoMatch = github_url.match(/github\.com\/([^/]+)\/([^/\s]+)/);
+            if (repoMatch) {
+              const [, owner, repo] = repoMatch;
+              const repoName = repo.replace(/\/$/, '');
+
+              try {
+                const { data } = await github.rest.repos.get({ owner, repo: repoName });
+                repoExists = true;
+                repoData = data;
+                console.log(`  ✅ Repo exists: ${owner}/${repoName} (${data.stargazers_count} ⭐)`);
+
+                // Check for README
+                try {
+                  await github.rest.repos.getReadme({ owner, repo: repoName });
+                  hasReadme = true;
+                  console.log('  ✅ README found');
+                } catch {
+                  console.log('  ⚠️ No README');
+                }
+
+                // Check for license via API
+                if (data.license && data.license.spdx_id && data.license.spdx_id !== 'NOASSERTION') {
+                  hasRepoLicense = true;
+                  console.log(`  ✅ License detected: ${data.license.spdx_id}`);
+                } else {
+                  console.log('  ⚠️ No license detected via API');
+                }
+
+                // Check for images in README (potential thumbnail)
+                try {
+                  const readmeResp = await github.rest.repos.getReadme({
+                    owner, repo: repoName,
+                    mediaType: { format: 'raw' }
+                  });
+                  const readme = typeof readmeResp.data === 'string' ? readmeResp.data : '';
+                  const imgRegex = /!\[.*?\]\((.*?)\)|<img[^>]+src=["']([^"']+)["']/gi;
+                  let match;
+                  let imgCount = 0;
+                  while ((match = imgRegex.exec(readme)) !== null) {
+                    const url = match[1] || match[2];
+                    // Skip badges (shields.io, badge URLs, small status images)
+                    if (url && !url.includes('shields.io') && !url.includes('badge') && !url.includes('img.shields')) {
+                      imgCount++;
+                    }
+                  }
+                  if (imgCount > 0) {
+                    hasImage = true;
+                    console.log(`  ✅ ${imgCount} non-badge image(s) in README`);
+                  } else {
+                    console.log('  ⚠️ No images found in README');
+                  }
+                } catch {
+                  console.log('  ⚠️ Could not parse README for images');
+                }
+
+              } catch (err) {
+                console.log(`  ❌ Repo not accessible: ${err.status || err.message}`);
+                needsAttention = true;
+              }
+            } else {
+              console.log('  ❌ No valid GitHub URL found');
+              needsAttention = true;
+            }
+
+            // Check 3: License in form OR repo
+            const hasLicense = (license && license.length > 1 && license !== '_No response_') || hasRepoLicense;
+
+            // Build label list
+            if (repoExists) labelsToAdd.push('✅ repo-verified');
+            if (hasLicense) labelsToAdd.push('✅ has-license');
+            if (hasReadme) labelsToAdd.push('✅ has-readme');
+            if (hasImage) labelsToAdd.push('📸 has-image');
+
+            if (!repoExists || !hasLicense) {
+              needsAttention = true;
+            }
+
+            if (needsAttention) {
+              labelsToAdd.push('needs-attention');
+            }
+
+            // Apply labels
+            if (labelsToAdd.length > 0) {
+              console.log(`  🏷️ Adding labels: ${labelsToAdd.join(', ')}`);
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNum,
+                labels: labelsToAdd
+              });
+            }
+
+            // Log summary
+            console.log('\n══════════════════════════════════');
+            console.log(`  Tool: ${name || 'unknown'}`);
+            console.log(`  Repo: ${repoExists ? '✅' : '❌'} | License: ${hasLicense ? '✅' : '❌'} | README: ${hasReadme ? '✅' : '❌'} | Image: ${hasImage ? '✅' : '❌'}`);
+            console.log(`  Needs attention: ${needsAttention}`);
+            console.log('══════════════════════════════════');
