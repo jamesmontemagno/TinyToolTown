@@ -193,8 +193,11 @@ jobs:
 
               if (!fm) { console.log(`[${i+1}/${mdFiles.length}] ${file} ⚠️ no frontmatter`); continue; }
 
-              // Skip if already has summary (unless mode=all)
-              if (mode !== 'all' && content.includes('ai_summary:')) {
+              const hasSummary = /(^|\n)ai_summary:\s*"/m.test(content);
+              const hasFeatures = /(^|\n)ai_features:\s*\[/m.test(content);
+
+              // In "new" mode, only skip when both summary and features are present.
+              if (mode !== 'all' && hasSummary && hasFeatures) {
                 skipped++;
                 continue;
               }
