@@ -10,6 +10,8 @@ license: "MIT"
 theme: "None"
 date_added: "2026-02-24"
 featured: false
+ai_summary: "Need a quick GUID or UUID for your project? This command-line wizard whips them up in a snap, ready to copy, save, or format however you like!"
+ai_features: ["🔥 Generate GUIDs and UUIDs instantly", "⚡ Output in various formats", "🎯 Copy results directly to clipboard", "💾 Save GUIDs to output files"]
 ---
 
 A command-line utility to help developers create GUIDs and UUIDs for their projects in various output formats, copy to clipboard, and save to output file.

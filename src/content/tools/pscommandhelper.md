@@ -10,6 +10,8 @@ license: "MIT"
 theme: "terminal"
 date_added: "2026-02-24"
 featured: false
+ai_summary: "Struggling with bash commands in PowerShell? This nifty helper jumps in with friendly PowerShell equivalents and clear explanations so you learn by doing without missing a beat!"
+ai_features: ["🔵 Catches unknown bash commands and suggests PowerShell alternatives", "🟡 Detects aliased commands with bash-style flags and offers fixes", "🟢 Supports 75+ common bash commands across file, text, system, and network operations"]
 ---
 
 When you type a bash/Linux command in PowerShell 7 that doesn't exist (like `rm -rf`, `grep`, `curl`), PSCommandHelper intercepts it and shows you the PowerShell equivalent with a colorful, educational explanation.

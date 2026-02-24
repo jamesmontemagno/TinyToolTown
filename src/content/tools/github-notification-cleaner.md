@@ -9,6 +9,8 @@ license: "MIT"
 theme: "None"
 date_added: "2026-02-24"
 featured: false
+ai_summary: "Tired of your GitHub notifications turning into a cluttered mess? This nifty Chrome extension sweeps away all those stale closed, merged, or draft notifications with a single click so you can zero in on what really matters."
+ai_features: ["🧹 Bulk-mark stale notifications as Done with one click", "🔍 Automatically scans and selects notifications based on status", "🔄 Paginates through all notification pages to clean everything", "🎨 Configurable filters to choose which statuses to clear"]
 ---
 
 GitHub's notification inbox fills up with PRs and issues that have already been merged, closed, or are still in draft. Clearing them manually is tedious — you have to check each one and click Done, page after page.

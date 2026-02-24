@@ -11,6 +11,8 @@ license: "MIT"
 theme: "terminal"
 date_added: "2026-02-23"
 featured: false
+ai_summary: "Ignite your creativity by instantly spinning up and managing quick experimental dev projects all in one cozy burner home—then scorch them when you're done to keep your workspace tidy and fire-free!"
+ai_features: ["🔥 Quick scaffolding with predefined templates", "📂 Organized unified burner directory for all projects", "🗑️ Easy cleanup with auto-removal of old experiments", "✨ Extensible with support for custom templates"]
 ---
 
 A CLI tool to create and manage temporary dev projects for quick experiments or throwaway code - because folders like “temp-project-final-v2-REAL” shouldn’t exist.

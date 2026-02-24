@@ -11,6 +11,8 @@ language: "HTML, CSS"
 license: "MIT"
 date_added: "2026-02-23"
 featured: false
+ai_summary: "Dive into an audio-first study adventure that makes prepping for Microsoft certifications feel like a breeze — perfect for on-the-go learners who want to ace exams without staring at a screen all day!"
+ai_features: ["🎧 1,058 exam questions ready to play", "🎚️ Adjustable playback speed for perfect pacing", "📚 Bookmark your progress and filter by sections", "🚀 Simple local setup with just a browser and no fuss"]
 ---
 
 Learn with Nico’s AI-900 Audio Player is a lightweight, no-nonsense study companion for Microsoft Azure AI Fundamentals. More to come like AZ 900 and other, as It turns a big question bank (1,058 items) into an audio-first “press play and grind” experience. 

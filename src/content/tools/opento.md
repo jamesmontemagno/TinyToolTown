@@ -12,6 +12,8 @@ license: "MIT"
 theme: "pastel"
 date_added: "2026-02-24"
 featured: false
+ai_summary: "Spice up your LinkedIn avatar with a splash of personality by creating custom #OpenTo banners that shout your vibe loud and proud! Say goodbye to boring defaults and hello to colorful, fun overlays that get you noticed."
+ai_features: ["🎨 Customize your message with any #OpenTo phrase you like", "🌈 Choose your own gradient start and stop colors", "🔄 Crop avatars to circle or square shapes", "🎯 Adjust text offset and background color for perfect style alignment"]
 ---
 
 Ever since LinkedIn introduced the #OpenToWork / #OpenToHire overlays for avatars, this feature started living a life of its own. Sadly this feature is severely limited and apart from work/hire the user has no say in customising the message. So this little app lets everyone create their custom made #OpenTo... banners.
