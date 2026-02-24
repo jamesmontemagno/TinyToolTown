@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: refresh-thumbnails
+  group: tool-file-writer
   cancel-in-progress: false
 
 permissions:
@@ -248,7 +248,20 @@ jobs:
           else
             CHANGED=$(git diff --cached --name-only | wc -l)
             git commit -m "🖼️ Refresh thumbnails ($CHANGED files updated)"
-            git push
+            PUSHED=false
+            for i in 1 2 3 4 5; do
+              if git push origin main; then
+                PUSHED=true
+                break
+              fi
+              echo "⚠️ Push failed (attempt $i), pulling and retrying..."
+              git pull --rebase origin main || true
+              sleep $((i * 2))
+            done
+            if [ "$PUSHED" != "true" ]; then
+              echo "❌ Push failed after retries"
+              exit 1
+            fi
           fi
 
       - name: Trigger site rebuild
