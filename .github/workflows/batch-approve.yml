@@ -29,9 +29,17 @@ jobs:
             const sanitize = (s) => s.replace(/[\r\n]+/g, ' ').replace(/[^\x20-\x7E\xA0-\uFFFF]/g, '').trim();
             const yamlStr = (s) => `"${sanitize(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
             // Strip ALL HTML tags from descriptions to prevent XSS
-            const sanitizeHtml = (s) => s
-              .replace(/<[^>]*>/g, '')
-              .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/<[^>]*>/g, '');
+            const sanitizeHtml = (s) => {
+              let clean = s;
+              for (let i = 0; i < 3; i++) {
+                const prev = clean;
+                clean = clean.replace(/<[^>]*>/g, '');
+                clean = clean.replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&amp;/gi, '&');
+                clean = clean.replace(/<[^>]*>/g, '');
+                if (clean === prev) break;
+              }
+              return clean;
+            };
             const safeImageExt = (urlStr) => {
               const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
               try {
@@ -76,7 +84,7 @@ jobs:
                 const name = getField(body, 'Tool Name');
                 const tagline = getField(body, 'One-line description');
                 const description = getField(body, 'Tell us about your tool');
-                const github_url = getField(body, 'GitHub Repository URL');
+                let github_url = getField(body, 'GitHub Repository URL');
                 const website_url = getField(body, 'Website or Demo URL \\(optional\\)');
                 const author = getField(body, 'Your Name');
                 const author_github = getField(body, 'Your GitHub Username');

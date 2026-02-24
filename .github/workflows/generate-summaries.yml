@@ -157,8 +157,9 @@ jobs:
                 else if (trimmed.toUpperCase().startsWith('FEATURES:'))
                   features = trimmed.slice('FEATURES:'.length).trim();
               }
-              // Clean YAML-unsafe chars
+              // Clean YAML-unsafe chars from both summary and features
               summary = summary.replace(/[\n\r]/g, ' ').replace(/"/g, "'").trim();
+              if (features) features = features.replace(/[\n\r]/g, ' ').trim();
               return { summary, features };
             }
 

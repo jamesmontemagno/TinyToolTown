@@ -99,9 +99,19 @@ jobs:
             const sanitize = (s) => s.replace(/[\r\n]+/g, ' ').replace(/[^\x20-\x7E\xA0-\uFFFF]/g, '').trim();
             const yamlStr = (s) => `"${sanitize(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
             // Strip ALL HTML tags from descriptions to prevent XSS
-            const sanitizeHtml = (s) => s
-              .replace(/<[^>]*>/g, '')
-              .replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/<[^>]*>/g, '');
+            // Decode entities first, strip tags, then strip any tags revealed by decoding
+            const sanitizeHtml = (s) => {
+              let clean = s;
+              // Iteratively decode and strip until stable
+              for (let i = 0; i < 3; i++) {
+                const prev = clean;
+                clean = clean.replace(/<[^>]*>/g, '');
+                clean = clean.replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&amp;/gi, '&');
+                clean = clean.replace(/<[^>]*>/g, '');
+                if (clean === prev) break;
+              }
+              return clean;
+            };
             const safeImageExt = (urlStr) => {
               const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
               try {
