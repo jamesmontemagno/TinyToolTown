@@ -1,459 +1,91 @@
-name: Approve Tool Submission
+name: Queue Tool Submission
 
 on:
   issues:
     types: [labeled]
 
 jobs:
-  add-tool:
-    if: github.event.label.name == 'approved'
+  queue-import:
+    if: github.event.label.name == 'approved' && github.event.issue.state == 'open'
     runs-on: ubuntu-latest
-    concurrency:
-      group: tool-file-writer
-      cancel-in-progress: false
     permissions:
-      contents: write
       issues: write
       actions: write
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Parse issue and create tool file
+      - name: Queue approved issue for batch import
         uses: actions/github-script@v7
         with:
           script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
             const issue = context.payload.issue;
-            const body = issue.body || '';
+            const labels = (issue.labels || []).map(l => l.name);
 
-            // Parse form fields from GitHub Issue form
-            const getField = (label) => {
-              const regex = new RegExp(`### ${label}\\s*\\n\\s*([\\s\\S]*?)(?=\\n###|\\n\\n###|$)`);
-              const match = body.match(regex);
-              return match ? match[1].trim() : '';
-            };
-
-            const name = getField('Tool Name');
-            const tagline = getField('One-line description');
-            const description = getField('Tell us about your tool');
-            let github_url = getField('GitHub Repository URL');
-            const website_url = getField('Website or Demo URL \\(optional\\)');
-            const author = getField('Your Name');
-            const author_github = getField('Your GitHub Username');
-            const tagsRaw = getField('Tags \\(comma-separated\\)');
-            const language = getField('Primary Programming Language');
-            const license = getField('License');
-            const theme = getField('Page Theme \\(optional\\)');
-
-            // Validate required fields
-            if (!name || !tagline || !github_url || !author || !author_github) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: '⚠️ Missing required fields. Please ensure Tool Name, Tagline, GitHub URL, Author, and GitHub Username are filled in.'
-              });
-              return;
-            }
-
-            // Validate GitHub URL format (allow subpaths like /tree/main/subfolder)
-            github_url = github_url.replace('://www.github.com/', '://github.com/');
-            if (!/^https:\/\/github\.com\/[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+(\/.*)?$/.test(github_url)) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: '⚠️ GitHub URL doesn\'t look right. Expected format: `https://github.com/owner/repo`'
-              });
-              return;
-            }
-
-            // Verify the GitHub repo is public
-            const repoMatch = github_url.match(/github\.com\/([^/]+)\/([^/]+)/);
-            if (repoMatch) {
+            async function ensureLabel(name, color, description) {
               try {
-                const { data: repoData } = await github.rest.repos.get({
-                  owner: repoMatch[1],
-                  repo: repoMatch[2].replace(/\/$/, ''),
-                });
-                if (repoData.private) {
-                  await github.rest.issues.createComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: issue.number,
-                    body: '⚠️ This repository is private. Tiny Tool Town only lists public, open source tools. Please make the repo public and re-submit.'
-                  });
-                  return;
-                }
+                await github.rest.issues.getLabel({ owner, repo, name });
               } catch (err) {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: '⚠️ Could not access the GitHub repository. Please make sure the URL is correct and the repo is public.'
-                });
-                return;
-              }
-            }
-
-            // Sanitize strings for YAML — strip newlines and control chars
-            const sanitize = (s) => s.replace(/[\r\n]+/g, ' ').replace(/[^\x20-\x7E\xA0-\uFFFF]/g, '').trim();
-            const yamlStr = (s) => `"${sanitize(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-            // Strip ALL HTML tags from descriptions to prevent XSS
-            // Decode entities first, strip tags, then strip any tags revealed by decoding
-            const sanitizeHtml = (s) => {
-              let clean = s;
-              // Iteratively decode and strip until stable
-              for (let i = 0; i < 3; i++) {
-                const prev = clean;
-                clean = clean.replace(/<[^>]*>/g, '');
-                clean = clean.replace(/&lt;/gi, '<').replace(/&gt;/gi, '>').replace(/&amp;/gi, '&');
-                clean = clean.replace(/<[^>]*>/g, '');
-                if (clean === prev) break;
-              }
-              return clean;
-            };
-            const safeImageExt = (urlStr) => {
-              const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
-              try {
-                const ext = require('path').extname(new URL(urlStr).pathname).split('?')[0].toLowerCase();
-                return allowed.includes(ext) ? ext : '.png';
-              } catch { return '.png'; }
-            };
-
-            // Build tags array — split on commas or semicolons, normalize
-            const tagSynonyms = {
-              'devtools': 'developer-tools', 'dev-tools': 'developer-tools',
-              'system tray': 'system-tray', 'ui': 'web', 'webapp': 'web',
-              'funny': 'fun', 'silly': 'fun', 'trains': 'train',
-              'games': 'game', 'presentations': 'presentation',
-              'audio profiles': 'audio', 'internet radio': 'radio',
-              'key bindings': 'keyboard', 'copilot cli': 'copilot',
-            };
-            const langTags = ['c#', 'csharp', 'c++', 'rust', 'typescript', 'javascript',
-              'python', 'powershell', 'go', 'ruby', 'java', 'swift', 'nim',
-              'html', 'css', 'xaml', 'shell', 'bash', 'ts', 'js'];
-            const tags = tagsRaw.split(/[,;]+/).map(t => {
-              let tag = sanitize(t).toLowerCase();
-              if (tagSynonyms[tag]) tag = tagSynonyms[tag];
-              return tag;
-            }).filter(t => t && !langTags.includes(t)).slice(0, 5);
-
-            // Generate slug from tool name (only alphanumeric + hyphens)
-            const slug = sanitize(name).toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-|-$/g, '');
-
-            if (!slug || slug.length < 2) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: '⚠️ Tool name produced an invalid slug. Please use a name with at least 2 alphanumeric characters.'
-              });
-              return;
-            }
-
-            // Build frontmatter with proper YAML escaping
-            const today = new Date().toISOString().split('T')[0];
-            const lines = [
-              '---',
-              `name: ${yamlStr(name)}`,
-              `tagline: ${yamlStr(tagline)}`,
-              `author: ${yamlStr(author)}`,
-              `author_github: "${sanitize(author_github).replace(/[^a-zA-Z0-9_-]/g, '')}"`,
-              `github_url: ${yamlStr(github_url)}`,
-            ];
-            if (website_url && website_url !== '_No response_') {
-              if (!/^https?:\/\/.+/.test(website_url)) {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: '⚠️ Website URL must start with `http://` or `https://`.'
-                });
-                return;
-              }
-              lines.push(`website_url: ${yamlStr(website_url)}`);
-            }
-            lines.push(`tags: [${tags.map(t => `"${t.replace(/"/g, '')}"`).join(', ')}]`);
-            if (language && language !== '_No response_') {
-              lines.push(`language: "${sanitize(language).replace(/"/g, '')}"`);
-            }
-            if (license && license !== '_No response_') {
-              lines.push(`license: "${sanitize(license).replace(/"/g, '')}"`);
-            }
-            if (theme && theme !== '_No response_' && theme !== 'None (site default)') {
-              lines.push(`theme: "${sanitize(theme).replace(/"/g, '')}"`);
-            }
-            lines.push(`date_added: "${today}"`);
-            lines.push('featured: false');
-            lines.push('---');
-            lines.push('');
-            lines.push(sanitizeHtml(description));
-
-            const content = lines.join('\n');
-            const filePath = `src/content/tools/${slug}.md`;
-
-            // Check if file already exists
-            const fs = require('fs');
-            if (fs.existsSync(filePath)) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: `⚠️ A tool with slug \`${slug}\` already exists. Please rename and re-submit.`
-              });
-              return;
-            }
-
-            // Write the file
-            fs.writeFileSync(filePath, content);
-
-            // Download README thumbnail image - pick biggest from top 5 images
-            const badgeHosts = ['img.shields.io', 'badge.fury.io', 'badgen.net', 'badges.', 'coveralls.io', 'codecov.io', 'travis-ci.', 'ci.appveyor.com', 'github.com/workflows'];
-            const isBadge = (u) => badgeHosts.some(h => u.includes(h)) || u.includes('/badge');
-            const repoClean = github_url.replace(/\/$/, '');
-            const repoOwner = repoClean.split('/')[3];
-            const repoName = repoClean.split('/')[4];
-            const MIN_IMAGE_SIZE = 10 * 1024; // 10 KB minimum
-            const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB maximum
-            let thumbPath = null;
-            
-            // First, check issue comments for uploaded images
-            const comments = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-            });
-            
-            let imageFromComment = null;
-            for (const comment of comments.data) {
-              const commentBody = comment.body || '';
-              // Look for uploaded images in markdown format (both http and https)
-              const uploadedImg = commentBody.match(/!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
-              if (uploadedImg) {
-                imageFromComment = uploadedImg[1];
-                console.log(`📸 Found uploaded image in comment: ${imageFromComment}`);
-                break;
-              }
-            }
-            
-            if (imageFromComment) {
-              // Use the uploaded image from comments
-              try {
-                const ext = safeImageExt(imageFromComment);
-                const thumbFile = `${slug}${ext}`;
-                const thumbDest = `public/thumbnails/${thumbFile}`;
-                if (!fs.existsSync('public/thumbnails')) fs.mkdirSync('public/thumbnails', { recursive: true });
-                const imgRes = await fetch(imageFromComment);
-                if (imgRes.ok) {
-                  const contentLen = parseInt(imgRes.headers.get('content-length') || '0', 10);
-                  if (contentLen > MAX_IMAGE_SIZE) {
-                    console.log(`⚠️ Comment image too large (${(contentLen / 1024 / 1024).toFixed(1)} MB), skipping`);
-                  } else {
-                    const buf = Buffer.from(await imgRes.arrayBuffer());
-                    if (buf.length >= MIN_IMAGE_SIZE && buf.length <= MAX_IMAGE_SIZE) {
-                      fs.writeFileSync(thumbDest, buf);
-                      thumbPath = `/thumbnails/${thumbFile}`;
-                      const updated = fs.readFileSync(filePath, 'utf-8').replace(
-                        /(github_url:.*\n)/,
-                        `$1thumbnail: "${thumbPath}"\n`
-                      );
-                      fs.writeFileSync(filePath, updated);
-                      console.log(`📸 Downloaded thumbnail from comment: ${thumbFile} (${(buf.length / 1024).toFixed(1)} KB)`);
-                    }
-                  }
-                }
-              } catch (e) {
-                console.log(`⚠️ Failed to download image from comment: ${e.message}`);
-              }
-            }
-            
-            // If no image from comments, check README
-            let noSuitableImageFound = false;
-            if (!thumbPath) {
-              for (const branch of ['main', 'master']) {
-                try {
-                  const readmeRes = await fetch(`https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/README.md`);
-                  if (!readmeRes.ok) continue;
-                  const readme = await readmeRes.text();
-                  
-                  // Find all images (markdown and HTML), filter out badges
-                  const mdImgs = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(u => !isBadge(u));
-                  const htmlImgs = [...readme.matchAll(/<img[^>]+src=["']([^"']+)["']/gi)].map(m => m[1]).filter(u => !isBadge(u));
-                  const allImages = [...mdImgs, ...htmlImgs];
-                  
-                  // Take top 5 images
-                  const topImages = allImages.slice(0, 5);
-                  
-                  if (topImages.length === 0) {
-                    console.log(`⚠️ No images found in README`);
-                    noSuitableImageFound = true;
-                    break;
-                  }
-                  
-                  console.log(`🔍 Found ${topImages.length} candidate images in README`);
-                  
-                  // Download each image and check size
-                  const imageCandidates = [];
-                  for (const imgPath of topImages) {
-                    try {
-                      let imgUrl = imgPath;
-                      if (!imgPath.startsWith('http')) {
-                        imgUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/${imgPath.replace(/^\.\//, '')}`;
-                      }
-                      const imgRes = await fetch(imgUrl);
-                      if (imgRes.ok) {
-                        const contentLen = parseInt(imgRes.headers.get('content-length') || '0', 10);
-                        if (contentLen > MAX_IMAGE_SIZE) {
-                          console.log(`  ⚠️ ${imgUrl.split('/').pop()}: too large (${(contentLen / 1024 / 1024).toFixed(1)} MB)`);
-                          continue;
-                        }
-                        const buf = Buffer.from(await imgRes.arrayBuffer());
-                        console.log(`  📏 ${imgUrl.split('/').pop()}: ${(buf.length / 1024).toFixed(1)} KB`);
-                        if (buf.length >= MIN_IMAGE_SIZE && buf.length <= MAX_IMAGE_SIZE) {
-                          imageCandidates.push({ url: imgUrl, size: buf.length, buffer: buf });
-                        }
-                      }
-                    } catch (e) {
-                      console.log(`  ⚠️ Failed to fetch ${imgPath}: ${e.message}`);
-                    }
-                  }
-                  
-                  if (imageCandidates.length === 0) {
-                    console.log(`⚠️ No images met minimum size requirement (${MIN_IMAGE_SIZE / 1024} KB)`);
-                    noSuitableImageFound = true;
-                    break;
-                  }
-                  
-                  // Pick the biggest image
-                  imageCandidates.sort((a, b) => b.size - a.size);
-                  const bestImage = imageCandidates[0];
-                  
-                  const ext = safeImageExt(bestImage.url);
-                  const thumbFile = `${slug}${ext}`;
-                  const thumbDest = `public/thumbnails/${thumbFile}`;
-                  if (!fs.existsSync('public/thumbnails')) fs.mkdirSync('public/thumbnails', { recursive: true });
-                  
-                  fs.writeFileSync(thumbDest, bestImage.buffer);
-                  thumbPath = `/thumbnails/${thumbFile}`;
-                  // Update the .md to include thumbnail
-                  const updated = fs.readFileSync(filePath, 'utf-8').replace(
-                    /(github_url:.*\n)/,
-                    `$1thumbnail: "${thumbPath}"\n`
-                  );
-                  fs.writeFileSync(filePath, updated);
-                  console.log(`📸 Downloaded thumbnail: ${thumbFile} (${(bestImage.size / 1024).toFixed(1)} KB) - biggest of ${imageCandidates.length} candidates`);
-                  break;
-                } catch (e) {
-                  console.log(`⚠️ Thumbnail fetch failed: ${e.message}`);
+                if (err.status === 404) {
+                  await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                } else {
+                  throw err;
                 }
               }
-              
-              // Post a comment if no suitable image was found
-              if (noSuitableImageFound) {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: `📸 **Image needed!**\n\nI couldn't find a suitable thumbnail image in your README. The images I found were either too small (less than ${MIN_IMAGE_SIZE / 1024} KB) or were badges/icons.\n\nPlease upload a screenshot or image that showcases your tool by:\n1. Dragging and dropping an image into a comment below\n2. Using markdown syntax: \`![Description](image-url)\`\n\nOnce you've uploaded an image, I'll automatically use it when the tool is approved. Thanks! ✨`
-                });
-              }
             }
 
-            // Git commit and push using array args to avoid shell injection
-            const { execFileSync } = require('child_process');
-            execFileSync('git', ['config', 'user.name', 'Tiny Tool Town Bot']);
-            execFileSync('git', ['config', 'user.email', 'bot@tinytooltown.com']);
-            execFileSync('git', ['add', filePath]);
-            if (thumbPath) {
-              execFileSync('git', ['add', `public/thumbnails/`]);
-            }
-            execFileSync('git', ['commit', '-m', `🏠 Add ${sanitize(name)} (from issue #${issue.number})`]);
+            await ensureLabel('queued-import', '0e8a16', 'Queued for batch import into site content');
+            await ensureLabel('import-failed', 'd73a4a', 'Batch import failed and needs maintainer attention');
 
-            // Retry push with rebase in case another run pushed first
-            for (let attempt = 0; attempt < 5; attempt++) {
+            if (!labels.includes('queued-import')) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issue.number,
+                labels: ['queued-import'],
+              });
+              console.log(`#${issue.number} queued for import`);
+            } else {
+              console.log(`#${issue.number} already queued`);
+            }
+
+            if (labels.includes('import-failed')) {
               try {
-                execFileSync('git', ['push']);
-                break;
-              } catch (e) {
-                if (attempt === 4) throw e;
-                console.log(`⚠️ Push failed (attempt ${attempt + 1}), pulling and retrying...`);
-                execFileSync('git', ['pull', '--rebase']);
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: issue.number,
+                  name: 'import-failed',
+                });
+              } catch (err) {
+                if (err.status !== 404) throw err;
               }
             }
 
-            // Close the issue with a comment
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              body: `🏘️ **Welcome to Tiny Tool Town!**\n\n**${sanitize(name)}** has been added and will be live on [tinytooltown.com](https://www.tinytooltown.com/tools/${slug}/) once the site rebuilds (about 1 minute).\n\nThanks for sharing your tool! ✨`
+            // Kick off queue processing unless one is already running/queued.
+            const running = await github.rest.actions.listWorkflowRuns({
+              owner,
+              repo,
+              workflow_id: 'batch-approve.yml',
+              status: 'in_progress',
+              per_page: 1,
+            });
+            const queued = await github.rest.actions.listWorkflowRuns({
+              owner,
+              repo,
+              workflow_id: 'batch-approve.yml',
+              status: 'queued',
+              per_page: 1,
             });
 
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: issue.number,
-              state: 'closed'
-            });
-
-            console.log(`✅ Added ${sanitize(name)} as ${filePath}`);
-
-      - name: Verify file was committed
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issue = context.payload.issue;
-            const body = issue.body || '';
-            const getField = (label) => {
-              const regex = new RegExp(`### ${label}\\s*\\n\\s*([\\s\\S]*?)(?=\\n###|\\n\\n###|$)`);
-              const match = body.match(regex);
-              return match ? match[1].trim() : '';
-            };
-            const name = getField('Tool Name');
-            if (!name) return;
-            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            const filePath = `src/content/tools/${slug}.md`;
-
-            // Check if the file exists on main
-            try {
-              await github.rest.repos.getContent({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                path: filePath,
-                ref: 'main'
+            if ((running.data.total_count || 0) === 0 && (queued.data.total_count || 0) === 0) {
+              await github.rest.actions.createWorkflowDispatch({
+                owner,
+                repo,
+                workflow_id: 'batch-approve.yml',
+                ref: 'main',
               });
-              console.log(`✅ Verified: ${filePath} exists on main`);
-            } catch {
-              console.log(`❌ File ${filePath} NOT found on main after workflow run`);
-              // Only post if the issue is still open (wasn't closed by the previous step)
-              const { data: currentIssue } = await github.rest.issues.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number
-              });
-              if (currentIssue.state === 'open') {
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: `⚠️ **Approval workflow completed but the tool file wasn't created.** This can happen if the repo is inaccessible, the slug conflicts with an existing tool, or a git push failed. A maintainer will look into it.`
-                });
-                await github.rest.issues.addLabels({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  labels: ['needs-attention']
-                });
-              }
+              console.log('Dispatched batch-approve queue processor');
+            } else {
+              console.log('Queue processor already running or queued');
             }
-
-      - name: Trigger site rebuild
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches \
-            -d '{"ref":"main"}'

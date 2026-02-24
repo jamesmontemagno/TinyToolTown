@@ -1,23 +1,29 @@
-name: Batch Approve Tool Submissions
+name: Process Import Queue
 
 on:
   workflow_dispatch:
+    inputs:
+      batch_size:
+        description: Number of queued issues to process (1-100)
+        required: false
+        default: "25"
+  schedule:
+    - cron: "*/10 * * * *"
 
 concurrency:
   group: tool-file-writer
   cancel-in-progress: false
 
 jobs:
-  batch-add-tools:
+  process-queue:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
-      actions: write
     steps:
       - uses: actions/checkout@v4
 
-      - name: Process all approved issues
+      - name: Process queued issues in one batch
         uses: actions/github-script@v7
         with:
           script: |
@@ -25,12 +31,20 @@ jobs:
             const path = require('path');
             const { execFileSync } = require('child_process');
 
-            // --- Shared helpers ---
-            const sanitize = (s) => s.replace(/[\r\n]+/g, ' ').replace(/[^\x20-\x7E\xA0-\uFFFF]/g, '').trim();
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const inputBatch = core.getInput('batch_size');
+            const batchSize = Math.max(1, Math.min(100, parseInt(inputBatch || '25', 10) || 25));
+
+            const sanitize = (s) => (s || '')
+              .replace(/[\r\n]+/g, ' ')
+              .replace(/[^\x20-\x7E\xA0-\uFFFF]/g, '')
+              .trim();
             const yamlStr = (s) => `"${sanitize(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-            // Strip ALL HTML tags from descriptions to prevent XSS
+
             const sanitizeHtml = (s) => {
-              let clean = s;
+              let clean = s || '';
               for (let i = 0; i < 3; i++) {
                 const prev = clean;
                 clean = clean.replace(/<[^>]*>/g, '');
@@ -40,47 +54,102 @@ jobs:
               }
               return clean;
             };
+
             const safeImageExt = (urlStr) => {
               const allowed = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
               try {
                 const ext = path.extname(new URL(urlStr).pathname).split('?')[0].toLowerCase();
                 return allowed.includes(ext) ? ext : '.png';
-              } catch { return '.png'; }
+              } catch {
+                return '.png';
+              }
             };
-            const badgeHosts = ['img.shields.io', 'badge.fury.io', 'badgen.net', 'badges.', 'coveralls.io', 'codecov.io', 'travis-ci.', 'ci.appveyor.com', 'github.com/workflows'];
+
+            const badgeHosts = [
+              'img.shields.io', 'badge.fury.io', 'badgen.net', 'badges.', 'coveralls.io',
+              'codecov.io', 'travis-ci.', 'ci.appveyor.com', 'github.com/workflows',
+            ];
             const isBadge = (u) => badgeHosts.some(h => u.includes(h)) || u.includes('/badge');
+
             const MIN_IMAGE_SIZE = 10 * 1024;
             const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
             const getField = (body, label) => {
-              const regex = new RegExp(`### ${label}\\s*\\n\\s*([\\s\\S]*?)(?=\\n###|\\n\\n###|$)`);
-              const match = body.match(regex);
+              const regex = new RegExp(`### ${label}\\s*\\n*\\s*([\\s\\S]*?)(?=\\n###|\\n\\n###|$)`);
+              const match = (body || '').match(regex);
               return match ? match[1].trim() : '';
             };
 
-            // --- Find approved issues that haven't been processed yet ---
-            const issues = await github.paginate(github.rest.issues.listForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: 'approved',
+            const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name });
+              } catch (err) {
+                if (err.status === 404) {
+                  await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                } else {
+                  throw err;
+                }
+              }
+            }
+
+            async function removeLabelIfExists(issueNumber, name) {
+              try {
+                await github.rest.issues.removeLabel({ owner, repo, issue_number: issueNumber, name });
+              } catch (err) {
+                if (err.status !== 404) throw err;
+              }
+            }
+
+            async function markFailed(issueNumber, reason, removeFromQueue = true) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                labels: ['import-failed'],
+              });
+              if (removeFromQueue) {
+                await removeLabelIfExists(issueNumber, 'queued-import');
+              }
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: `⚠️ Import failed: ${reason}\n\nA maintainer can re-queue this by adding the \`approved\` label again.`,
+              });
+            }
+
+            await ensureLabel('import-failed', 'd73a4a', 'Batch import failed and needs maintainer attention');
+
+            const queuedIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              labels: 'queued-import',
               state: 'open',
+              sort: 'created',
+              direction: 'asc',
               per_page: 100,
             });
 
-            console.log(`Found ${issues.length} open approved issues`);
-            if (issues.length === 0) return;
+            const issues = queuedIssues.slice(0, batchSize);
+            if (issues.length === 0) {
+              console.log('No queued issues to process');
+              return;
+            }
 
-            // Git config
+            console.log(`Processing ${issues.length} queued issue(s)`);
+
             execFileSync('git', ['config', 'user.name', 'Tiny Tool Town Bot']);
             execFileSync('git', ['config', 'user.email', 'bot@tinytooltown.com']);
 
-            let processed = 0;
-            let skipped = 0;
-            let failed = 0;
+            const processed = [];
+            const failed = [];
 
             for (const issue of issues) {
               try {
                 const body = issue.body || '';
+
                 const name = getField(body, 'Tool Name');
                 const tagline = getField(body, 'One-line description');
                 const description = getField(body, 'Tell us about your tool');
@@ -92,100 +161,72 @@ jobs:
                 const language = getField(body, 'Primary Programming Language');
                 const license = getField(body, 'License');
                 const theme = getField(body, 'Page Theme \\(optional\\)');
-                // Validate required fields
+
                 if (!name || !tagline || !github_url || !author || !author_github) {
-                  console.log(`⏭️ #${issue.number}: missing required fields, skipping`);
-                  skipped++;
-                  continue;
+                  throw new Error('Missing required fields');
                 }
 
-                // Validate GitHub URL format (allow subpaths like /tree/main/subfolder)
                 github_url = github_url.replace('://www.github.com/', '://github.com/');
                 if (!/^https:\/\/github\.com\/[a-zA-Z0-9._-]+\/[a-zA-Z0-9._-]+(\/.*)?$/.test(github_url)) {
-                  console.log(`⏭️ #${issue.number}: invalid GitHub URL, skipping`);
-                  skipped++;
-                  continue;
+                  throw new Error('GitHub URL is invalid');
                 }
 
-                // Generate slug
                 const slug = sanitize(name).toLowerCase()
                   .replace(/[^a-z0-9]+/g, '-')
                   .replace(/^-|-$/g, '');
-
                 if (!slug || slug.length < 2) {
-                  console.log(`⏭️ #${issue.number}: invalid slug, skipping`);
-                  skipped++;
-                  continue;
+                  throw new Error('Generated slug is invalid');
                 }
 
                 const filePath = `src/content/tools/${slug}.md`;
-
-                // Skip if already processed (don't claim credit)
                 if (fs.existsSync(filePath)) {
-                  console.log(`⏭️ #${issue.number} (${name}): already exists as ${slug}.md`);
-                  // Close the issue but note it was a duplicate slug
-                  await github.rest.issues.createComment({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: issue.number,
-                    body: `⚠️ A tool with slug \`${slug}\` already exists. If this is a different tool, please resubmit with a unique name.`
-                  });
-                  await github.rest.issues.update({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: issue.number,
-                    state: 'closed'
-                  });
-                  skipped++;
-                  continue;
+                  throw new Error(`Slug collision: ${slug}.md already exists`);
                 }
 
-                console.log(`🔧 Processing #${issue.number}: ${name}...`);
-
-                // Verify repo is public
                 const repoMatch = github_url.match(/github\.com\/([^/]+)\/([^/]+)/);
                 if (repoMatch) {
-                  try {
-                    const { data: repoData } = await github.rest.repos.get({
-                      owner: repoMatch[1],
-                      repo: repoMatch[2].replace(/\/$/, ''),
-                    });
-                    if (repoData.private) {
-                      console.log(`⏭️ #${issue.number}: repo is private, skipping`);
-                      skipped++;
-                      continue;
-                    }
-                  } catch (err) {
-                    console.log(`⏭️ #${issue.number}: can't access repo, skipping`);
-                    skipped++;
-                    continue;
+                  const repoOwner = repoMatch[1];
+                  const repoName = repoMatch[2].replace(/\/$/, '');
+                  const { data: repoData } = await github.rest.repos.get({ owner: repoOwner, repo: repoName });
+                  if (repoData.private) {
+                    throw new Error('Repository is private');
                   }
                 }
 
-                // Validate website URL
                 if (website_url && website_url !== '_No response_' && !/^https?:\/\/.+/.test(website_url)) {
-                  console.log(`⏭️ #${issue.number}: invalid website URL, skipping`);
-                  skipped++;
-                  continue;
+                  throw new Error('Website URL is invalid');
                 }
 
-                // Build frontmatter
                 const tagSynonyms = {
-                  'devtools': 'developer-tools', 'dev-tools': 'developer-tools',
-                  'system tray': 'system-tray', 'ui': 'web', 'webapp': 'web',
-                  'funny': 'fun', 'silly': 'fun', 'trains': 'train',
-                  'games': 'game', 'presentations': 'presentation',
-                  'audio profiles': 'audio', 'internet radio': 'radio',
-                  'key bindings': 'keyboard', 'copilot cli': 'copilot',
+                  'devtools': 'developer-tools',
+                  'dev-tools': 'developer-tools',
+                  'system tray': 'system-tray',
+                  'ui': 'web',
+                  'webapp': 'web',
+                  'funny': 'fun',
+                  'silly': 'fun',
+                  'trains': 'train',
+                  'games': 'game',
+                  'presentations': 'presentation',
+                  'audio profiles': 'audio',
+                  'internet radio': 'radio',
+                  'key bindings': 'keyboard',
+                  'copilot cli': 'copilot',
                 };
-                const langTags = ['c#', 'csharp', 'c++', 'rust', 'typescript', 'javascript',
-                  'python', 'powershell', 'go', 'ruby', 'java', 'swift', 'nim',
-                  'html', 'css', 'xaml', 'shell', 'bash', 'ts', 'js'];
-                const tags = tagsRaw.split(/[,;]+/).map(t => {
-                  let tag = sanitize(t).toLowerCase();
-                  if (tagSynonyms[tag]) tag = tagSynonyms[tag];
-                  return tag;
-                }).filter(t => t && !langTags.includes(t)).slice(0, 5);
+                const langTags = [
+                  'c#', 'csharp', 'c++', 'rust', 'typescript', 'javascript', 'python', 'powershell',
+                  'go', 'ruby', 'java', 'swift', 'nim', 'html', 'css', 'xaml', 'shell', 'bash', 'ts', 'js',
+                ];
+                const tags = (tagsRaw || '')
+                  .split(/[,;]+/)
+                  .map(t => {
+                    let tag = sanitize(t).toLowerCase();
+                    if (tagSynonyms[tag]) tag = tagSynonyms[tag];
+                    return tag;
+                  })
+                  .filter(t => t && !langTags.includes(t))
+                  .slice(0, 5);
+
                 const today = new Date().toISOString().split('T')[0];
                 const lines = [
                   '---',
@@ -205,7 +246,7 @@ jobs:
                 if (license && license !== '_No response_') {
                   lines.push(`license: "${sanitize(license).replace(/"/g, '')}"`);
                 }
-                if (theme && theme !== '_No response_' && theme !== 'None (site default)') {
+                if (theme && theme !== '_No response_' && theme !== 'None (site default)' && theme !== 'None') {
                   lines.push(`theme: "${sanitize(theme).replace(/"/g, '')}"`);
                 }
                 lines.push(`date_added: "${today}"`);
@@ -213,19 +254,17 @@ jobs:
                 lines.push('---');
                 lines.push('');
                 lines.push(sanitizeHtml(description));
-
                 fs.writeFileSync(filePath, lines.join('\n'));
 
-                // --- Thumbnail logic ---
+                // Thumbnail extraction
                 const repoClean = github_url.replace(/\/$/, '');
                 const repoOwner = repoClean.split('/')[3];
                 const repoName = repoClean.split('/')[4];
                 let thumbPath = null;
 
-                // Check issue comments for uploaded images
                 const comments = await github.rest.issues.listComments({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
+                  owner,
+                  repo,
                   issue_number: issue.number,
                 });
 
@@ -249,20 +288,15 @@ jobs:
                     if (imgRes.ok) {
                       const contentLen = parseInt(imgRes.headers.get('content-length') || '0', 10);
                       if (contentLen <= MAX_IMAGE_SIZE) {
-                      const buf = Buffer.from(await imgRes.arrayBuffer());
-                      if (buf.length >= MIN_IMAGE_SIZE && buf.length <= MAX_IMAGE_SIZE) {
-                        fs.writeFileSync(thumbDest, buf);
-                        thumbPath = `/thumbnails/${thumbFile}`;
-                        const updated = fs.readFileSync(filePath, 'utf-8').replace(
-                          /(github_url:.*\n)/,
-                          `$1thumbnail: "${thumbPath}"\n`
-                        );
-                        fs.writeFileSync(filePath, updated);
-                      }
+                        const buf = Buffer.from(await imgRes.arrayBuffer());
+                        if (buf.length >= MIN_IMAGE_SIZE && buf.length <= MAX_IMAGE_SIZE) {
+                          fs.writeFileSync(thumbDest, buf);
+                          thumbPath = `/thumbnails/${thumbFile}`;
+                        }
                       }
                     }
                   } catch (e) {
-                    console.log(`  ⚠️ Comment image failed: ${e.message}`);
+                    console.log(`Comment image failed for #${issue.number}: ${e.message}`);
                   }
                 }
 
@@ -273,10 +307,13 @@ jobs:
                       if (!readmeRes.ok) continue;
                       const readme = await readmeRes.text();
 
-                      const mdImgs = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)].map(m => m[1]).filter(u => !isBadge(u));
-                      const htmlImgs = [...readme.matchAll(/<img[^>]+src=["']([^"']+)["']/gi)].map(m => m[1]).filter(u => !isBadge(u));
+                      const mdImgs = [...readme.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)]
+                        .map(m => m[1])
+                        .filter(u => !isBadge(u));
+                      const htmlImgs = [...readme.matchAll(/<img[^>]+src=["']([^"']+)["']/gi)]
+                        .map(m => m[1])
+                        .filter(u => !isBadge(u));
                       const topImages = [...mdImgs, ...htmlImgs].slice(0, 5);
-
                       if (topImages.length === 0) break;
 
                       const imageCandidates = [];
@@ -287,89 +324,117 @@ jobs:
                             imgUrl = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/${imgPath.replace(/^\.\//, '')}`;
                           }
                           const imgRes = await fetch(imgUrl);
-                          if (imgRes.ok) {
-                            const contentLen = parseInt(imgRes.headers.get('content-length') || '0', 10);
-                            if (contentLen > MAX_IMAGE_SIZE) continue;
-                            const buf = Buffer.from(await imgRes.arrayBuffer());
-                            if (buf.length >= MIN_IMAGE_SIZE && buf.length <= MAX_IMAGE_SIZE) {
-                              imageCandidates.push({ url: imgUrl, size: buf.length, buffer: buf });
-                            }
+                          if (!imgRes.ok) continue;
+                          const contentLen = parseInt(imgRes.headers.get('content-length') || '0', 10);
+                          if (contentLen > MAX_IMAGE_SIZE) continue;
+                          const buf = Buffer.from(await imgRes.arrayBuffer());
+                          if (buf.length >= MIN_IMAGE_SIZE && buf.length <= MAX_IMAGE_SIZE) {
+                            imageCandidates.push({ url: imgUrl, size: buf.length, buffer: buf });
                           }
-                        } catch (e) { /* skip */ }
+                        } catch {
+                          // Continue on image errors
+                        }
                       }
 
                       if (imageCandidates.length === 0) break;
-
                       imageCandidates.sort((a, b) => b.size - a.size);
                       const bestImage = imageCandidates[0];
                       const ext = safeImageExt(bestImage.url);
                       const thumbFile = `${slug}${ext}`;
                       const thumbDest = `public/thumbnails/${thumbFile}`;
                       if (!fs.existsSync('public/thumbnails')) fs.mkdirSync('public/thumbnails', { recursive: true });
-
                       fs.writeFileSync(thumbDest, bestImage.buffer);
                       thumbPath = `/thumbnails/${thumbFile}`;
-                      const updated = fs.readFileSync(filePath, 'utf-8').replace(
-                        /(github_url:.*\n)/,
-                        `$1thumbnail: "${thumbPath}"\n`
-                      );
-                      fs.writeFileSync(filePath, updated);
                       break;
                     } catch (e) {
-                      console.log(`  ⚠️ README image failed: ${e.message}`);
+                      console.log(`README image scan failed for #${issue.number}: ${e.message}`);
                     }
                   }
                 }
 
-                // Git add, commit
-                execFileSync('git', ['add', filePath]);
                 if (thumbPath) {
-                  execFileSync('git', ['add', 'public/thumbnails/']);
-                }
-                execFileSync('git', ['commit', '-m', `🏠 Add ${sanitize(name)} (from issue #${issue.number})`]);
-
-                // Push with rebase retry
-                for (let attempt = 0; attempt < 5; attempt++) {
-                  try {
-                    execFileSync('git', ['push']);
-                    break;
-                  } catch (e) {
-                    if (attempt === 4) throw e;
-                    console.log(`  ⚠️ Push retry ${attempt + 1}...`);
-                    execFileSync('git', ['pull', '--rebase']);
-                  }
+                  const updated = fs.readFileSync(filePath, 'utf-8').replace(
+                    /(github_url:.*\n)/,
+                    `$1thumbnail: "${thumbPath}"\n`,
+                  );
+                  fs.writeFileSync(filePath, updated);
                 }
 
-                // Close the issue
-                await github.rest.issues.createComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  body: `🏘️ **Welcome to Tiny Tool Town!**\n\n**${sanitize(name)}** has been added and will be live on [tinytooltown.com](https://www.tinytooltown.com/tools/${slug}/) once the site rebuilds (about 1 minute).\n\nThanks for sharing your tool! ✨`
+                processed.push({
+                  issueNumber: issue.number,
+                  name: sanitize(name),
+                  slug,
                 });
-
-                await github.rest.issues.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: issue.number,
-                  state: 'closed'
-                });
-
-                console.log(`✅ #${issue.number}: ${name} added as ${slug}.md`);
-                processed++;
-
-              } catch (e) {
-                console.log(`❌ #${issue.number}: ${e.message}`);
-                failed++;
+                console.log(`Prepared #${issue.number}: ${name}`);
+              } catch (err) {
+                const reason = err.message || 'Unknown error';
+                failed.push({ issueNumber: issue.number, reason });
+                console.log(`Failed #${issue.number}: ${reason}`);
+                await markFailed(issue.number, reason, true);
               }
             }
 
-            console.log(`\n📊 Done! Processed: ${processed}, Skipped: ${skipped}, Failed: ${failed}`);
+            let pushed = false;
+            if (processed.length > 0) {
+              execFileSync('git', ['add', 'src/content/tools']);
+              if (fs.existsSync('public/thumbnails')) {
+                execFileSync('git', ['add', 'public/thumbnails']);
+              }
 
-      - name: Trigger site rebuild
+              let hasChanges = true;
+              try {
+                execFileSync('git', ['diff', '--cached', '--quiet']);
+                hasChanges = false;
+              } catch {
+                hasChanges = true;
+              }
+
+              if (hasChanges) {
+                const commitTitle = `🏘️ Add ${processed.length} tool${processed.length === 1 ? '' : 's'} from import queue`;
+                execFileSync('git', ['commit', '-m', commitTitle]);
+
+                for (let attempt = 0; attempt < 5; attempt++) {
+                  try {
+                    execFileSync('git', ['push']);
+                    pushed = true;
+                    break;
+                  } catch (err) {
+                    if (attempt === 4) throw err;
+                    try {
+                      execFileSync('git', ['pull', '--rebase']);
+                    } catch {
+                      // If pull fails, next push attempt may still recover.
+                    }
+                    const backoffMs = Math.min(30000, (2 ** (attempt + 1)) * 1000) + Math.floor(Math.random() * 500);
+                    sleep(backoffMs);
+                  }
+                }
+              }
+            }
+
+            if (processed.length > 0 && pushed) {
+              for (const item of processed) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: item.issueNumber,
+                  body: `🏘️ **Welcome to Tiny Tool Town!**\n\n**${item.name}** has been added and will be live on [tinytooltown.com](https://www.tinytooltown.com/tools/${item.slug}/) once the site rebuilds.`,
+                });
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: item.issueNumber,
+                  state: 'closed',
+                });
+              }
+            } else if (processed.length > 0 && !pushed) {
+              for (const item of processed) {
+                await markFailed(item.issueNumber, 'Git push failed after retries', false);
+              }
+            }
+
+            console.log(`Done. Prepared: ${processed.length}, Failed: ${failed.length}, Pushed: ${pushed}`);
+
+      - name: Write summary
         run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches \
-            -d '{"ref":"main"}'
+          echo "Processed queued import batch."
