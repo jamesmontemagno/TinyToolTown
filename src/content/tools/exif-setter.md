@@ -4,6 +4,7 @@ tagline: "Set date in EXIF metadata for old digitized photos based on date in fi
 author: "Michiel Post"
 author_github: "michielpost"
 github_url: "https://github.com/michielpost/ExifSetter"
+thumbnail: "/thumbnails/exif-setter.png"
 tags: ["cli", "exif", "photos"]
 language: "C#"
 license: "MIT"

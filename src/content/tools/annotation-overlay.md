@@ -4,6 +4,7 @@ tagline: "Draw on your screen. Works over anything."
 author: "Andrea Griffiths"
 author_github: "andreagriffiths11"
 github_url: "https://github.com/AndreaGriffiths11/annotation-overlay"
+thumbnail: "/thumbnails/annotation-overlay.gif"
 website_url: "https://github.com/AndreaGriffiths11/annotation-overlay/blob/main/assets/demo.gif"
 tags: ["screen annotation", "drawing overlay", "presentation tool", "screen sharing", "electron"]
 language: "JavaScript"

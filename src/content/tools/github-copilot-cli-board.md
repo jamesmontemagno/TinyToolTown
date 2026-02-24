@@ -4,7 +4,7 @@ tagline: "Kanban board for GitHub Copilot CLI"
 author: "Lior Kamrat"
 author_github: "likamrat"
 github_url: "https://github.com/likamrat/copilot-cli-board"
-thumbnail: "/thumbnails/github-copilot-cli-board.png"
+thumbnail: "/thumbnails/github-copilot-cli-board.gif"
 tags: ["cli", "githubcopilot", "kanban"]
 language: "TypeScript, JavaScript"
 license: "MIT"
