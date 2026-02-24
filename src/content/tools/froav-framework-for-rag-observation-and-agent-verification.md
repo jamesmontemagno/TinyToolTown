@@ -4,6 +4,7 @@ tagline: "FROAV is an advanced document analysis ecosystem designed to bridge th
 author: "Ivan Lin"
 author_github: "tw40210"
 github_url: "https://github.com/tw40210/FROAV_LLM/tree/main"
+thumbnail: "/thumbnails/froav-framework-for-rag-observation-and-agent-verification.png"
 website_url: "https://youtu.be/w-SyxT03ySA"
 tags: ["n8n", "research", "web"]
 language: "Python"

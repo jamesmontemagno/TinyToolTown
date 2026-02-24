@@ -4,6 +4,7 @@ tagline: "`statoo` is a super simple http GET tool for checking site health"
 author: "Uğur Özyılmazel"
 author_github: "vigo"
 github_url: "https://github.com/vigo/statoo"
+thumbnail: "/thumbnails/statoo.png"
 tags: ["cli", "health-check", "monitoring", "http-client"]
 language: "Go"
 license: "MIT"

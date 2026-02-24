@@ -4,6 +4,7 @@ tagline: "Windows tool to convert HEIC photos"
 author: "J Schell"
 author_github: "jschell"
 github_url: "https://github.com/jschell/heic-convert"
+thumbnail: "/thumbnails/heicautoconverter.png"
 tags: ["windows", "heic", "photos", "jpg", "convert"]
 language: "C#"
 license: "MIT"

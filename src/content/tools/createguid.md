@@ -4,6 +4,7 @@ tagline: "A command-line utility to help developers create GUIDs and UUIDs for t
 author: "Pedro Silva"
 author_github: "DarthPedro"
 github_url: "https://github.com/d20Tek/cli-tools/tree/main/src/D20Tek.Tools.CreateGuid"
+thumbnail: "/thumbnails/createguid.png"
 tags: ["guid", "create guid", "uuid", "guidgen", "uuid7"]
 language: "C#"
 license: "MIT"

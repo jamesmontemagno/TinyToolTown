@@ -4,6 +4,7 @@ tagline: "Twist. Tick. Done. Confetti. Repeat."
 author: "Rohan Malpani"
 author_github: "romalpani"
 github_url: "https://github.com/romalpani/realpomo"
+thumbnail: "/thumbnails/realpomo.png"
 website_url: "https://romalpani.github.io/realpomo/index.html"
 tags: ["macos", "windows", "fun", "designer", "vibe-coded"]
 date_added: "2026-02-13"

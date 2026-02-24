@@ -4,6 +4,7 @@ tagline: "`tablo` is a golang data pipeline tool inspired by Nushell, where ever
 author: "Uğur Özyılmazel"
 author_github: "vigo"
 github_url: "https://github.com/vigo/tablo"
+thumbnail: "/thumbnails/tablo.png"
 tags: ["cli", "text-tool", "bash-pipe"]
 language: "Go"
 license: "MIT"

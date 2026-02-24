@@ -4,6 +4,7 @@ tagline: "Convert and format CBR / CBZ / PDF file to CBZ file with right format"
 author: "rherault"
 author_github: "Romaixn"
 github_url: "https://github.com/Romaixn/cbz-converter"
+thumbnail: "/thumbnails/cbz-converter.png"
 tags: ["cli", "cbz", "pdf", "cbr"]
 language: "Go"
 license: "GPL-3.0"

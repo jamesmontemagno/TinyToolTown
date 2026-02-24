@@ -4,6 +4,7 @@ tagline: "Android App to help you keep track of how much it costs to run your de
 author: "Derek Brown"
 author_github: "cgsguy2"
 github_url: "https://github.com/cgsguy2/energy-calculator"
+thumbnail: "/thumbnails/energy-calculator.png"
 tags: ["android", "energy", "calculator"]
 language: "Kotlin"
 license: "MIT"

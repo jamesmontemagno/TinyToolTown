@@ -4,6 +4,7 @@ tagline: "Create a countdown people won't ignore. Pick your date, pick your vibe
 author: "Chris Reddington"
 author_github: "chrisreddington"
 github_url: "https://github.com/chrisreddington/timestamp"
+thumbnail: "/thumbnails/timestamp.png"
 website_url: "https://chrisreddington.com/timestamp/"
 tags: ["web", "countdown"]
 language: "TypeScript"

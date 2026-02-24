@@ -4,6 +4,7 @@ tagline: "Multi-agent writing assistant where grammar, style, research, fact-che
 author: "Bethany Jepchumba"
 author_github: "bethanyjep"
 github_url: "https://github.com/BethanyJep/writing-editor"
+thumbnail: "/thumbnails/editorial.png"
 website_url: "https://youtu.be/g3lM68PuKyE"
 tags: ["fun", "agents", "web"]
 language: "Python"

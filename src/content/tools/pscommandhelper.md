@@ -4,6 +4,7 @@ tagline: "Learn PowerShell by doing — auto-suggests PS equivalents when you ty
 author: "Eric Hansen"
 author_github: "ericchansen"
 github_url: "https://github.com/ericchansen/PSCommandHelper"
+thumbnail: "/thumbnails/pscommandhelper.png"
 tags: ["cli", "learning", "developer-tools"]
 language: "PowerShell"
 license: "MIT"

@@ -4,6 +4,7 @@ tagline: "A CLI to fetch clean urls as clean markdown for LLMs"
 author: "Nico Baier"
 author_github: "nbbaier"
 github_url: "https://github.com/nbbaier/into-md"
+thumbnail: "/thumbnails/into-md.png"
 website_url: "https://into-md.nicobaier.com"
 tags: ["cli", "markdown", "developer-tools", "ai"]
 date_added: "2026-02-14"

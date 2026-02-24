@@ -4,6 +4,7 @@ tagline: "Cleans stale notifications for PRs and Issues that are already closed/
 author: "Christopher Scott"
 author_github: "christothes"
 github_url: "https://github.com/christothes/gh-notif-cleaner"
+thumbnail: "/thumbnails/github-notification-cleaner.png"
 tags: ["github", "productivity"]
 license: "MIT"
 theme: "None"

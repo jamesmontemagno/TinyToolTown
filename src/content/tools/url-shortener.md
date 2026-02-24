@@ -4,6 +4,7 @@ tagline: "A simple HTTP server application for shortening URI addresses."
 author: "Vítězslav Šimon"
 author_github: "VitSimon"
 github_url: "https://github.com/VitSimon/urlshort"
+thumbnail: "/thumbnails/url-shortener.png"
 tags: ["web", "server", "url", "shortener"]
 language: "Go"
 license: "MIT"

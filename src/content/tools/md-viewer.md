@@ -4,6 +4,7 @@ tagline: "A minimal macOS Markdown viewer. No editor, no bloat — just clean re
 author: "Torsten Mahr"
 author_github: "trsdn"
 github_url: "https://github.com/trsdn/mdviewer"
+thumbnail: "/thumbnails/md-viewer.png"
 website_url: "https://trsdn.github.io/mdviewer/"
 tags: ["markdown", "macos"]
 language: "Swift"

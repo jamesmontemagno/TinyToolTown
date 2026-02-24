@@ -4,7 +4,7 @@ tagline: "HelpViewer is a modern, portable and fast tool for viewing Markdown an
 author: "Vítězslav Šimon"
 author_github: "VitSimon"
 github_url: "https://github.com/HelpViewer/HelpViewer/"
-thumbnail: "/thumbnails/HVMainPage.png"
+thumbnail: "/thumbnails/helpviewer.png"
 website_url: "https://helpviewer.github.io/"
 tags: ["web", "static", "help", "manual", "markdown"]
 language: "JavaScript"

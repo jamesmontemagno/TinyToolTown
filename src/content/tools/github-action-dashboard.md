@@ -4,6 +4,7 @@ tagline: "All your workflows, one tab."
 author: "Andrew Herrick"
 author_github: "aherrick"
 github_url: "https://github.com/aherrick/GithubActionDashboard"
+thumbnail: "/thumbnails/github-action-dashboard.png"
 website_url: "https://salmon-tree-00ab82010.3.azurestaticapps.net/"
 tags: ["github", "developer-tools", "productivity"]
 language: "Blazor"

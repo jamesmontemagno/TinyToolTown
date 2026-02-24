@@ -4,6 +4,7 @@ tagline: "Search and reason over your technical question"
 author: "Jason Theodorakopoulos"
 author_github: "jayt87"
 github_url: "https://github.com/jayt87/reasoning-websearch"
+thumbnail: "/thumbnails/websearch-w-reasoning.png"
 tags: ["search", "reason", "complex", "questions"]
 language: "python"
 license: "MIT"

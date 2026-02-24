@@ -4,6 +4,7 @@ tagline: "A cross-platform PowerShell script that automatically removes language
 author: "Jack Tracey"
 author_github: "jtracey93"
 github_url: "https://github.com/jtracey93/UrlClipboardLanguageCleaner"
+thumbnail: "/thumbnails/url-clipboard-language-cleaner.png"
 tags: ["cli", "clipboard", "productivity"]
 language: "PowerShell"
 license: "MIT"

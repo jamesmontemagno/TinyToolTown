@@ -4,6 +4,7 @@ tagline: "Morph two images together, output as gif or webm. It's morphin' time!"
 author: "Nick Radford"
 author_github: "nickradford"
 github_url: "https://github.com/nickradford/morph"
+thumbnail: "/thumbnails/morph.png"
 website_url: "https://morph.nickradford.dev"
 tags: ["fun", "images"]
 language: "Typescript"

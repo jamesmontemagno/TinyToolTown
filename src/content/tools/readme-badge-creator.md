@@ -4,6 +4,7 @@ tagline: "One-click install badges for MCP servers, VS Code extensions, packages
 author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/mcp-badge-creator"
+thumbnail: "/thumbnails/readme-badge-creator.png"
 website_url: "https://jamesmontemagno.github.io/mcp-badge-creator/"
 tags: ["mcp", "badges", "readme", "markdown", "vscode"]
 language: "TypeScript"

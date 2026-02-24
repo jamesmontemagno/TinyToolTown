@@ -4,6 +4,7 @@ tagline: "A fast Python package installer written in Go. Drop-in replacement for
 author: "Bilus Teknoloji"
 author_github: "vigo"
 github_url: "https://github.com/bilusteknoloji/pipg/"
+thumbnail: "/thumbnails/pipg.png"
 tags: ["cli", "python", "pip", "go"]
 language: "Go"
 license: "MIT"

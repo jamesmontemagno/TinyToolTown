@@ -4,6 +4,7 @@ tagline: "A tool that lives in windows tray and shows your access to qc and late
 author: "Bram Dobbelaar"
 author_github: "BramDo"
 github_url: "https://github.com/BramDo/qcapi"
+thumbnail: "/thumbnails/qcapi.png"
 tags: ["quantum"]
 language: "python"
 license: "MIT"

@@ -4,6 +4,7 @@ tagline: "A CLI tool to create a .NET virtual environment, similar to Python ven
 author: "Essam"
 author_github: "TheBlueSky"
 github_url: "https://github.com/TheBlueSky/dotnet-venv"
+thumbnail: "/thumbnails/dotnet-venv.png"
 tags: ["cli", "dotnet", "venv"]
 language: "C#"
 license: "MIT"

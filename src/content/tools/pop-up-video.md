@@ -4,6 +4,7 @@ tagline: "A TamperMonkey Script and Python BackEnd to simulate VH1’s Pop-Up Vi
 author: "Tim McGuffin"
 author_github: "NotMedic"
 github_url: "https://github.com/NotMedic/PopUpVideo"
+thumbnail: "/thumbnails/pop-up-video.png"
 tags: ["fun"]
 language: "JavaScript, Python"
 license: "MIT"

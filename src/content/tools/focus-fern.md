@@ -4,6 +4,7 @@ tagline: "A cozy focus timer where a unique pixel plant grows while you code."
 author: "Lawrence Lockhart"
 author_github: "lawrencedcodes"
 github_url: "https://github.com/lawrencedcodes/vibes/tree/main/focusfern"
+thumbnail: "/thumbnails/focus-fern.png"
 tags: ["productivity", "canvas", "cozy-web"]
 language: "Typescript"
 license: "MIT"

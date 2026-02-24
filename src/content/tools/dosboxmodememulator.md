@@ -4,6 +4,7 @@ tagline: "Make your Dosbox experience complete by playing retro dialing sounds w
 author: "I-am-shodan"
 author_github: "I-am-shodan"
 github_url: "https://github.com/i-am-shodan/DosBoxModemEmulator"
+thumbnail: "/thumbnails/dosboxmodememulator.png"
 website_url: "https://x.com/therealshodan/status/2019203592629178373?s=46"
 tags: ["fun", "pi", "dosbox"]
 language: "C#"

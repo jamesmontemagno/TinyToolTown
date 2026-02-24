@@ -4,7 +4,7 @@ tagline: "A tool to help agents classify your bank transactions."
 author: "David Fowler"
 author_github: "davidfowl"
 github_url: "https://github.com/davidfowl/tally"
-thumbnail: "/thumbnails/tally.gif"
+thumbnail: "/thumbnails/tally.png"
 website_url: "https://tallyai.money/"
 tags: ["cli", "finance", "money", "budget"]
 language: "Python"

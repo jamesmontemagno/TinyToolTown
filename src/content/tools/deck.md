@@ -4,6 +4,7 @@ tagline: "Terminal-based presentations from Markdown files using PowerShell"
 author: "Jake Hildreth"
 author_github: "jakehildreth"
 github_url: "https://github.com/jakehildreth/Deck"
+thumbnail: "/thumbnails/deck.png"
 website_url: "https://www.powershellgallery.com/packages/Deck"
 tags: ["cli", "terminal", "markdown", "presentation", "slides"]
 language: "PowerShell"

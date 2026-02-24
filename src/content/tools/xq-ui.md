@@ -4,6 +4,7 @@ tagline: "XQ-UI - Interactive terminal playground for jq and yq with real-time e
 author: "Andrea Migliaccio"
 author_github: "andrea-migliaccio"
 github_url: "https://github.com/andrea-migliaccio/xq-ui"
+thumbnail: "/thumbnails/xq-ui.png"
 tags: ["tui", "jq", "yq", "ai"]
 language: "Go"
 license: "MIT"
