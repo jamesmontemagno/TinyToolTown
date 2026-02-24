@@ -4,6 +4,7 @@ tagline: "A lightweight Visual Studio extension that provides syntax highlightin
 author: "Mark Davis"
 author_github: "markdav-is"
 github_url: "https://github.com/markdav-is/Feature-Highlighter"
+thumbnail: "/thumbnails/bdd-feature-highlighter.png"
 website_url: "https://marketplace.visualstudio.com/items?itemName=MarkDavis.FeatureHighlighter"
 tags: ["bbd", "visual studio", "extension"]
 language: "C#"

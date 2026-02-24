@@ -4,6 +4,7 @@ tagline: "Copilot-powered .NET CLI to improve social posts (with styles, emoji c
 author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/post-helper-cli"
+thumbnail: "/thumbnails/posthelper-cli.png"
 tags: ["dotnet", "cli", "github-copilot", "ai", "social-media"]
 language: "C#"
 license: "MIT"

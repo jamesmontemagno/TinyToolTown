@@ -4,6 +4,7 @@ tagline: "Copilot-powered .NET tool to turn transcripts into titles, chapters & 
 author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/podcast-metadata-generator"
+thumbnail: "/thumbnails/podcast-metadata-generator.png"
 tags: ["dotnet", "cli", "github-copilot", "ai", "podcast"]
 language: "C#"
 license: "MIT"
