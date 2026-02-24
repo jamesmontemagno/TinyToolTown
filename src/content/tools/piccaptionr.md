@@ -10,7 +10,8 @@ language: "C#"
 license: "MIT"
 date_added: "2026-02-14"
 featured: false
-ai_summary: "A playful AI sidekick that reads your photos and instantly crafts scroll-stopping captions in multiple languages so posting feels effortless | FEATURES: 🔥 Uses OpenAI Vision API to understand and describe photos | ⚡ Multilingual output in English German and Spanish | 🎯 Processes multiple images and saves captions as .txt files | 💻 Cross platform Console Avalonia and Windows WPF apps with OpenAI or Azure backends"
+ai_summary: "Snap a pic and watch it magically turn into a scroll-stopping Instagram caption faster than you can say hashtag goals! This tool uses AI wizardry to make your photos talk in multiple languages and across all your favorite platforms."
+ai_features: ["🧠 AI-powered photo understanding with OpenAI Vision API", "🌍 Multilingual captions in English, German, and Spanish", "🖼️ Supports batch processing of multiple images", "💻 Cross-platform apps including console, Windows WPF, and Avalonia GUI"]
 ---
 
 PicCaptionr is your AI-powered caption sidekick.
