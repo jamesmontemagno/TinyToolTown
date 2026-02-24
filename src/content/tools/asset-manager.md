@@ -4,6 +4,7 @@ tagline: "A secure multi-user web-based asset management system with AI-powered 
 author: "Felipe Simões"
 author_github: "fdsimoes-git"
 github_url: "https://github.com/fdsimoes-git/asset-management"
+thumbnail: "/thumbnails/asset-manager.png"
 tags: ["ios", "finance", "couples", "management"]
 language: "JavaScript"
 date_added: "2026-02-13"

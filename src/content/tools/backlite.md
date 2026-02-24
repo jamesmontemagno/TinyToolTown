@@ -4,6 +4,7 @@ tagline: "Turn your extra monitor into a fully configurable backlight for meetin
 author: "Daniel Fosco"
 author_github: "dfosco"
 github_url: "https://github.com/dfosco/backlite"
+thumbnail: "/thumbnails/backlite.png"
 website_url: "https://dfosco.github.io/backlite/"
 tags: ["tiny", "lighting", "meetings"]
 language: "CSS"
