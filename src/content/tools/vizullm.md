@@ -4,6 +4,7 @@ tagline: "Schema-Driven Rendering Engine for LLM-Generated Documents"
 author: "Burak Taşçı"
 author_github: "tscburak"
 github_url: "https://github.com/GenR8ive/VizuLLM"
+thumbnail: "/thumbnails/vizullm.png"
 website_url: "https://vizullm.com"
 tags: ["llm", "documents", "ai", "pdf"]
 language: "Typescript"

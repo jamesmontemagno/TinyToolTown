@@ -4,6 +4,7 @@ tagline: "Play an audio tone in your browser based on the network traffic"
 author: "Bill Johnson"
 author_github: "dubrie"
 github_url: "https://github.com/dubrie/Windchime"
+thumbnail: "/thumbnails/windchime.png"
 tags: ["chrome extension", "fun", "network traffic", "data", "audio"]
 language: "JavaScript"
 license: "Apache-2.0"

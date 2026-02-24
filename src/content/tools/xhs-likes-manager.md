@@ -4,6 +4,7 @@ tagline: "Fetch, organize, and auto-tag your Xiaohongshu (小红书) likes and b
 author: "Charli Cheung"
 author_github: "jinghan23"
 github_url: "https://github.com/jinghan23/xhs-likes-manager"
+thumbnail: "/thumbnails/xhs-likes-manager.png"
 tags: ["cli", "social-media", "organization", "ai"]
 theme: "None"
 date_added: "2026-02-23"

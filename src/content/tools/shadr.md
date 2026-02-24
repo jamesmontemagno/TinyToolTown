@@ -4,6 +4,7 @@ tagline: "Brightness on your terms."
 author: "Andrew Herrick"
 author_github: "aherrick"
 github_url: "https://github.com/aherrick/Shadr"
+thumbnail: "/thumbnails/shadr.png"
 tags: ["tray-app", "windows", "brightness"]
 language: "C#"
 license: "MIT"
