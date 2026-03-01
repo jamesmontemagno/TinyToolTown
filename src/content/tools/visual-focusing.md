@@ -4,6 +4,7 @@ tagline: "Visual Focusing lets you switch to the nearest window in any direction
 author: "Chris Chen"
 author_github: "wasichris"
 github_url: "https://github.com/wasichris/visual-focusing"
+thumbnail: "/thumbnails/visual-focusing.png"
 website_url: "https://wasichris.github.io/visual-focusing/"
 tags: ["window-switching", "productivity", "macos"]
 license: "MIT"

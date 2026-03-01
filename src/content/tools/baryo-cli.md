@@ -4,6 +4,7 @@ tagline: "A local AI chat CLI powered by Docker Model Runner."
 author: "Arnel Isiderio Robles"
 author_github: "baryodev"
 github_url: "https://github.com/BaryoDev/Baryo.CLI"
+thumbnail: "/thumbnails/baryo-cli.png"
 tags: ["cli", "vibe"]
 language: "Go"
 license: "MPL2.0"
