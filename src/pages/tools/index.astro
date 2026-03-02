@@ -64,9 +64,9 @@ const moreTags = [...tagCounts.entries()]
       </div>
       <div class="sort-bar" role="group" aria-label="Sort tools">
         <span class="sort-label">Sort by</span>
-        <button class="sort-btn active" data-sort="newest">Newest</button>
-        <button class="sort-btn" data-sort="oldest">Oldest</button>
-        <button class="sort-btn" data-sort="stars">⭐ Stars</button>
+        <button class="sort-btn active" data-sort="newest" aria-pressed="true">Newest</button>
+        <button class="sort-btn" data-sort="oldest" aria-pressed="false">Oldest</button>
+        <button class="sort-btn" data-sort="stars" aria-pressed="false">⭐ Stars</button>
       </div>
       <div class="tags-filter" id="tags-filter">
         <button class="tag-btn active" data-tag="all">All</button>
@@ -200,8 +200,12 @@ const moreTags = [...tagCounts.entries()]
   // Sort button handler
   document.querySelectorAll('.sort-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sort-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       activeSort = (btn as HTMLElement).dataset.sort || 'newest';
       sortTools();
       // Update URL param
@@ -225,7 +229,9 @@ const moreTags = [...tagCounts.entries()]
   if (urlSort && ['newest', 'oldest', 'stars'].includes(urlSort)) {
     activeSort = urlSort;
     document.querySelectorAll('.sort-btn').forEach(b => {
-      b.classList.toggle('active', (b as HTMLElement).dataset.sort === activeSort);
+      const isActive = (b as HTMLElement).dataset.sort === activeSort;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-pressed', String(isActive));
     });
     sortTools();
   }
@@ -278,11 +284,21 @@ const moreTags = [...tagCounts.entries()]
       const raw = localStorage.getItem(STAR_CACHE_PREFIX + repo);
       if (!raw) return null;
       const entry = JSON.parse(raw);
-      if (Date.now() - entry.ts > STAR_TTL_MS) {
+      if (entry === null || typeof entry !== 'object') {
         localStorage.removeItem(STAR_CACHE_PREFIX + repo);
         return null;
       }
-      return entry.stars;
+      const ts = Number(entry.ts);
+      const stars = Number(entry.stars);
+      if (!Number.isFinite(ts) || !Number.isFinite(stars)) {
+        localStorage.removeItem(STAR_CACHE_PREFIX + repo);
+        return null;
+      }
+      if (Date.now() - ts > STAR_TTL_MS) {
+        localStorage.removeItem(STAR_CACHE_PREFIX + repo);
+        return null;
+      }
+      return stars;
     } catch { return null; }
   }
 
@@ -316,16 +332,19 @@ const moreTags = [...tagCounts.entries()]
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(`https://api.github.com/repos/${repo}`, {
-        headers: { 'Accept': 'application/vnd.github.v3+json' },
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      if (!res.ok) return;
-      const data = await res.json();
-      const stars = data.stargazers_count || 0;
-      setCachedStars(repo, stars);
-      updateCardStars(item, stars);
+      try {
+        const res = await fetch(`https://api.github.com/repos/${repo}`, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' },
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const stars = data.stargazers_count || 0;
+        setCachedStars(repo, stars);
+        updateCardStars(item, stars);
+      } finally {
+        clearTimeout(timeout);
+      }
     } catch { /* network error, keep build-time value */ }
   }
 

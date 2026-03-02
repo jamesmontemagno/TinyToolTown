@@ -144,19 +144,22 @@ export async function fetchFromApi(requests: FetchRequest[]): Promise<FetchResul
       }
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(`https://api.github.com/repos/${req.repo}`, {
-        headers,
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
+      try {
+        const res = await fetch(`https://api.github.com/repos/${req.repo}`, {
+          headers,
+          signal: controller.signal,
+        });
 
-      // 304 Not Modified — cached value is still fresh (doesn't cost rate limit)
-      if (res.status === 304) return null;
+        // 304 Not Modified — cached value is still fresh (doesn't cost rate limit)
+        if (res.status === 304) return null;
 
-      if (!res.ok) return null;
-      const etag = res.headers.get('etag') || undefined;
-      const data = await res.json();
-      return { repo: req.repo, stars: (data.stargazers_count as number) || 0, etag };
+        if (!res.ok) return null;
+        const etag = res.headers.get('etag') || undefined;
+        const data = await res.json();
+        return { repo: req.repo, stars: (data.stargazers_count as number) || 0, etag };
+      } finally {
+        clearTimeout(timeout);
+      }
     } catch {
       return null;
     }

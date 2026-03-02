@@ -83,13 +83,16 @@ async function main() {
       if (cached && cached.etag) {
         reqHeaders['If-None-Match'] = cached.etag;
       }
-      const res = await fetch(`https://api.github.com/repos/${repo}`, { headers: reqHeaders, signal: controller.signal });
-      clearTimeout(timeout);
-      if (res.status === 304) return { repo, notModified: true };
-      if (!res.ok) return null;
-      const etag = res.headers.get('etag') || undefined;
-      const data = await res.json();
-      return { repo, stars: data.stargazers_count || 0, etag };
+      try {
+        const res = await fetch(`https://api.github.com/repos/${repo}`, { headers: reqHeaders, signal: controller.signal });
+        if (res.status === 304) return { repo, notModified: true };
+        if (!res.ok) return null;
+        const etag = res.headers.get('etag') || undefined;
+        const data = await res.json();
+        return { repo, stars: data.stargazers_count || 0, etag };
+      } finally {
+        clearTimeout(timeout);
+      }
     }));
     for (const r of results) {
       if (r.status === 'fulfilled' && r.value) {
