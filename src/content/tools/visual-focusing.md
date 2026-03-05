@@ -7,6 +7,7 @@ github_url: "https://github.com/wasichris/visual-focusing"
 thumbnail: "/thumbnails/visual-focusing.png"
 website_url: "https://wasichris.github.io/visual-focusing/"
 tags: ["window-switching", "productivity", "macos"]
+language: "Swift"
 license: "MIT"
 date_added: "2026-02-28"
 featured: false

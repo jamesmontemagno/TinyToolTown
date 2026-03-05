@@ -7,6 +7,7 @@ github_url: "https://github.com/lxxxvi/yes-or-no.fyi"
 website_url: "https://yes-or-no.fyi/"
 tags: ["yes", "no", "maybe"]
 language: "Vanilla JS"
+license: "MIT"
 date_added: "2026-03-04"
 featured: false
 ---

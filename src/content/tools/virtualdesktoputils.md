@@ -1,6 +1,6 @@
 ---
 name: "VirtualDesktopUtils"
-tagline: "The best Windows virtual desktop utility application in the world, probably, maybe, not......but even so it's very useful"
+tagline: "Improve Windows 11 virtual desktop management with hotkey-triggered window movement and desktop switching"
 author: "Mark Woan"
 author_github: "woanware"
 github_url: "https://github.com/woanware/VirtualDesktopUtils"
