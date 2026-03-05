@@ -113,8 +113,8 @@ const currentPath = Astro.url.pathname;
 </style>
 
 <script>
-  const themes = ['dark', 'light', 'geocities'];
-  const icons: Record<string, string> = { dark: '🌙', light: '☀️', geocities: '🌈' };
+  const themes = ['dark', 'light', 'geocities', 'vscode-blue', 'vscode-green'];
+  const icons: Record<string, string> = { dark: '🌙', light: '☀️', geocities: '🌈', 'vscode-blue': '🔵', 'vscode-green': '🟢' };
 
   function getTheme(): string {
     const saved = localStorage.getItem('ttt-theme');

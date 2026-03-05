@@ -390,6 +390,46 @@
   --font-display: Georgia, 'Times New Roman', serif;
 }
 
+/* VS Code Blue: VS Code Dark+ with blue accent */
+[data-theme="vscode-blue"] {
+  --color-bg: #1e1e1e;
+  --color-bg-card: #252526;
+  --color-bg-hover: #2d2d2d;
+  --color-text: #d4d4d4;
+  --color-text-muted: #858585;
+  --color-primary: #007acc;
+  --color-secondary: #569cd6;
+  --color-tertiary: #4ec9b0;
+  --color-accent: #007acc;
+  --color-green: #4ec9b0;
+  --color-tag-bg: rgba(0, 122, 204, 0.12);
+  --color-tag-text: #007acc;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-header-bg: rgba(30, 30, 30, 0.95);
+  --font-body: 'Cascadia Code', 'Consolas', 'Menlo', 'Courier New', monospace;
+  --font-display: 'Cascadia Code', 'Consolas', 'Menlo', 'Courier New', monospace;
+}
+
+/* VS Code Green: VS Code Dark+ with green/teal accent */
+[data-theme="vscode-green"] {
+  --color-bg: #1e1e1e;
+  --color-bg-card: #252526;
+  --color-bg-hover: #2d2d2d;
+  --color-text: #d4d4d4;
+  --color-text-muted: #858585;
+  --color-primary: #4ec9b0;
+  --color-secondary: #6a9955;
+  --color-tertiary: #23d18b;
+  --color-accent: #4ec9b0;
+  --color-green: #23d18b;
+  --color-tag-bg: rgba(78, 201, 176, 0.12);
+  --color-tag-text: #4ec9b0;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-header-bg: rgba(30, 30, 30, 0.95);
+  --font-body: 'Cascadia Code', 'Consolas', 'Menlo', 'Courier New', monospace;
+  --font-display: 'Cascadia Code', 'Consolas', 'Menlo', 'Courier New', monospace;
+}
+
 /* Retro: amber CRT monitor */
 [data-theme="retro"] {
   --color-bg: #1a1200;
