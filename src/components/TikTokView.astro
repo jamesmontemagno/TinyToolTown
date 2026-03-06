@@ -8,419 +8,380 @@ interface Props {
 
 const { tools } = Astro.props;
 
-// Constants for gradient generation - creates varied color backgrounds for tools without thumbnails
-const HUE_OFFSET_PRIMARY = 37;
-const HUE_OFFSET_SECONDARY = 53;
+// Serialize only the fields needed to build each panel client-side
+const shortsToolsData = tools.map((tool) => ({
+  slug: tool.id.replace(/\.md$/, ''),
+  name: tool.data.name,
+  tagline: tool.data.tagline,
+  author: tool.data.author,
+  authorGithub: tool.data.author_github,
+  thumbnail: tool.data.thumbnail ?? null,
+  githubUrl: tool.data.github_url,
+  repo: getGitHubRepo(tool.data.github_url),
+  tags: tool.data.tags.slice(0, 3),
+}));
 ---
 
 <div id="shorts-viewer" class="viewer-hidden" role="dialog" aria-label="Tool shorts viewer" aria-modal="true">
   <button id="exit-shorts" class="exit-control" aria-label="Exit">✕</button>
-  
-  <div class="viewer-track">
-    {tools.map((tool, index) => {
-      const toolPath = tool.id.replace(/\.md$/, '');
-      const hasImage = !!tool.data.thumbnail;
-      
-      return (
-        <section class="tool-panel" data-position={index}>
-          {/* Background layer */}
-          <div class="panel-bg">
-            {hasImage ? (
-              <img src={tool.data.thumbnail} alt="" class="bg-image" />
-            ) : (
-              <div class="bg-gradient" style={`background: linear-gradient(135deg, hsl(${index * HUE_OFFSET_PRIMARY}, 70%, 50%), hsl(${index * HUE_OFFSET_SECONDARY}, 60%, 40%))`}></div>
-            )}
-            <div class="bg-dim"></div>
-          </div>
-          
-          {/* Content layer */}
-          <div class="panel-content">
-            <div class="content-wrapper">
-              {!hasImage && (
-                <div class="tool-thumbnail">
-                  <div class="thumb-placeholder">🔧</div>
-                </div>
-              )}
-              
-              <h2 class="tool-heading">{tool.data.name}</h2>
-              <p class="tool-description">{tool.data.tagline}</p>
-              
-              <div class="creator-info">
-                <img 
-                  src={`https://avatars.githubusercontent.com/${tool.data.author_github}?s=32`}
-                  alt={tool.data.author}
-                  class="creator-avatar"
-                  width="28"
-                  height="28"
-                />
-                <span class="creator-handle">@{tool.data.author}</span>
-              </div>
-              
-              <div class="metadata-tags">
-                {tool.data.tags.slice(0, 3).map(tag => (
-                  <span class="metadata-tag">{tag}</span>
-                ))}
-              </div>
-              
-              <a href={`/tools/${toolPath}/`} class="navigate-link">
-                View Full Details →
-              </a>
-            </div>
-          </div>
-
-          {/* Actions sidebar */}
-          <aside class="panel-actions">
-            <button class="panel-action favorite-action" data-tool={toolPath} aria-label="Favorite">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-              <span class="action-text">Like</span>
-            </button>
-            
-            <button class="panel-action distribute-action" data-tool-title={tool.data.name} aria-label="Share">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-              </svg>
-              <span class="action-text">Share</span>
-            </button>
-
-            {getGitHubRepo(tool.data.github_url) && (
-              <a href={tool.data.github_url} target="_blank" rel="noopener noreferrer" class="panel-action star-action" data-repo={getGitHubRepo(tool.data.github_url)} aria-label="Star on GitHub">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                <span class="action-text star-count-text">Star</span>
-              </a>
-            )}
-
-            <a href={tool.data.github_url} target="_blank" rel="noopener noreferrer" class="panel-action repository-action" aria-label="GitHub Repository">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-              </svg>
-              <span class="action-text">Code</span>
-            </a>
-          </aside>
-
-          {/* Position counter */}
-          <div class="panel-counter">🔀 {index + 1} / {tools.length}</div>
-        </section>
-      );
-    })}
-  </div>
+  <div class="viewer-track"></div>
 </div>
 
+{/* Tool data island — consumed by buildPanels() when Shorts is first opened */}
+<script type="application/json" id="shorts-tools-data" set:html={JSON.stringify(shortsToolsData)} />
+
+<template id="shorts-panel-tpl">
+  <section class="tool-panel">
+    <div class="panel-bg">
+      <img class="bg-image" src="" alt="" />
+      <div class="bg-gradient"></div>
+      <div class="bg-dim"></div>
+    </div>
+    <div class="panel-content">
+      <div class="content-wrapper">
+        <div class="tool-thumbnail">
+          <div class="thumb-placeholder">&#x1F527;</div>
+        </div>
+        <h2 class="tool-heading"></h2>
+        <p class="tool-description"></p>
+        <div class="creator-info">
+          <img class="creator-avatar" src="" alt="" width="28" height="28" />
+          <span class="creator-handle"></span>
+        </div>
+        <div class="metadata-tags"></div>
+        <a href="" class="navigate-link">View Full Details &#x2192;</a>
+      </div>
+    </div>
+    <aside class="panel-actions">
+      <button class="panel-action favorite-action" aria-label="Favorite">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"> <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /> </svg><span class="action-text">Like</span>
+      </button>
+      <button class="panel-action distribute-action" aria-label="Share">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"> <circle cx="18" cy="5" r="3" /> <circle cx="6" cy="12" r="3" /> <circle cx="18" cy="19" r="3" /> <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /> <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /> </svg><span class="action-text">Share</span>
+      </button>
+      <a class="panel-action star-action" href="" target="_blank" rel="noopener noreferrer" aria-label="Star on GitHub">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"> <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /> </svg><span class="action-text star-count-text">Star</span>
+      </a>
+      <a class="panel-action repository-action" href="" target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"> <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/> </svg><span class="action-text">Code</span>
+      </a>
+    </aside>
+    <div class="panel-counter"></div>
+  </section>
+</template>
+
 <script>
-  // Navigation state
-  let viewerState = {
-    index: 0,
-    active: false,
-    swipeStart: 0,
-    swiping: false
-  };
+  const SWIPE_MIN = 60;
+  const HUE_OFFSET_PRIMARY = 37;
+  const HUE_OFFSET_SECONDARY = 53;
 
-  // Minimum distance (in pixels) for a swipe to be recognized
-  const SWIPE_THRESHOLD = 60;
+  let viewerState = { pos: 0, active: false, drag0: 0, dragging: false };
+  let frameInit = false;
+  let previousFocus: HTMLElement | null = null;
 
-  function setupViewer() {
-    const viewer = document.getElementById('shorts-viewer');
-    const panels = document.querySelectorAll('.tool-panel');
-    const exitBtn = document.getElementById('exit-shorts');
+  // Build panel nodes from JSON data island by cloning the <template>.
+  // Invoked on first Shorts open — keeps initial HTML payload small.
+  function buildPanels() {
+    const track = document.querySelector<HTMLElement>('.viewer-track');
+    if (!track || track.children.length > 0) return;
+    const tpl = document.getElementById('shorts-panel-tpl') as HTMLTemplateElement | null;
+    const src = document.getElementById('shorts-tools-data');
+    if (!tpl || !src) return;
 
-    if (!viewer || panels.length === 0) return;
+    type ShortsToolEntry = {
+      slug: string; name: string; tagline: string;
+      author: string; authorGithub: string;
+      thumbnail: string | null; githubUrl: string;
+      repo: string | null; tags: string[];
+    };
+    let items: ShortsToolEntry[];
+    try { items = JSON.parse(src.textContent || '[]'); } catch { return; }
 
-    // Initialize panel positions
-    updatePanelPositions();
-    exitBtn?.addEventListener('click', hideViewer);
+    const total = items.length;
+    const frag = document.createDocumentFragment();
 
-    // Touch handling
-    viewer.addEventListener('touchstart', handleSwipeStart, { passive: true });
-    viewer.addEventListener('touchmove', preventScrollIfActive, { passive: false });
-    viewer.addEventListener('touchend', handleSwipeEnd);
+    items.forEach((t, i) => {
+      const node = document.importNode(tpl.content, true);
+      const sec = node.querySelector('section')!;
+      sec.dataset.position = String(i);
 
-    // Mouse handling
-    viewer.addEventListener('mousedown', handleDragStart);
-    viewer.addEventListener('mouseup', handleDragEnd);
-
-    // Wheel handling
-    viewer.addEventListener('wheel', handleWheel, { passive: false });
-
-    // Keyboard handling
-    document.addEventListener('keydown', handleKeys);
-
-    // Action buttons
-    panels.forEach(panel => {
-      const favBtn = panel.querySelector('.favorite-action');
-      const shareBtn = panel.querySelector('.distribute-action');
-      
-      favBtn?.addEventListener('click', toggleFavorite);
-      shareBtn?.addEventListener('click', sharePanel);
-    });
-  }
-  
-  function updatePanelPositions() {
-    const panels = document.querySelectorAll('.tool-panel');
-    panels.forEach((panel, index) => {
-      panel.classList.remove('panel-visible', 'panel-above', 'panel-below');
-      if (index === viewerState.index) {
-        panel.classList.add('panel-visible');
-      } else if (index < viewerState.index) {
-        panel.classList.add('panel-above');
+      const bgImg  = sec.querySelector<HTMLImageElement>('.bg-image')!;
+      const bgGrad = sec.querySelector<HTMLElement>('.bg-gradient')!;
+      if (t.thumbnail) {
+        bgImg.src = t.thumbnail;
+        bgGrad.remove();
       } else {
-        panel.classList.add('panel-below');
+        bgImg.remove();
+        bgGrad.style.background =
+          `linear-gradient(135deg,hsl(${i * HUE_OFFSET_PRIMARY},70%,50%),hsl(${i * HUE_OFFSET_SECONDARY},60%,40%))`;
       }
+
+      const thumb = sec.querySelector<HTMLElement>('.tool-thumbnail')!;
+      if (t.thumbnail) thumb.remove();
+
+      sec.querySelector('.tool-heading')!.textContent = t.name;
+      sec.querySelector('.tool-description')!.textContent = t.tagline;
+
+      const av = sec.querySelector<HTMLImageElement>('.creator-avatar')!;
+      av.src = `https://avatars.githubusercontent.com/${t.authorGithub}?s=32`;
+      av.alt = t.author;
+      sec.querySelector('.creator-handle')!.textContent = `@${t.author}`;
+
+      const tagsEl = sec.querySelector('.metadata-tags')!;
+      t.tags.forEach(tag => {
+        const sp = document.createElement('span');
+        sp.className = 'metadata-tag';
+        sp.textContent = tag;
+        tagsEl.appendChild(sp);
+      });
+
+      sec.querySelector<HTMLAnchorElement>('.navigate-link')!.href = `/tools/${t.slug}/`;
+
+      const favBtn = sec.querySelector<HTMLElement>('.favorite-action')!;
+      favBtn.dataset.tool = t.slug;
+      favBtn.addEventListener('click', toggleFavorite);
+
+      const shrBtn = sec.querySelector<HTMLElement>('.distribute-action')!;
+      shrBtn.dataset.toolTitle = t.name;
+      shrBtn.addEventListener('click', sharePanel);
+
+      const starA = sec.querySelector<HTMLAnchorElement>('.star-action')!;
+      if (t.repo) {
+        starA.href = t.githubUrl;
+        starA.dataset.repo = t.repo;
+      } else {
+        starA.remove();
+      }
+
+      sec.querySelector<HTMLAnchorElement>('.repository-action')!.href = t.githubUrl;
+
+      sec.querySelector('.panel-counter')!.textContent = `🔀 ${i + 1} / ${total}`;
+
+      frag.appendChild(node);
     });
-    // Update all counters to reflect current position
-    const counter = panels[viewerState.index]?.querySelector('.panel-counter');
-    if (counter) counter.textContent = `🔀 ${viewerState.index + 1} / ${panels.length}`;
+
+    track.appendChild(frag);
   }
 
-  function handleSwipeStart(e: TouchEvent) {
-    viewerState.swipeStart = e.touches[0].clientY;
-    viewerState.swiping = true;
+  // Attach viewer-container events once
+  function setupViewerFrame() {
+    if (frameInit) return;
+    const vw = document.getElementById('shorts-viewer');
+    if (!vw) return;
+    document.getElementById('exit-shorts')?.addEventListener('click', closeViewer);
+    vw.addEventListener('touchstart', handleTouchStart, { passive: true });
+    vw.addEventListener('touchmove', handleTouchMove, { passive: false });
+    vw.addEventListener('touchend', handleTouchEnd);
+    vw.addEventListener('mousedown', handleMouseDown);
+    vw.addEventListener('mouseup', handleMouseUp);
+    vw.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('keydown', handleKeyDown);
+    frameInit = true;
   }
 
-  function preventScrollIfActive(e: TouchEvent) {
-    if (viewerState.swiping && viewerState.active) e.preventDefault();
+  function updatePanelPositions() {
+    const ps = document.querySelectorAll('.tool-panel');
+    ps.forEach((p, i) => {
+      p.classList.remove('panel-visible', 'panel-above', 'panel-below');
+      if (i === viewerState.pos) p.classList.add('panel-visible');
+      else if (i < viewerState.pos) p.classList.add('panel-above');
+      else p.classList.add('panel-below');
+    });
+    const ctr = ps[viewerState.pos]?.querySelector('.panel-counter');
+    if (ctr) ctr.textContent = `🔀 ${viewerState.pos + 1} / ${ps.length}`;
   }
 
-  function handleSwipeEnd(e: TouchEvent) {
-    if (!viewerState.swiping || !viewerState.active) return;
-    
-    const swipeEnd = e.changedTouches[0].clientY;
-    const distance = viewerState.swipeStart - swipeEnd;
-
-    if (Math.abs(distance) > SWIPE_THRESHOLD) {
-      distance > 0 ? advancePanel() : retreatPanel();
-    }
-    
-    viewerState.swiping = false;
+  function handleTouchStart(e: TouchEvent) { viewerState.drag0 = e.touches[0].clientY; viewerState.dragging = true; }
+  function handleTouchMove(e: TouchEvent) { if (viewerState.dragging && viewerState.active) e.preventDefault(); }
+  function handleTouchEnd(e: TouchEvent) {
+    if (!viewerState.dragging || !viewerState.active) return;
+    const d = viewerState.drag0 - e.changedTouches[0].clientY;
+    if (Math.abs(d) > SWIPE_MIN) d > 0 ? advancePanel() : retreatPanel();
+    viewerState.dragging = false;
   }
-
-  function handleDragStart(e: MouseEvent) {
-    const clicked = e.target as HTMLElement;
-    if (clicked.closest('.panel-action') || clicked.closest('.navigate-link') || clicked.closest('.exit-control')) return;
-    
-    viewerState.swipeStart = e.clientY;
-    viewerState.swiping = true;
+  function handleMouseDown(e: MouseEvent) {
+    const el = e.target as HTMLElement;
+    if (el.closest('.panel-action') || el.closest('.navigate-link') || el.closest('.exit-control')) return;
+    viewerState.drag0 = e.clientY; viewerState.dragging = true;
   }
-
-  function handleDragEnd(e: MouseEvent) {
-    if (!viewerState.swiping || !viewerState.active) return;
-    
-    const dragEnd = e.clientY;
-    const distance = viewerState.swipeStart - dragEnd;
-
-    if (Math.abs(distance) > SWIPE_THRESHOLD) {
-      distance > 0 ? advancePanel() : retreatPanel();
-    }
-    
-    viewerState.swiping = false;
+  function handleMouseUp(e: MouseEvent) {
+    if (!viewerState.dragging || !viewerState.active) return;
+    const d = viewerState.drag0 - e.clientY;
+    if (Math.abs(d) > SWIPE_MIN) d > 0 ? advancePanel() : retreatPanel();
+    viewerState.dragging = false;
   }
-
   function handleWheel(e: WheelEvent) {
     if (!viewerState.active) return;
     e.preventDefault();
     e.deltaY > 0 ? advancePanel() : retreatPanel();
   }
 
-  function handleKeys(e: KeyboardEvent) {
+  function handleKeyDown(e: KeyboardEvent) {
     if (!viewerState.active) return;
-    
-    // Focus trap — WCAG 2.4.3
     if (e.key === 'Tab') {
-      const viewer = document.getElementById('shorts-viewer');
-      if (!viewer) return;
-      const focusable = viewer.querySelectorAll<HTMLElement>(
+      const vw = document.getElementById('shorts-viewer');
+      if (!vw) return;
+      const all = vw.querySelectorAll<HTMLElement>(
         'button, a[href], input, [tabindex]:not([tabindex="-1"])'
       );
-      const visiblePanel = viewer.querySelector('.panel-visible');
-      const panelFocusable = visiblePanel
-        ? Array.from(focusable).filter(el => visiblePanel.contains(el) || el.id === 'exit-shorts')
-        : Array.from(focusable);
-      if (panelFocusable.length === 0) return;
-      const first = panelFocusable[0];
-      const last = panelFocusable[panelFocusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
+      const vis = vw.querySelector('.panel-visible');
+      const foc = vis
+        ? Array.from(all).filter(el => vis.contains(el) || el.id === 'exit-shorts')
+        : Array.from(all);
+      if (!foc.length) return;
+      if (e.shiftKey && document.activeElement === foc[0]) {
+        e.preventDefault(); foc[foc.length - 1].focus();
+      } else if (!e.shiftKey && document.activeElement === foc[foc.length - 1]) {
+        e.preventDefault(); foc[0].focus();
       }
       return;
     }
-
-    const keyActions: Record<string, () => void> = {
-      'ArrowDown': () => { e.preventDefault(); advancePanel(); },
-      'ArrowRight': () => { e.preventDefault(); advancePanel(); },
-      'ArrowUp': () => { e.preventDefault(); retreatPanel(); },
-      'ArrowLeft': () => { e.preventDefault(); retreatPanel(); },
-      'Escape': () => { e.preventDefault(); hideViewer(); }
+    const km: Record<string, () => void> = {
+      ArrowDown:  () => { e.preventDefault(); advancePanel(); },
+      ArrowRight: () => { e.preventDefault(); advancePanel(); },
+      ArrowUp:    () => { e.preventDefault(); retreatPanel(); },
+      ArrowLeft:  () => { e.preventDefault(); retreatPanel(); },
+      Escape:     () => { e.preventDefault(); closeViewer(); },
     };
-
-    keyActions[e.key]?.();
+    km[e.key]?.();
   }
 
   function advancePanel() {
-    const panels = document.querySelectorAll('.tool-panel');
-    viewerState.index = (viewerState.index + 1) % panels.length;
-    updatePanelPositions();
+    const n = document.querySelectorAll('.tool-panel').length;
+    viewerState.pos = (viewerState.pos + 1) % n; updatePanelPositions();
   }
-
   function retreatPanel() {
-    const panels = document.querySelectorAll('.tool-panel');
-    viewerState.index = (viewerState.index - 1 + panels.length) % panels.length;
-    updatePanelPositions();
+    const n = document.querySelectorAll('.tool-panel').length;
+    viewerState.pos = (viewerState.pos - 1 + n) % n; updatePanelPositions();
   }
 
-  function hideViewer() {
-    const viewer = document.getElementById('shorts-viewer');
-    if (viewer) {
-      viewer.classList.add('viewer-hidden');
+  function closeViewer() {
+    const vw = document.getElementById('shorts-viewer');
+    if (vw) {
+      vw.classList.add('viewer-hidden');
       viewerState.active = false;
       document.body.style.overflow = '';
-      // Restore focus to element that opened the viewer
       previousFocus?.focus();
     }
   }
 
   function toggleFavorite(e: Event) {
     const btn = e.currentTarget as HTMLElement;
-    const isFavorited = btn.classList.toggle('favorited');
-    
-    const svg = btn.querySelector('svg');
-    if (svg) {
-      svg.style.animation = 'heartbeat 0.35s ease';
-      setTimeout(() => svg.style.animation = '', 350);
+    const nowOn = btn.classList.toggle('favorited');
+    const svgEl = btn.querySelector('svg');
+    if (svgEl) {
+      svgEl.style.animation = 'heartbeat 0.35s ease';
+      setTimeout(() => { svgEl.style.animation = ''; }, 350);
     }
-    
-    // Store in localStorage
     const toolId = btn.getAttribute('data-tool');
     if (toolId) {
-      const favorites = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-      if (isFavorited) {
-        if (!favorites.includes(toolId)) favorites.push(toolId);
+      const favs: string[] = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
+      if (nowOn) {
+        if (!favs.includes(toolId)) favs.push(toolId);
       } else {
-        const idx = favorites.indexOf(toolId);
-        if (idx > -1) favorites.splice(idx, 1);
+        const ix = favs.indexOf(toolId);
+        if (ix > -1) favs.splice(ix, 1);
       }
-      localStorage.setItem('ttt-favorites', JSON.stringify(favorites));
+      localStorage.setItem('ttt-favorites', JSON.stringify(favs));
     }
   }
 
   function sharePanel(e: Event) {
     const btn = e.currentTarget as HTMLElement;
-    const toolTitle = btn.getAttribute('data-tool-title');
-    const currentUrl = window.location.origin + window.location.pathname;
-
+    const title = btn.getAttribute('data-tool-title');
+    const pageUrl = window.location.origin + window.location.pathname;
     if (navigator.share) {
       navigator.share({
-        title: toolTitle || 'Tiny Tool Town',
-        text: toolTitle ? `Check out "${toolTitle}" on Tiny Tool Town! 🏘️` : 'Check out this tool on Tiny Tool Town! 🏘️',
-        url: currentUrl,
-      }).catch(() => {
-        // User cancelled or share failed - this is expected behavior, no action needed
-      });
+        title: title || 'Tiny Tool Town',
+        text: title
+          ? `Check out "${title}" on Tiny Tool Town! 🏘️`
+          : 'Check out this tool on Tiny Tool Town! 🏘️',
+        url: pageUrl,
+      }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(currentUrl).then(() => {
-        const textEl = btn.querySelector('.action-text');
-        if (textEl) {
-          const original = textEl.textContent;
-          textEl.textContent = 'Copied!';
-          setTimeout(() => textEl.textContent = original, 2000);
+      navigator.clipboard.writeText(pageUrl).then(() => {
+        const lbl = btn.querySelector('.action-text');
+        if (lbl) {
+          const orig = lbl.textContent;
+          lbl.textContent = 'Copied!';
+          setTimeout(() => { lbl.textContent = orig; }, 2000);
         }
       });
     }
   }
 
   function loadFavoriteStates() {
-    const favorites = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-    favorites.forEach((toolId: string) => {
-      const btn = document.querySelector(`.favorite-action[data-tool="${toolId}"]`);
-      btn?.classList.add('favorited');
+    const favs: string[] = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
+    favs.forEach(id => {
+      document.querySelector(`.favorite-action[data-tool="${id}"]`)?.classList.add('favorited');
     });
   }
-
-  // Focus management for modal — WCAG 2.4.3
-  let previousFocus: HTMLElement | null = null;
-
-  // Global function to open viewer
-  (window as any).launchShortsViewer = function() {
-    const viewer = document.getElementById('shorts-viewer');
-    if (viewer) {
-      previousFocus = document.activeElement as HTMLElement;
-      viewer.classList.remove('viewer-hidden');
-      viewerState.active = true;
-      viewerState.index = 0;
-      document.body.style.overflow = 'hidden';
-      
-      // Shuffle panels randomly each time
-      shufflePanels();
-      updatePanelPositions();
-      loadFavoriteStates();
-
-      // Move focus into viewer
-      const exitBtn = document.getElementById('exit-shorts');
-      exitBtn?.focus();
-    }
-  };
 
   function shufflePanels() {
     const track = document.querySelector('.viewer-track');
     if (!track) return;
-    const panels = Array.from(track.querySelectorAll('.tool-panel'));
-    // Fisher-Yates shuffle
-    for (let i = panels.length - 1; i > 0; i--) {
+    const ps = Array.from(track.querySelectorAll('.tool-panel'));
+    for (let i = ps.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      track.appendChild(panels[j]);
-      panels[j] = panels[i];
+      track.appendChild(ps[j]);
+      ps[j] = ps[i];
     }
   }
+
+  (window as any).launchShortsViewer = function () {
+    setupViewerFrame();
+    buildPanels();
+    const vw = document.getElementById('shorts-viewer');
+    if (!vw) return;
+    previousFocus = document.activeElement as HTMLElement;
+    vw.classList.remove('viewer-hidden');
+    viewerState.active = true;
+    viewerState.pos = 0;
+    document.body.style.overflow = 'hidden';
+    shufflePanels();
+    updatePanelPositions();
+    loadFavoriteStates();
+    document.getElementById('exit-shorts')?.focus();
+  };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupViewer);
+    document.addEventListener('DOMContentLoaded', setupViewerFrame);
   } else {
-    setupViewer();
+    setupViewerFrame();
   }
 
-  // Fetch star counts for shorts panels
+  // Fetch GitHub star counts once, when viewer first becomes visible
   const starCache = new Map<string, string>();
-  function fetchStarCounts() {
-    document.querySelectorAll('.star-action[data-repo]').forEach(async (el) => {
+  function fetchStars() {
+    document.querySelectorAll('.star-action[data-repo]').forEach(async el => {
       const repo = (el as HTMLElement).dataset.repo!;
-      const textEl = el.querySelector('.star-count-text');
-      if (!textEl || starCache.has(repo)) {
-        if (starCache.has(repo)) textEl!.textContent = starCache.get(repo)!;
-        return;
-      }
+      const lbl  = el.querySelector('.star-count-text');
+      if (!lbl) return;
+      if (starCache.has(repo)) { lbl.textContent = starCache.get(repo)!; return; }
       try {
-        const r = await fetch(`https://api.github.com/repos/${repo}`);
-        if (!r.ok) return;
-        const data = await r.json();
-        const count = data.stargazers_count;
-        const label = '⭐ ' + (count >= 1000
-          ? (count / 1000).toFixed(count >= 10000 ? 0 : 1) + 'k'
-          : count.toString());
-        starCache.set(repo, label);
-        textEl.textContent = label;
-      } catch {}
+        const res = await fetch(`https://api.github.com/repos/${repo}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const cnt = data.stargazers_count as number;
+        const text = '⭐ ' + (cnt >= 1000
+          ? (cnt / 1000).toFixed(cnt >= 10000 ? 0 : 1) + 'k'
+          : String(cnt));
+        starCache.set(repo, text);
+        lbl.textContent = text;
+      } catch { /* network error — keep default label */ }
     });
   }
-  // Fetch on viewer open
-  const observer = new MutationObserver(() => {
-    const viewer = document.getElementById('shorts-viewer');
-    if (viewer && !viewer.classList.contains('viewer-hidden')) {
-      fetchStarCounts();
-      observer.disconnect();
+  const starObserver = new MutationObserver(() => {
+    const vw = document.getElementById('shorts-viewer');
+    if (vw && !vw.classList.contains('viewer-hidden')) {
+      fetchStars();
+      starObserver.disconnect();
     }
   });
-  const viewerEl = document.getElementById('shorts-viewer');
-  if (viewerEl) observer.observe(viewerEl, { attributes: true, attributeFilter: ['class'] });
+  const vel = document.getElementById('shorts-viewer');
+  if (vel) starObserver.observe(vel, { attributes: true, attributeFilter: ['class'] });
 </script>
+
 
 <style>
   #shorts-viewer {
