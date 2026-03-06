@@ -410,6 +410,64 @@
   --font-display: 'Courier New', monospace;
 }
 
+/* OG Xbox: classic original Xbox console vibes */
+[data-theme="xbox"] {
+  --color-bg: #060a00;
+  --color-bg-card: #0e1400;
+  --color-bg-hover: #172000;
+  --color-text: #d0e8b0;
+  --color-text-muted: #6a9050;
+  --color-primary: #52b043;
+  --color-secondary: #107c10;
+  --color-tertiary: #9bc900;
+  --color-accent: #7ecb54;
+  --color-green: #52b043;
+  --color-tag-bg: rgba(82, 176, 67, 0.12);
+  --color-tag-text: #7ecb54;
+  --color-border: rgba(82, 176, 67, 0.18);
+  --color-header-bg: rgba(6, 10, 0, 0.95);
+}
+
+[data-theme="xbox"] .gradient-text {
+  background: linear-gradient(135deg, #52b043, #9bc900);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="xbox"] .site-header {
+  border-bottom: 2px solid #52b043;
+  box-shadow: 0 2px 24px rgba(82, 176, 67, 0.3);
+}
+
+[data-theme="xbox"] .tool-card {
+  border: 1px solid rgba(82, 176, 67, 0.2) !important;
+}
+
+[data-theme="xbox"] .tool-card:hover {
+  box-shadow: 0 4px 28px rgba(82, 176, 67, 0.25);
+  border-color: rgba(82, 176, 67, 0.5) !important;
+}
+
+[data-theme="xbox"] .btn-primary {
+  background: #52b043;
+  color: #000000;
+}
+
+[data-theme="xbox"] .btn-primary:hover {
+  background: #6ac054;
+  box-shadow: 0 4px 20px rgba(82, 176, 67, 0.5);
+  color: #000000;
+}
+
+[data-theme="xbox"] .hero-title {
+  text-shadow: 0 0 40px rgba(82, 176, 67, 0.45);
+}
+
+[data-theme="xbox"] .site-footer {
+  border-top: 2px solid rgba(82, 176, 67, 0.3);
+}
+
 *, *::before, *::after {
   margin: 0;
   padding: 0;
