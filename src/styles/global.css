@@ -410,6 +410,43 @@
   --font-display: 'Courier New', monospace;
 }
 
+/* Xbox: retro OG Xbox dashboard */
+[data-theme="xbox"] {
+  --color-bg: #0b0b0b;
+  --color-bg-card: #141414;
+  --color-bg-hover: #1c1c1c;
+  --color-text: #d8d8d8;
+  --color-text-muted: #808080;
+  --color-primary: #52b043;
+  --color-secondary: #83c330;
+  --color-tertiary: #107c10;
+  --color-accent: #52b043;
+  --color-green: #52b043;
+  --color-tag-bg: rgba(82, 176, 67, 0.12);
+  --color-tag-text: #52b043;
+  --color-border: rgba(82, 176, 67, 0.2);
+  --color-header-bg: rgba(11, 11, 11, 0.97);
+}
+
+[data-theme="xbox"] .site-header {
+  border-bottom: 2px solid #107c10;
+  box-shadow: 0 2px 16px rgba(82, 176, 67, 0.25);
+}
+
+[data-theme="xbox"] .tool-card {
+  border: 1px solid rgba(82, 176, 67, 0.25) !important;
+  box-shadow: 0 0 12px rgba(82, 176, 67, 0.08);
+}
+
+[data-theme="xbox"] .tool-card:hover {
+  border-color: #52b043 !important;
+  box-shadow: 0 0 24px rgba(82, 176, 67, 0.3);
+}
+
+[data-theme="xbox"] .hero-title {
+  text-shadow: 0 0 24px rgba(82, 176, 67, 0.4);
+}
+
 *, *::before, *::after {
   margin: 0;
   padding: 0;
