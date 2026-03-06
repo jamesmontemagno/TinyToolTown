@@ -114,6 +114,8 @@ const HUE_OFFSET_SECONDARY = 53;
 </div>
 
 <script>
+  import { getFavoriteIds, onFavoritesChanged, toggleFavorite as toggleFavoriteById } from '../lib/favorites';
+
   // Navigation state
   let viewerState = {
     index: 0,
@@ -290,7 +292,11 @@ const HUE_OFFSET_SECONDARY = 53;
 
   function toggleFavorite(e: Event) {
     const btn = e.currentTarget as HTMLElement;
-    const isFavorited = btn.classList.toggle('favorited');
+    const toolId = btn.getAttribute('data-tool');
+    if (!toolId) return;
+
+    const isFavorited = toggleFavoriteById(toolId);
+    btn.classList.toggle('favorited', isFavorited);
     
     const svg = btn.querySelector('svg');
     if (svg) {
@@ -298,18 +304,6 @@ const HUE_OFFSET_SECONDARY = 53;
       setTimeout(() => svg.style.animation = '', 350);
     }
     
-    // Store in localStorage
-    const toolId = btn.getAttribute('data-tool');
-    if (toolId) {
-      const favorites = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-      if (isFavorited) {
-        if (!favorites.includes(toolId)) favorites.push(toolId);
-      } else {
-        const idx = favorites.indexOf(toolId);
-        if (idx > -1) favorites.splice(idx, 1);
-      }
-      localStorage.setItem('ttt-favorites', JSON.stringify(favorites));
-    }
   }
 
   function sharePanel(e: Event) {
@@ -338,10 +332,11 @@ const HUE_OFFSET_SECONDARY = 53;
   }
 
   function loadFavoriteStates() {
-    const favorites = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-    favorites.forEach((toolId: string) => {
-      const btn = document.querySelector(`.favorite-action[data-tool="${toolId}"]`);
-      btn?.classList.add('favorited');
+    const favorites = new Set(getFavoriteIds());
+    document.querySelectorAll('.favorite-action[data-tool]').forEach((button) => {
+      const el = button as HTMLElement;
+      const toolId = el.dataset.tool || '';
+      el.classList.toggle('favorited', favorites.has(toolId));
     });
   }
 
@@ -382,9 +377,15 @@ const HUE_OFFSET_SECONDARY = 53;
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupViewer);
+    document.addEventListener('DOMContentLoaded', () => {
+      setupViewer();
+      onFavoritesChanged(() => loadFavoriteStates());
+      loadFavoriteStates();
+    });
   } else {
     setupViewer();
+    onFavoritesChanged(() => loadFavoriteStates());
+    loadFavoriteStates();
   }
 
   // Fetch star counts for shorts panels

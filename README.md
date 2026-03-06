@@ -59,7 +59,7 @@ Why did you build it? Why is it delightful?
 - [Astro](https://astro.build) — Static site generator
 - [GitHub Pages](https://pages.github.com) — Hosting
 - [GitHub Actions](https://github.com/features/actions) — CI/CD + auto tool submission
-- Zero backend. Zero database. Zero cost.
+- Optional [Supabase](https://supabase.com) for GitHub-authenticated favorites sync
 
 ## Development
 
@@ -68,6 +68,49 @@ npm install
 npm run dev      # Start dev server
 npm run build    # Build for production
 npm run preview  # Preview production build
+```
+
+### Optional: GitHub Auth + Synced Favorites (Supabase)
+
+Create a local environment file from `.env.example` and set:
+
+```bash
+PUBLIC_SUPABASE_URL=...
+PUBLIC_SUPABASE_ANON_KEY=...
+```
+
+Configure Supabase Auth redirect URLs:
+
+- `http://localhost:4321/auth/callback/`
+- `https://tinytooltown.com/auth/callback/`
+
+Recommended `favorites` table schema:
+
+```sql
+create table if not exists public.favorites (
+	id uuid primary key default gen_random_uuid(),
+	user_id uuid not null references auth.users(id) on delete cascade,
+	tool_slug text not null,
+	created_at timestamptz not null default now(),
+	unique (user_id, tool_slug)
+);
+
+alter table public.favorites enable row level security;
+
+create policy "read own favorites"
+on public.favorites
+for select
+using (auth.uid() = user_id);
+
+create policy "insert own favorites"
+on public.favorites
+for insert
+with check (auth.uid() = user_id);
+
+create policy "delete own favorites"
+on public.favorites
+for delete
+using (auth.uid() = user_id);
 ```
 
 ## AI Summary Generator

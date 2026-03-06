@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Signing in — Tiny Tool Town 🏘️" description="Completing your GitHub sign-in.">
+  <main id="main" class="auth-callback container">
+    <h1>Signing you in…</h1>
+    <p id="auth-status">Completing GitHub authentication and syncing favorites.</p>
+    <p><a href="/favorites/">Continue manually</a></p>
+  </main>
+</BaseLayout>
+
+<script>
+  import { consumePostAuthRedirect, getSupabaseClient } from '../../lib/auth';
+
+  const status = document.getElementById('auth-status');
+
+  async function completeLogin() {
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      if (status) status.textContent = 'Supabase is not configured. Using local favorites only.';
+      window.setTimeout(() => {
+        window.location.replace('/favorites/');
+      }, 800);
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const authError = params.get('error_description') || params.get('error');
+
+    if (authError) {
+      if (status) status.textContent = `Sign-in failed: ${authError}`;
+      return;
+    }
+
+    if (code) {
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        if (status) status.textContent = `Sign-in failed: ${error.message}`;
+        return;
+      }
+    }
+
+    const redirectTo = consumePostAuthRedirect('/favorites/');
+    window.location.replace(redirectTo);
+  }
+
+  completeLogin();
+</script>
+
+<style>
+  .auth-callback {
+    min-height: 50vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 3rem 1rem;
+  }
+
+  .auth-callback h1 {
+    font-size: 1.8rem;
+    font-weight: 900;
+  }
+
+  .auth-callback p {
+    color: var(--color-text-muted);
+  }
+</style>

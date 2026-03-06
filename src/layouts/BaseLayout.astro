@@ -66,6 +66,34 @@ const {
 <body>
   <a href="#main" class="skip-link">Skip to main content</a>
   <slot />
+
+  <script>
+    import { getCurrentSession, getSupabaseClient, onAuthStateChange } from '../lib/auth';
+    import { disableRemoteFavoritesSync, enableRemoteFavoritesSync } from '../lib/favorites';
+
+    const supabase = getSupabaseClient();
+
+    async function applySession() {
+      if (!supabase) {
+        disableRemoteFavoritesSync();
+        return;
+      }
+
+      const session = await getCurrentSession();
+      if (!session?.user) {
+        disableRemoteFavoritesSync();
+        return;
+      }
+
+      await enableRemoteFavoritesSync(supabase, session.user.id);
+    }
+
+    applySession();
+
+    onAuthStateChange(() => {
+      applySession();
+    });
+  </script>
 </body>
 </html>
 

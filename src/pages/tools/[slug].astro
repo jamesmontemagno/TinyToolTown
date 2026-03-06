@@ -16,6 +16,7 @@ export async function getStaticPaths() {
 const { tool } = Astro.props;
 const { Content } = await render(tool);
 const repo = getGitHubRepo(tool.data.github_url);
+const toolId = tool.id.replace(/\.md$/, '');
 
 const langColors: Record<string, string> = {
   'C#': '#178600',
@@ -100,6 +101,9 @@ const langColor = tool.data.language ? langColors[tool.data.language] || '#8b949
                 🌐 Website
               </a>
             )}
+            <button type="button" class="btn btn-secondary favorite-detail-btn" data-favorite-toggle={toolId} aria-pressed="false">
+              ❤ Favorite
+            </button>
           </div>
         </div>
 
@@ -296,6 +300,12 @@ const langColor = tool.data.language ? langColors[tool.data.language] || '#8b949
     border: 1px solid var(--color-border);
   }
 
+  .favorite-detail-btn.favorited {
+    border-color: #ff507a;
+    color: #ff8cab;
+    background: rgba(255, 80, 122, 0.14);
+  }
+
   .tool-screenshot img {
     width: 100%;
     display: block;
@@ -443,6 +453,30 @@ const langColor = tool.data.language ? langColors[tool.data.language] || '#8b949
 </style>
 
 <script>
+  import { isFavorite, onFavoritesChanged, toggleFavorite } from '../../lib/favorites';
+
+  const favoriteButton = document.querySelector<HTMLButtonElement>('.favorite-detail-btn[data-favorite-toggle]');
+  function syncFavoriteButton() {
+    if (!favoriteButton) return;
+    const tool = favoriteButton.dataset.favoriteToggle || '';
+    const favorited = tool ? isFavorite(tool) : false;
+    favoriteButton.classList.toggle('favorited', favorited);
+    favoriteButton.setAttribute('aria-pressed', String(favorited));
+    favoriteButton.textContent = favorited ? '❤ Favorited' : '❤ Favorite';
+  }
+
+  favoriteButton?.addEventListener('click', () => {
+    const tool = favoriteButton.dataset.favoriteToggle;
+    if (!tool) return;
+    const favorited = toggleFavorite(tool);
+    favoriteButton.classList.toggle('favorited', favorited);
+    favoriteButton.setAttribute('aria-pressed', String(favorited));
+    favoriteButton.textContent = favorited ? '❤ Favorited' : '❤ Favorite';
+  });
+
+  syncFavoriteButton();
+  onFavoritesChanged(() => syncFavoriteButton());
+
   const badge = document.getElementById('star-badge');
   if (badge) {
     const repo = badge.dataset.repo;

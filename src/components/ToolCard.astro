@@ -31,56 +31,82 @@ const langColors: Record<string, string> = {
 const langColor = language ? langColors[language] || '#8b949e' : null;
 ---
 
-<a href={`/tools/${slug}/`} class:list={["tool-card", { featured }]}>
-  <div class="card-thumbnail">
-    {thumbnail ? (
-      <img src={thumbnail} alt={`Screenshot of ${name}`} loading="lazy" />
-    ) : (
-      <div class="card-placeholder">
-        <span class="placeholder-emoji">🔧</span>
-      </div>
-    )}
-  </div>
-  <div class="card-body">
-    <h3 class="card-title">{name}</h3>
-    <p class="card-tagline">{tagline}</p>
-    <div class="card-meta">
-      <div class="card-tags">
-        {tags.slice(0, 3).map(tag => (
-          <span class="tag">{tag}</span>
-        ))}
-      </div>
-      {language && (
-        <span class="card-lang">
-          <span class="lang-dot" style={`background: ${langColor}`}></span>
-          {language}
-        </span>
+<div class="tool-card-wrap">
+  <a href={`/tools/${slug}/`} class:list={["tool-card", { featured }]} data-tool-card={slug}>
+    <div class="card-thumbnail">
+      {thumbnail ? (
+        <img src={thumbnail} alt={`Screenshot of ${name}`} loading="lazy" />
+      ) : (
+        <div class="card-placeholder">
+          <span class="placeholder-emoji">🔧</span>
+        </div>
       )}
     </div>
-    <div class="card-author">
-      <img
-        src={`https://avatars.githubusercontent.com/${author_github}?s=24`}
-        alt={author}
-        class="author-avatar"
-        loading="lazy"
-      />
-      <span class="author-name" data-author-search={author.toLowerCase()}>{author}</span>
-      {typeof stars === 'number' ? (
-        <span class="card-stars-count">⭐ {stars.toLocaleString()}</span>
-      ) : repo ? (
+    <div class="card-body">
+      <h3 class="card-title">{name}</h3>
+      <p class="card-tagline">{tagline}</p>
+      <div class="card-meta">
+        <div class="card-tags">
+          {tags.slice(0, 3).map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+        {language && (
+          <span class="card-lang">
+            <span class="lang-dot" style={`background: ${langColor}`}></span>
+            {language}
+          </span>
+        )}
+      </div>
+      <div class="card-author">
         <img
-          src={`https://img.shields.io/github/stars/${repo}?style=flat&label=%E2%AD%90`}
-          alt={`GitHub stars for ${name}`}
-          class="card-stars"
+          src={`https://avatars.githubusercontent.com/${author_github}?s=24`}
+          alt={author}
+          class="author-avatar"
           loading="lazy"
-          onerror="this.style.display='none'"
         />
-      ) : null}
+        <span class="author-name" data-author-search={author.toLowerCase()}>{author}</span>
+        {typeof stars === 'number' ? (
+          <span class="card-stars-count">⭐ {stars.toLocaleString()}</span>
+        ) : repo ? (
+          <img
+            src={`https://img.shields.io/github/stars/${repo}?style=flat&label=%E2%AD%90`}
+            alt={`GitHub stars for ${name}`}
+            class="card-stars"
+            loading="lazy"
+            onerror="this.style.display='none'"
+          />
+        ) : null}
+      </div>
     </div>
-  </div>
-</a>
+  </a>
+
+  <button
+    type="button"
+    class="favorite-toggle"
+    data-favorite-toggle={slug}
+    aria-label={`Favorite ${name}`}
+    aria-pressed="false"
+    title="Save to favorites"
+  >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  </button>
+</div>
 
 <script>
+  import { isFavorite, onFavoritesChanged, toggleFavorite } from '../lib/favorites';
+
+  function syncFavoriteButtons() {
+    document.querySelectorAll<HTMLButtonElement>('.favorite-toggle[data-favorite-toggle]').forEach((button) => {
+      const toolId = button.dataset.favoriteToggle || '';
+      const favorited = toolId ? isFavorite(toolId) : false;
+      button.classList.toggle('favorited', favorited);
+      button.setAttribute('aria-pressed', String(favorited));
+    });
+  }
+
   document.querySelectorAll('.author-name[data-author-search]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -88,9 +114,30 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
       window.location.href = `/tools/?q=${encodeURIComponent((el as HTMLElement).dataset.authorSearch!)}`;
     });
   });
+
+  document.querySelectorAll<HTMLButtonElement>('.favorite-toggle[data-favorite-toggle]').forEach((button) => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const toolId = button.dataset.favoriteToggle;
+      if (!toolId) return;
+
+      const favorited = toggleFavorite(toolId);
+      button.classList.toggle('favorited', favorited);
+      button.setAttribute('aria-pressed', String(favorited));
+    });
+  });
+
+  syncFavoriteButtons();
+  onFavoritesChanged(() => syncFavoriteButtons());
 </script>
 
 <style>
+  .tool-card-wrap {
+    position: relative;
+    height: 100%;
+  }
+
   .tool-card {
     display: flex;
     flex-direction: column;
@@ -248,5 +295,40 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
     color: var(--color-text-muted);
     margin-left: auto;
     flex-shrink: 0;
+  }
+
+  .favorite-toggle {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.7rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(15, 14, 23, 0.65);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
+    z-index: 2;
+  }
+
+  .favorite-toggle:hover {
+    transform: scale(1.05);
+    border-color: var(--color-primary);
+  }
+
+  .favorite-toggle.favorited {
+    border-color: #ff507a;
+    background: rgba(255, 80, 122, 0.24);
+    color: #ff8cab;
+  }
+
+  .favorite-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 </style>
