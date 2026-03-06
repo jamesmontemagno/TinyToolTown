@@ -1,0 +1,69 @@
+---
+interface Props {
+  count: number;
+}
+const { count } = Astro.props;
+---
+
+<div class="tool-counter">
+  <span class="counter-number" data-target={count}>0</span>
+  <span class="counter-label">tiny tools and counting</span>
+</div>
+
+<script>
+  function animateCounter(el: HTMLElement) {
+    const target = parseInt(el.dataset.target || '0', 10);
+    const duration = 1500;
+    const start = performance.now();
+
+    function update(now: number) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target).toString();
+      if (progress < 1) requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  const counters = document.querySelectorAll<HTMLElement>('.counter-number');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCounter(entry.target as HTMLElement);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counters.forEach(el => observer.observe(el));
+</script>
+
+<style>
+  .tool-counter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 1.5rem auto;
+  }
+
+  .counter-number {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .counter-label {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+</style>

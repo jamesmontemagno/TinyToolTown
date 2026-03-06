@@ -1,4 +1,9 @@
 ---
+import ToolCounter from './ToolCounter.astro';
+interface Props {
+  count?: number;
+}
+const { count = 0 } = Astro.props;
 ---
 
 <section class="hero">
@@ -24,6 +29,7 @@
       A place for <strong>stupid-delightful</strong> tools made with love.<br>
       Free, fun & open source. Made for an audience of one.
     </p>
+    {count > 0 && <ToolCounter count={count} />}
     <div class="hero-cta">
       <a href="/tools/" class="btn btn-primary">Browse the Town 🏘️</a>
       <a href="/submit/" class="btn btn-secondary">Submit Your Tool ✨</a>

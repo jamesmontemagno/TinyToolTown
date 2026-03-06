@@ -4,6 +4,7 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import ToolCard from '../../components/ToolCard.astro';
 import TikTokView from '../../components/TikTokView.astro';
+import ToolCounter from '../../components/ToolCounter.astro';
 import { getCollection } from 'astro:content';
 import { getGitHubRepo, fetchStarCounts } from '../../lib/github';
 
@@ -44,9 +45,9 @@ const moreTags = [...tagCounts.entries()]
   <Header />
 
   <main id="main" class="container">
-    <section class="browse-header">
+    <section class="browse-header" id="browse-header">
       <h1>Browse the Town 🏘️</h1>
-      <p class="browse-subtitle" id="browse-subtitle">{tools.length} tiny tools and counting</p>
+      <ToolCounter count={tools.length} />
     </section>
 
     <!-- Search & Filter -->
@@ -67,6 +68,7 @@ const moreTags = [...tagCounts.entries()]
         <button class="sort-btn active" data-sort="newest" aria-pressed="true">Newest</button>
         <button class="sort-btn" data-sort="oldest" aria-pressed="false">Oldest</button>
         <button class="sort-btn" data-sort="stars" aria-pressed="false">⭐ Stars</button>
+        <button class="sort-btn favorites-only-btn" id="favorites-only-btn" aria-pressed="false">❤ Favorites only</button>
       </div>
       <div class="tags-filter" id="tags-filter">
         <button class="tag-btn active" data-tag="all">All</button>
@@ -88,6 +90,7 @@ const moreTags = [...tagCounts.entries()]
     <div class="tool-grid" id="tool-grid">
       {tools.map(tool => (
         <div class="tool-item"
+          data-tool={tool.id.replace(/\.md$/, '')}
           data-name={tool.data.name.toLowerCase()}
           data-tagline={tool.data.tagline.toLowerCase()}
           data-tags={tool.data.tags.map(t => t.toLowerCase()).join(',')}
@@ -95,6 +98,7 @@ const moreTags = [...tagCounts.entries()]
           data-date-added={tool.data.date_added}
           data-stars={toolStars.get(tool.id) || 0}
           data-repo={repoMap.get(tool.id) || ''}
+          data-favorited="false"
         >
           <ToolCard
             name={tool.data.name}
@@ -129,19 +133,59 @@ const moreTags = [...tagCounts.entries()]
 </BaseLayout>
 
 <script>
+  import { FAVORITES_CHANGED_EVENT, readFavorites } from '../../lib/favorites';
+
   const search = document.getElementById('search') as HTMLInputElement;
   const grid = document.getElementById('tool-grid')!;
   const items = grid.querySelectorAll('.tool-item');
+  const favoritesOnlyBtn = document.getElementById('favorites-only-btn') as HTMLButtonElement | null;
   const tagButtons = document.querySelectorAll('.tag-btn:not(.more-tags-toggle)');
   const noResults = document.getElementById('no-results')!;
   const moreToggle = document.getElementById('more-tags-toggle');
   const moreTags = document.getElementById('more-tags');
 
-  const subtitle = document.getElementById('browse-subtitle')!;
+  const subtitle = document.getElementById('browse-subtitle');
+  const counterNumber = document.querySelector<HTMLElement>('#browse-header .counter-number');
+  const counterLabel = document.querySelector<HTMLElement>('#browse-header .counter-label');
   const totalCount = items.length;
 
   let activeTag = 'all';
   let activeSort = 'newest';
+  let favoritesOnly = false;
+
+  function syncFavoriteFlags(): void {
+    const favorites = new Set(readFavorites());
+
+    items.forEach(item => {
+      const el = item as HTMLElement;
+      const slug = el.dataset.tool || '';
+      el.dataset.favorited = String(favorites.has(slug));
+    });
+  }
+
+  function updateFavoritesButtonState(): void {
+    if (!favoritesOnlyBtn) return;
+
+    favoritesOnlyBtn.classList.toggle('active', favoritesOnly);
+    favoritesOnlyBtn.setAttribute('aria-pressed', String(favoritesOnly));
+  }
+
+  function updateUrlState(): void {
+    const url = new URL(window.location.href);
+    if (activeSort === 'newest') {
+      url.searchParams.delete('sort');
+    } else {
+      url.searchParams.set('sort', activeSort);
+    }
+
+    if (favoritesOnly) {
+      url.searchParams.set('favorites', '1');
+    } else {
+      url.searchParams.delete('favorites');
+    }
+
+    history.replaceState(null, '', url.toString());
+  }
 
   // "More ▾" expander
   if (moreToggle && moreTags) {
@@ -179,11 +223,13 @@ const moreTags = [...tagCounts.entries()]
       const tagline = el.dataset.tagline || '';
       const tags = (el.dataset.tags || '').toLowerCase();
       const author = el.dataset.author || '';
+      const favorited = el.dataset.favorited === 'true';
 
       const matchesSearch = !query || name.includes(query) || tagline.includes(query) || tags.includes(query) || author.includes(query);
       const matchesTag = activeTag === 'all' || tags.split(',').includes(activeTag);
+      const matchesFavorites = !favoritesOnly || favorited;
 
-      if (matchesSearch && matchesTag) {
+      if (matchesSearch && matchesTag && matchesFavorites) {
         el.style.display = '';
         visible++;
       } else {
@@ -192,9 +238,22 @@ const moreTags = [...tagCounts.entries()]
     });
 
     noResults.style.display = visible === 0 ? 'block' : 'none';
-    subtitle.textContent = (visible === totalCount)
-      ? `${totalCount} tiny tools and counting`
-      : `Showing ${visible} of ${totalCount} tools`;
+    if (subtitle) {
+      subtitle.textContent = (visible === totalCount)
+        ? `${totalCount} tiny tools and counting`
+        : `Showing ${visible} of ${totalCount} tools`;
+    }
+    if (counterNumber && counterLabel) {
+      counterNumber.style.webkitTextFillColor = '';
+      if (visible === totalCount) {
+        counterNumber.textContent = String(totalCount);
+        counterNumber.style.webkitTextFillColor = '';
+        counterLabel.textContent = 'tiny tools and counting';
+      } else {
+        counterNumber.textContent = `${visible} of ${totalCount}`;
+        counterLabel.textContent = 'tools shown';
+      }
+    }
   }
 
   // Sort button handler
@@ -208,15 +267,15 @@ const moreTags = [...tagCounts.entries()]
       btn.setAttribute('aria-pressed', 'true');
       activeSort = (btn as HTMLElement).dataset.sort || 'newest';
       sortTools();
-      // Update URL param
-      const url = new URL(window.location.href);
-      if (activeSort === 'newest') {
-        url.searchParams.delete('sort');
-      } else {
-        url.searchParams.set('sort', activeSort);
-      }
-      history.replaceState(null, '', url.toString());
+      updateUrlState();
     });
+  });
+
+  favoritesOnlyBtn?.addEventListener('click', () => {
+    favoritesOnly = !favoritesOnly;
+    updateFavoritesButtonState();
+    filterTools();
+    updateUrlState();
   });
 
   // Pre-fill search from ?q= URL parameter, or activate tag from ?tag=
@@ -224,6 +283,7 @@ const moreTags = [...tagCounts.entries()]
   const urlQ = params.get('q');
   const urlTag = params.get('tag');
   const urlSort = params.get('sort');
+  const urlFavorites = params.get('favorites');
 
   // Apply sort from URL
   if (urlSort && ['newest', 'oldest', 'stars'].includes(urlSort)) {
@@ -235,6 +295,9 @@ const moreTags = [...tagCounts.entries()]
     });
     sortTools();
   }
+
+  favoritesOnly = urlFavorites === '1' || urlFavorites === 'true';
+  updateFavoritesButtonState();
 
   if (urlQ) {
     search.value = urlQ;
@@ -262,6 +325,13 @@ const moreTags = [...tagCounts.entries()]
   }
 
   search.addEventListener('input', filterTools);
+
+  syncFavoriteFlags();
+  filterTools();
+  window.addEventListener(FAVORITES_CHANGED_EVENT, () => {
+    syncFavoriteFlags();
+    filterTools();
+  });
 
   // Handle tag clicks (both popular and expanded)
   document.getElementById('tags-filter')!.addEventListener('click', (e) => {
