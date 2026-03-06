@@ -9,7 +9,7 @@ interface Props {
 const { tools } = Astro.props;
 
 // Serialize only the fields needed to build each panel client-side
-const panelData = tools.map((tool) => ({
+const shortsToolsData = tools.map((tool) => ({
   slug: tool.id.replace(/\.md$/, ''),
   name: tool.data.name,
   tagline: tool.data.tagline,
@@ -28,7 +28,7 @@ const panelData = tools.map((tool) => ({
 </div>
 
 {/* Tool data island — consumed by buildPanels() when Shorts is first opened */}
-<script type="application/json" id="shorts-tools-data" set:html={JSON.stringify(panelData)} />
+<script type="application/json" id="shorts-tools-data" set:html={JSON.stringify(shortsToolsData)} />
 
 <template id="shorts-panel-tpl">
   <section class="tool-panel">
@@ -72,12 +72,12 @@ const panelData = tools.map((tool) => ({
 
 <script>
   const SWIPE_MIN = 60;
-  const HUE_P = 37;
-  const HUE_S = 53;
+  const HUE_OFFSET_PRIMARY = 37;
+  const HUE_OFFSET_SECONDARY = 53;
 
-  let vs = { pos: 0, active: false, drag0: 0, dragging: false };
+  let viewerState = { pos: 0, active: false, drag0: 0, dragging: false };
   let frameInit = false;
-  let prevFocus: HTMLElement | null = null;
+  let previousFocus: HTMLElement | null = null;
 
   // Build panel nodes from JSON data island by cloning the <template>.
   // Invoked on first Shorts open — keeps initial HTML payload small.
@@ -88,13 +88,13 @@ const panelData = tools.map((tool) => ({
     const src = document.getElementById('shorts-tools-data');
     if (!tpl || !src) return;
 
-    type Entry = {
+    type ShortsToolEntry = {
       slug: string; name: string; tagline: string;
       author: string; authorGithub: string;
       thumbnail: string | null; githubUrl: string;
       repo: string | null; tags: string[];
     };
-    let items: Entry[];
+    let items: ShortsToolEntry[];
     try { items = JSON.parse(src.textContent || '[]'); } catch { return; }
 
     const total = items.length;
@@ -113,7 +113,7 @@ const panelData = tools.map((tool) => ({
       } else {
         bgImg.remove();
         bgGrad.style.background =
-          `linear-gradient(135deg,hsl(${i * HUE_P},70%,50%),hsl(${i * HUE_S},60%,40%))`;
+          `linear-gradient(135deg,hsl(${i * HUE_OFFSET_PRIMARY},70%,50%),hsl(${i * HUE_OFFSET_SECONDARY},60%,40%))`;
       }
 
       const thumb = sec.querySelector<HTMLElement>('.tool-thumbnail')!;
@@ -139,11 +139,11 @@ const panelData = tools.map((tool) => ({
 
       const favBtn = sec.querySelector<HTMLElement>('.favorite-action')!;
       favBtn.dataset.tool = t.slug;
-      favBtn.addEventListener('click', handleFav);
+      favBtn.addEventListener('click', toggleFavorite);
 
       const shrBtn = sec.querySelector<HTMLElement>('.distribute-action')!;
       shrBtn.dataset.toolTitle = t.name;
-      shrBtn.addEventListener('click', handleShare);
+      shrBtn.addEventListener('click', sharePanel);
 
       const starA = sec.querySelector<HTMLAnchorElement>('.star-action')!;
       if (t.repo) {
@@ -164,60 +164,60 @@ const panelData = tools.map((tool) => ({
   }
 
   // Attach viewer-container events once
-  function initFrame() {
+  function setupViewerFrame() {
     if (frameInit) return;
     const vw = document.getElementById('shorts-viewer');
     if (!vw) return;
     document.getElementById('exit-shorts')?.addEventListener('click', closeViewer);
-    vw.addEventListener('touchstart', onTS, { passive: true });
-    vw.addEventListener('touchmove', onTM, { passive: false });
-    vw.addEventListener('touchend', onTE);
-    vw.addEventListener('mousedown', onMD);
-    vw.addEventListener('mouseup', onMU);
-    vw.addEventListener('wheel', onWHL, { passive: false });
-    document.addEventListener('keydown', onKD);
+    vw.addEventListener('touchstart', handleTouchStart, { passive: true });
+    vw.addEventListener('touchmove', handleTouchMove, { passive: false });
+    vw.addEventListener('touchend', handleTouchEnd);
+    vw.addEventListener('mousedown', handleMouseDown);
+    vw.addEventListener('mouseup', handleMouseUp);
+    vw.addEventListener('wheel', handleWheel, { passive: false });
+    document.addEventListener('keydown', handleKeyDown);
     frameInit = true;
   }
 
-  function syncPos() {
+  function updatePanelPositions() {
     const ps = document.querySelectorAll('.tool-panel');
     ps.forEach((p, i) => {
       p.classList.remove('panel-visible', 'panel-above', 'panel-below');
-      if (i === vs.pos) p.classList.add('panel-visible');
-      else if (i < vs.pos) p.classList.add('panel-above');
+      if (i === viewerState.pos) p.classList.add('panel-visible');
+      else if (i < viewerState.pos) p.classList.add('panel-above');
       else p.classList.add('panel-below');
     });
-    const ctr = ps[vs.pos]?.querySelector('.panel-counter');
-    if (ctr) ctr.textContent = `🔀 ${vs.pos + 1} / ${ps.length}`;
+    const ctr = ps[viewerState.pos]?.querySelector('.panel-counter');
+    if (ctr) ctr.textContent = `🔀 ${viewerState.pos + 1} / ${ps.length}`;
   }
 
-  function onTS(e: TouchEvent) { vs.drag0 = e.touches[0].clientY; vs.dragging = true; }
-  function onTM(e: TouchEvent) { if (vs.dragging && vs.active) e.preventDefault(); }
-  function onTE(e: TouchEvent) {
-    if (!vs.dragging || !vs.active) return;
-    const d = vs.drag0 - e.changedTouches[0].clientY;
-    if (Math.abs(d) > SWIPE_MIN) d > 0 ? goNext() : goPrev();
-    vs.dragging = false;
+  function handleTouchStart(e: TouchEvent) { viewerState.drag0 = e.touches[0].clientY; viewerState.dragging = true; }
+  function handleTouchMove(e: TouchEvent) { if (viewerState.dragging && viewerState.active) e.preventDefault(); }
+  function handleTouchEnd(e: TouchEvent) {
+    if (!viewerState.dragging || !viewerState.active) return;
+    const d = viewerState.drag0 - e.changedTouches[0].clientY;
+    if (Math.abs(d) > SWIPE_MIN) d > 0 ? advancePanel() : retreatPanel();
+    viewerState.dragging = false;
   }
-  function onMD(e: MouseEvent) {
+  function handleMouseDown(e: MouseEvent) {
     const el = e.target as HTMLElement;
     if (el.closest('.panel-action') || el.closest('.navigate-link') || el.closest('.exit-control')) return;
-    vs.drag0 = e.clientY; vs.dragging = true;
+    viewerState.drag0 = e.clientY; viewerState.dragging = true;
   }
-  function onMU(e: MouseEvent) {
-    if (!vs.dragging || !vs.active) return;
-    const d = vs.drag0 - e.clientY;
-    if (Math.abs(d) > SWIPE_MIN) d > 0 ? goNext() : goPrev();
-    vs.dragging = false;
+  function handleMouseUp(e: MouseEvent) {
+    if (!viewerState.dragging || !viewerState.active) return;
+    const d = viewerState.drag0 - e.clientY;
+    if (Math.abs(d) > SWIPE_MIN) d > 0 ? advancePanel() : retreatPanel();
+    viewerState.dragging = false;
   }
-  function onWHL(e: WheelEvent) {
-    if (!vs.active) return;
+  function handleWheel(e: WheelEvent) {
+    if (!viewerState.active) return;
     e.preventDefault();
-    e.deltaY > 0 ? goNext() : goPrev();
+    e.deltaY > 0 ? advancePanel() : retreatPanel();
   }
 
-  function onKD(e: KeyboardEvent) {
-    if (!vs.active) return;
+  function handleKeyDown(e: KeyboardEvent) {
+    if (!viewerState.active) return;
     if (e.key === 'Tab') {
       const vw = document.getElementById('shorts-viewer');
       if (!vw) return;
@@ -237,35 +237,35 @@ const panelData = tools.map((tool) => ({
       return;
     }
     const km: Record<string, () => void> = {
-      ArrowDown:  () => { e.preventDefault(); goNext(); },
-      ArrowRight: () => { e.preventDefault(); goNext(); },
-      ArrowUp:    () => { e.preventDefault(); goPrev(); },
-      ArrowLeft:  () => { e.preventDefault(); goPrev(); },
+      ArrowDown:  () => { e.preventDefault(); advancePanel(); },
+      ArrowRight: () => { e.preventDefault(); advancePanel(); },
+      ArrowUp:    () => { e.preventDefault(); retreatPanel(); },
+      ArrowLeft:  () => { e.preventDefault(); retreatPanel(); },
       Escape:     () => { e.preventDefault(); closeViewer(); },
     };
     km[e.key]?.();
   }
 
-  function goNext() {
+  function advancePanel() {
     const n = document.querySelectorAll('.tool-panel').length;
-    vs.pos = (vs.pos + 1) % n; syncPos();
+    viewerState.pos = (viewerState.pos + 1) % n; updatePanelPositions();
   }
-  function goPrev() {
+  function retreatPanel() {
     const n = document.querySelectorAll('.tool-panel').length;
-    vs.pos = (vs.pos - 1 + n) % n; syncPos();
+    viewerState.pos = (viewerState.pos - 1 + n) % n; updatePanelPositions();
   }
 
   function closeViewer() {
     const vw = document.getElementById('shorts-viewer');
     if (vw) {
       vw.classList.add('viewer-hidden');
-      vs.active = false;
+      viewerState.active = false;
       document.body.style.overflow = '';
-      prevFocus?.focus();
+      previousFocus?.focus();
     }
   }
 
-  function handleFav(e: Event) {
+  function toggleFavorite(e: Event) {
     const btn = e.currentTarget as HTMLElement;
     const nowOn = btn.classList.toggle('favorited');
     const svgEl = btn.querySelector('svg');
@@ -286,7 +286,7 @@ const panelData = tools.map((tool) => ({
     }
   }
 
-  function handleShare(e: Event) {
+  function sharePanel(e: Event) {
     const btn = e.currentTarget as HTMLElement;
     const title = btn.getAttribute('data-tool-title');
     const pageUrl = window.location.origin + window.location.pathname;
@@ -310,7 +310,7 @@ const panelData = tools.map((tool) => ({
     }
   }
 
-  function restoreFavs() {
+  function loadFavoriteStates() {
     const favs: string[] = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
     favs.forEach(id => {
       document.querySelector(`.favorite-action[data-tool="${id}"]`)?.classList.add('favorited');
@@ -329,35 +329,35 @@ const panelData = tools.map((tool) => ({
   }
 
   (window as any).launchShortsViewer = function () {
-    initFrame();
+    setupViewerFrame();
     buildPanels();
     const vw = document.getElementById('shorts-viewer');
     if (!vw) return;
-    prevFocus = document.activeElement as HTMLElement;
+    previousFocus = document.activeElement as HTMLElement;
     vw.classList.remove('viewer-hidden');
-    vs.active = true;
-    vs.pos = 0;
+    viewerState.active = true;
+    viewerState.pos = 0;
     document.body.style.overflow = 'hidden';
     shufflePanels();
-    syncPos();
-    restoreFavs();
+    updatePanelPositions();
+    loadFavoriteStates();
     document.getElementById('exit-shorts')?.focus();
   };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFrame);
+    document.addEventListener('DOMContentLoaded', setupViewerFrame);
   } else {
-    initFrame();
+    setupViewerFrame();
   }
 
   // Fetch GitHub star counts once, when viewer first becomes visible
-  const scache = new Map<string, string>();
+  const starCache = new Map<string, string>();
   function fetchStars() {
     document.querySelectorAll('.star-action[data-repo]').forEach(async el => {
       const repo = (el as HTMLElement).dataset.repo!;
       const lbl  = el.querySelector('.star-count-text');
       if (!lbl) return;
-      if (scache.has(repo)) { lbl.textContent = scache.get(repo)!; return; }
+      if (starCache.has(repo)) { lbl.textContent = starCache.get(repo)!; return; }
       try {
         const res = await fetch(`https://api.github.com/repos/${repo}`);
         if (!res.ok) return;
@@ -366,20 +366,20 @@ const panelData = tools.map((tool) => ({
         const text = '⭐ ' + (cnt >= 1000
           ? (cnt / 1000).toFixed(cnt >= 10000 ? 0 : 1) + 'k'
           : String(cnt));
-        scache.set(repo, text);
+        starCache.set(repo, text);
         lbl.textContent = text;
       } catch { /* network error — keep default label */ }
     });
   }
-  const sobs = new MutationObserver(() => {
+  const starObserver = new MutationObserver(() => {
     const vw = document.getElementById('shorts-viewer');
     if (vw && !vw.classList.contains('viewer-hidden')) {
       fetchStars();
-      sobs.disconnect();
+      starObserver.disconnect();
     }
   });
   const vel = document.getElementById('shorts-viewer');
-  if (vel) sobs.observe(vel, { attributes: true, attributeFilter: ['class'] });
+  if (vel) starObserver.observe(vel, { attributes: true, attributeFilter: ['class'] });
 </script>
 
 
