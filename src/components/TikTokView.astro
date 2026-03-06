@@ -114,6 +114,8 @@ const HUE_OFFSET_SECONDARY = 53;
 </div>
 
 <script>
+  import { initClientState, isFavorited, subscribeClientState, toggleFavorite as toggleGlobalFavorite } from '../lib/client-state';
+
   // Navigation state
   let viewerState = {
     index: 0,
@@ -288,27 +290,20 @@ const HUE_OFFSET_SECONDARY = 53;
     }
   }
 
-  function toggleFavorite(e: Event) {
+  async function toggleFavorite(e: Event) {
     const btn = e.currentTarget as HTMLElement;
-    const isFavorited = btn.classList.toggle('favorited');
-    
+    const toolId = btn.getAttribute('data-tool');
+    if (!toolId) return;
+
+    await toggleGlobalFavorite(toolId);
+    loadFavoriteStates();
+
     const svg = btn.querySelector('svg');
     if (svg) {
       svg.style.animation = 'heartbeat 0.35s ease';
-      setTimeout(() => svg.style.animation = '', 350);
-    }
-    
-    // Store in localStorage
-    const toolId = btn.getAttribute('data-tool');
-    if (toolId) {
-      const favorites = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-      if (isFavorited) {
-        if (!favorites.includes(toolId)) favorites.push(toolId);
-      } else {
-        const idx = favorites.indexOf(toolId);
-        if (idx > -1) favorites.splice(idx, 1);
-      }
-      localStorage.setItem('ttt-favorites', JSON.stringify(favorites));
+      setTimeout(() => {
+        svg.style.animation = '';
+      }, 350);
     }
   }
 
@@ -338,10 +333,10 @@ const HUE_OFFSET_SECONDARY = 53;
   }
 
   function loadFavoriteStates() {
-    const favorites = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-    favorites.forEach((toolId: string) => {
-      const btn = document.querySelector(`.favorite-action[data-tool="${toolId}"]`);
-      btn?.classList.add('favorited');
+    const buttons = document.querySelectorAll('.favorite-action[data-tool]');
+    buttons.forEach((btn) => {
+      const toolId = (btn as HTMLElement).dataset.tool || '';
+      btn.classList.toggle('favorited', isFavorited(toolId));
     });
   }
 
@@ -386,6 +381,11 @@ const HUE_OFFSET_SECONDARY = 53;
   } else {
     setupViewer();
   }
+
+  void initClientState().then(() => {
+    loadFavoriteStates();
+    subscribeClientState(() => loadFavoriteStates());
+  });
 
   // Fetch star counts for shorts panels
   const starCache = new Map<string, string>();

@@ -31,56 +31,92 @@ const langColors: Record<string, string> = {
 const langColor = language ? langColors[language] || '#8b949e' : null;
 ---
 
-<a href={`/tools/${slug}/`} class:list={["tool-card", { featured }]}>
-  <div class="card-thumbnail">
-    {thumbnail ? (
-      <img src={thumbnail} alt={`Screenshot of ${name}`} loading="lazy" />
-    ) : (
-      <div class="card-placeholder">
-        <span class="placeholder-emoji">🔧</span>
-      </div>
-    )}
-  </div>
-  <div class="card-body">
-    <h3 class="card-title">{name}</h3>
-    <p class="card-tagline">{tagline}</p>
-    <div class="card-meta">
-      <div class="card-tags">
-        {tags.slice(0, 3).map(tag => (
-          <span class="tag">{tag}</span>
-        ))}
-      </div>
-      {language && (
-        <span class="card-lang">
-          <span class="lang-dot" style={`background: ${langColor}`}></span>
-          {language}
-        </span>
+<article class:list={["tool-card", { featured }]} data-tool-card={slug}>
+  <a href={`/tools/${slug}/`} class="tool-card-link">
+    <div class="card-thumbnail">
+      {thumbnail ? (
+        <img src={thumbnail} alt={`Screenshot of ${name}`} loading="lazy" />
+      ) : (
+        <div class="card-placeholder">
+          <span class="placeholder-emoji">🔧</span>
+        </div>
       )}
     </div>
-    <div class="card-author">
-      <img
-        src={`https://avatars.githubusercontent.com/${author_github}?s=24`}
-        alt={author}
-        class="author-avatar"
-        loading="lazy"
-      />
-      <span class="author-name" data-author-search={author.toLowerCase()}>{author}</span>
-      {typeof stars === 'number' ? (
-        <span class="card-stars-count">⭐ {stars.toLocaleString()}</span>
-      ) : repo ? (
+    <div class="card-body">
+      <h3 class="card-title">{name}</h3>
+      <p class="card-tagline">{tagline}</p>
+      <div class="card-meta">
+        <div class="card-tags">
+          {tags.slice(0, 3).map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+        {language && (
+          <span class="card-lang">
+            <span class="lang-dot" style={`background: ${langColor}`}></span>
+            {language}
+          </span>
+        )}
+      </div>
+      <div class="card-author">
         <img
-          src={`https://img.shields.io/github/stars/${repo}?style=flat&label=%E2%AD%90`}
-          alt={`GitHub stars for ${name}`}
-          class="card-stars"
+          src={`https://avatars.githubusercontent.com/${author_github}?s=24`}
+          alt={author}
+          class="author-avatar"
           loading="lazy"
-          onerror="this.style.display='none'"
         />
-      ) : null}
+        <span class="author-name" data-author-search={author.toLowerCase()}>{author}</span>
+        {typeof stars === 'number' ? (
+          <span class="card-stars-count">⭐ {stars.toLocaleString()}</span>
+        ) : repo ? (
+          <img
+            src={`https://img.shields.io/github/stars/${repo}?style=flat&label=%E2%AD%90`}
+            alt={`GitHub stars for ${name}`}
+            class="card-stars"
+            loading="lazy"
+            onerror="this.style.display='none'"
+          />
+        ) : null}
+      </div>
     </div>
-  </div>
-</a>
+  </a>
+
+  <button class="favorite-toggle" data-tool={slug} aria-label={`Toggle favorite for ${name}`} aria-pressed="false" type="button">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+  </button>
+</article>
 
 <script>
+  import { initClientState, isFavorited, subscribeClientState, toggleFavorite } from '../lib/client-state';
+
+  function updateFavoriteButtons() {
+    document.querySelectorAll('.favorite-toggle[data-tool]').forEach((el) => {
+      const btn = el as HTMLElement;
+      const slug = btn.getAttribute('data-tool') || '';
+      const active = isFavorited(slug);
+      btn.classList.toggle('favorited', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  async function handleFavoriteClick(event: Event) {
+    const target = event.target as HTMLElement;
+    const btn = target.closest('.favorite-toggle[data-tool]') as HTMLElement | null;
+    if (!btn) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const slug = btn.getAttribute('data-tool');
+    if (!slug) return;
+
+    btn.classList.add('busy');
+    await toggleFavorite(slug);
+    btn.classList.remove('busy');
+  }
+
   document.querySelectorAll('.author-name[data-author-search]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -88,10 +124,21 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
       window.location.href = `/tools/?q=${encodeURIComponent((el as HTMLElement).dataset.authorSearch!)}`;
     });
   });
+
+  document.addEventListener('click', handleFavoriteClick);
+
+  void initClientState().then(() => {
+    updateFavoriteButtons();
+    subscribeClientState(() => updateFavoriteButtons());
+  });
 </script>
 
 <style>
   .tool-card {
+    position: relative;
+  }
+
+  .tool-card-link {
     display: flex;
     flex-direction: column;
     background: var(--color-bg-card);
@@ -104,14 +151,14 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
     height: 100%;
   }
 
-  .tool-card:hover {
+  .tool-card:hover .tool-card-link {
     transform: translateY(-4px);
     border-color: var(--color-primary);
     box-shadow: 0 8px 30px rgba(255, 137, 6, 0.15);
     color: var(--color-text);
   }
 
-  .tool-card.featured {
+  .tool-card.featured .tool-card-link {
     border-color: rgba(255, 137, 6, 0.3);
   }
 
@@ -130,6 +177,44 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
 
   .tool-card:hover .card-thumbnail img {
     transform: scale(1.05);
+  }
+
+  .favorite-toggle {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(15, 14, 23, 0.75);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 4;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .favorite-toggle:hover {
+    transform: scale(1.06);
+    background: rgba(15, 14, 23, 0.92);
+    border-color: rgba(255, 255, 255, 0.75);
+  }
+
+  .favorite-toggle.favorited {
+    background: rgba(255, 45, 85, 0.9);
+    border-color: rgba(255, 45, 85, 1);
+  }
+
+  .favorite-toggle.favorited svg {
+    fill: #fff;
+    stroke: #fff;
+  }
+
+  .favorite-toggle.busy {
+    opacity: 0.7;
+    pointer-events: none;
   }
 
   .card-placeholder {

@@ -67,6 +67,7 @@ const moreTags = [...tagCounts.entries()]
         <button class="sort-btn active" data-sort="newest" aria-pressed="true">Newest</button>
         <button class="sort-btn" data-sort="oldest" aria-pressed="false">Oldest</button>
         <button class="sort-btn" data-sort="stars" aria-pressed="false">⭐ Stars</button>
+        <button class="filter-toggle-btn" id="favorites-only-btn" aria-pressed="false">❤ Favorites</button>
       </div>
       <div class="tags-filter" id="tags-filter">
         <button class="tag-btn active" data-tag="all">All</button>
@@ -88,6 +89,7 @@ const moreTags = [...tagCounts.entries()]
     <div class="tool-grid" id="tool-grid">
       {tools.map(tool => (
         <div class="tool-item"
+          data-slug={tool.id.replace(/\.md$/, '')}
           data-name={tool.data.name.toLowerCase()}
           data-tagline={tool.data.tagline.toLowerCase()}
           data-tags={tool.data.tags.map(t => t.toLowerCase()).join(',')}
@@ -129,6 +131,8 @@ const moreTags = [...tagCounts.entries()]
 </BaseLayout>
 
 <script>
+  import { getFavoriteSlugs, initClientState, subscribeClientState } from '../../lib/client-state';
+
   const search = document.getElementById('search') as HTMLInputElement;
   const grid = document.getElementById('tool-grid')!;
   const items = grid.querySelectorAll('.tool-item');
@@ -136,12 +140,14 @@ const moreTags = [...tagCounts.entries()]
   const noResults = document.getElementById('no-results')!;
   const moreToggle = document.getElementById('more-tags-toggle');
   const moreTags = document.getElementById('more-tags');
+  const favoritesOnlyBtn = document.getElementById('favorites-only-btn');
 
   const subtitle = document.getElementById('browse-subtitle')!;
   const totalCount = items.length;
 
   let activeTag = 'all';
   let activeSort = 'newest';
+  let favoritesOnly = false;
 
   // "More ▾" expander
   if (moreToggle && moreTags) {
@@ -171,6 +177,7 @@ const moreTags = [...tagCounts.entries()]
 
   function filterTools() {
     const query = search.value.toLowerCase().trim();
+    const favoriteSlugs = new Set(getFavoriteSlugs());
     let visible = 0;
 
     items.forEach(item => {
@@ -179,11 +186,13 @@ const moreTags = [...tagCounts.entries()]
       const tagline = el.dataset.tagline || '';
       const tags = (el.dataset.tags || '').toLowerCase();
       const author = el.dataset.author || '';
+      const slug = el.dataset.slug || '';
 
       const matchesSearch = !query || name.includes(query) || tagline.includes(query) || tags.includes(query) || author.includes(query);
       const matchesTag = activeTag === 'all' || tags.split(',').includes(activeTag);
+      const matchesFavorites = !favoritesOnly || favoriteSlugs.has(slug);
 
-      if (matchesSearch && matchesTag) {
+      if (matchesSearch && matchesTag && matchesFavorites) {
         el.style.display = '';
         visible++;
       } else {
@@ -224,6 +233,7 @@ const moreTags = [...tagCounts.entries()]
   const urlQ = params.get('q');
   const urlTag = params.get('tag');
   const urlSort = params.get('sort');
+  const urlFav = params.get('favorites');
 
   // Apply sort from URL
   if (urlSort && ['newest', 'oldest', 'stars'].includes(urlSort)) {
@@ -260,6 +270,31 @@ const moreTags = [...tagCounts.entries()]
     }
     filterTools();
   }
+
+  if (urlFav === '1') {
+    favoritesOnly = true;
+    favoritesOnlyBtn?.classList.add('active');
+    favoritesOnlyBtn?.setAttribute('aria-pressed', 'true');
+  }
+
+  favoritesOnlyBtn?.addEventListener('click', () => {
+    favoritesOnly = !favoritesOnly;
+    favoritesOnlyBtn.classList.toggle('active', favoritesOnly);
+    favoritesOnlyBtn.setAttribute('aria-pressed', String(favoritesOnly));
+    const url = new URL(window.location.href);
+    if (favoritesOnly) {
+      url.searchParams.set('favorites', '1');
+    } else {
+      url.searchParams.delete('favorites');
+    }
+    history.replaceState(null, '', url.toString());
+    filterTools();
+  });
+
+  void initClientState().then(() => {
+    filterTools();
+    subscribeClientState(() => filterTools());
+  });
 
   search.addEventListener('input', filterTools);
 
@@ -422,6 +457,29 @@ const moreTags = [...tagCounts.entries()]
     background: var(--color-primary);
     color: var(--color-bg);
     border-color: var(--color-primary);
+  }
+
+  .filter-toggle-btn {
+    padding: 0.4rem 0.9rem;
+    background: var(--color-bg-card);
+    border: 1px dashed var(--color-border);
+    border-radius: 50px;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .filter-toggle-btn:hover {
+    border-color: #ff2d55;
+    color: #ff2d55;
+  }
+
+  .filter-toggle-btn.active {
+    border-color: #ff2d55;
+    color: #ff2d55;
+    background: rgba(255, 45, 85, 0.08);
   }
 
   .search-icon {

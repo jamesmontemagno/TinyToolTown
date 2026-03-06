@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<BaseLayout title="Signing In — Tiny Tool Town 🏘️" description="Completing GitHub sign in.">
+  <Header />
+
+  <main id="main" class="container callback-shell">
+    <div class="callback-card">
+      <h1>Completing sign-in...</h1>
+      <p id="callback-status">Finalizing your GitHub session and syncing favorites.</p>
+      <p id="callback-error" class="callback-error" style="display:none;"></p>
+      <a href="/account/" id="callback-fallback" class="btn btn-secondary" style="display:none;">Go to account</a>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { handleAuthCodeExchange } from '../../lib/client-state';
+
+  const statusEl = document.getElementById('callback-status');
+  const errorEl = document.getElementById('callback-error');
+  const fallbackEl = document.getElementById('callback-fallback');
+
+  void handleAuthCodeExchange().then(({ nextPath, error }) => {
+    if (error) {
+      if (statusEl) statusEl.textContent = 'Sign-in could not be completed.';
+      if (errorEl) {
+        errorEl.textContent = error;
+        errorEl.style.display = 'block';
+      }
+      if (fallbackEl) fallbackEl.style.display = 'inline-flex';
+      return;
+    }
+
+    if (statusEl) {
+      statusEl.textContent = 'Signed in. Redirecting...';
+    }
+    window.location.replace(nextPath || '/account/');
+  });
+</script>
+
+<style>
+  .callback-shell {
+    min-height: 50vh;
+    display: grid;
+    place-items: center;
+    padding: 2.5rem 0 3rem;
+  }
+
+  .callback-card {
+    max-width: 640px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-card);
+    padding: 2rem;
+  }
+
+  .callback-card h1 {
+    font-size: 1.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .callback-card p {
+    color: var(--color-text-muted);
+  }
+
+  .callback-error {
+    color: #ff5f56;
+    font-weight: 600;
+    margin-top: 0.6rem;
+  }
+
+  #callback-fallback {
+    margin-top: 1rem;
+  }
+</style>

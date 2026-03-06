@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<BaseLayout title="Account — Tiny Tool Town 🏘️" description="Sign in with GitHub and sync your favorites.">
+  <Header />
+
+  <main id="main" class="container">
+    <section class="account-shell">
+      <h1>Account</h1>
+      <p id="account-subtitle" class="account-subtitle">Loading account state...</p>
+
+      <div class="account-card">
+        <p><strong>Status:</strong> <span id="account-status">Checking...</span></p>
+        <p><strong>User:</strong> <span id="account-user">Not signed in</span></p>
+        <p><strong>Favorites:</strong> <span id="account-favorites">0</span></p>
+        <p><strong>Sync:</strong> <span id="account-sync">idle</span></p>
+
+        <p id="account-error" class="account-error" style="display:none;"></p>
+
+        <div class="account-actions">
+          <button id="login-btn" class="btn btn-primary" type="button">Sign in with GitHub</button>
+          <button id="logout-btn" class="btn btn-secondary" type="button" style="display:none;">Sign out</button>
+          <a href="/favorites/" class="btn btn-secondary">View favorites</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import {
+    getClientStateSnapshot,
+    initClientState,
+    signInWithGitHub,
+    signOutUser,
+    subscribeClientState,
+  } from '../../lib/client-state';
+
+  const subtitle = document.getElementById('account-subtitle');
+  const statusEl = document.getElementById('account-status');
+  const userEl = document.getElementById('account-user');
+  const favoritesEl = document.getElementById('account-favorites');
+  const syncEl = document.getElementById('account-sync');
+  const errorEl = document.getElementById('account-error');
+  const loginBtn = document.getElementById('login-btn') as HTMLButtonElement | null;
+  const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement | null;
+
+  function render(state = getClientStateSnapshot()) {
+    if (statusEl) statusEl.textContent = state.signedIn ? 'Signed in' : 'Signed out';
+    if (userEl) userEl.textContent = state.user?.email || state.user?.user_metadata?.user_name || 'Not signed in';
+    if (favoritesEl) favoritesEl.textContent = String(state.favoriteCount);
+    if (syncEl) syncEl.textContent = state.syncStatus;
+
+    if (subtitle) {
+      subtitle.textContent = state.signedIn
+        ? 'Your favorites sync across devices through Supabase.'
+        : 'Sign in with GitHub to sync favorites to your account.';
+    }
+
+    if (errorEl) {
+      if (state.lastError) {
+        errorEl.textContent = state.lastError;
+        errorEl.style.display = 'block';
+      } else {
+        errorEl.textContent = '';
+        errorEl.style.display = 'none';
+      }
+    }
+
+    if (loginBtn) {
+      loginBtn.style.display = state.signedIn ? 'none' : 'inline-flex';
+      loginBtn.disabled = !state.authEnabled;
+      if (!state.authEnabled) {
+        loginBtn.textContent = 'Set Supabase env vars to enable login';
+      } else {
+        loginBtn.textContent = 'Sign in with GitHub';
+      }
+    }
+
+    if (logoutBtn) {
+      logoutBtn.style.display = state.signedIn ? 'inline-flex' : 'none';
+    }
+  }
+
+  loginBtn?.addEventListener('click', async () => {
+    loginBtn.disabled = true;
+    try {
+      await signInWithGitHub('/account/');
+    } catch (error) {
+      if (errorEl) {
+        errorEl.textContent = error instanceof Error ? error.message : 'Login failed';
+        errorEl.style.display = 'block';
+      }
+      loginBtn.disabled = false;
+    }
+  });
+
+  logoutBtn?.addEventListener('click', async () => {
+    logoutBtn.disabled = true;
+    try {
+      await signOutUser();
+    } catch (error) {
+      if (errorEl) {
+        errorEl.textContent = error instanceof Error ? error.message : 'Sign out failed';
+        errorEl.style.display = 'block';
+      }
+    } finally {
+      logoutBtn.disabled = false;
+      render();
+    }
+  });
+
+  void initClientState().then(() => {
+    render();
+    subscribeClientState((state) => render(state));
+  });
+</script>
+
+<style>
+  .account-shell {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2.5rem 0 3rem;
+  }
+
+  .account-shell h1 {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.4rem;
+  }
+
+  .account-subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .account-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-card);
+    padding: 1.5rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .account-error {
+    color: #ff5f56;
+    font-weight: 600;
+  }
+
+  .account-actions {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    padding-top: 0.5rem;
+  }
+</style>
