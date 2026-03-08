@@ -11,6 +11,8 @@ license: "MIT"
 theme: "newspaper"
 date_added: "2026-03-02"
 featured: false
+ai_summary: "Turn your tech dreams into stunning cloud architecture visuals just by chatting like a pro! It’s like having a design buddy who speaks fluent AI and turns your words into sleek diagrams instantly."
+ai_features: ["🗣️ Natural language input to create stylish architecture diagrams", "🤖 AI-powered clarifying questions make sure your design is spot on", "🎨 Vision refinement with iterative AI tweaks for picture-perfect output", "📊 Export diagrams as SVG or PNG with live pan and zoom"]
 ---
 
 DiagramAgent is an open-source, AI-powered tool that generates professional cloud architecture diagrams from natural language prompts, complete with product and service icons (AWS, Azure, GCP, Kubernetes, and more).

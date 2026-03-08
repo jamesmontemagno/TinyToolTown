@@ -12,6 +12,8 @@ license: "MIT"
 theme: "sunset"
 date_added: "2026-03-02"
 featured: false
+ai_summary: "Hunt down Destiny 2 emblem codes faster than a Guardian on a sparrow and say goodbye to shady ad-packed sites forever! This sleek, privacy-first app serves up real-time codes with stellar style and zero tracking."
+ai_features: ["🔍 Multi-source code aggregation from Reddit and more", "🖼️ Official Bungie emblem previews", "⚡ Lightning-fast React + Vite performance", "🔒 Privacy-first with no cookies or analytics"]
 ---
 
 Destiny Code Finder is a lightweight web app that aggregates community-shared Destiny 2 emblem codes in one place. It was created after getting frustrated digging through ad-heavy websites filled with autoplay videos, popups, and walls of filler text just to find working codes.

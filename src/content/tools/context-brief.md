@@ -11,6 +11,8 @@ language: "Swift"
 license: "MIT"
 date_added: "2026-03-02"
 featured: false
+ai_summary: "Snag all the juicy context from your favorite apps with a quick shortcut and serve your coding agent a perfectly brewed brief that makes problem-solving a breeze! It’s like having a personal assistant who copies, cleans, and compiles info so you can focus on the fun part—coding."
+ai_features: ["🚀 Capture multi-app context snapshots with one shortcut", "✨ Clean and densify raw data into high-signal briefs", "📚 Store and revisit context history locally", "🎯 Paste compiled context directly into any coding agent"]
 ---
 
 # Context Brief

@@ -8,6 +8,8 @@ thumbnail: "/thumbnails/vibecode-learn.png"
 tags: ["learn", "claude", "vibe code"]
 date_added: "2026-03-06"
 featured: false
+ai_summary: "Turn your AI coding sessions into a personal tutoring experience that breaks down concepts, saves smart notes, and helps you actually understand your code instead of just copying it. Learning just got way more fun and organized!"
+ai_features: ["🎓 Explains key coding concepts in plain English after each session", "📝 Saves structured, searchable notes with progressive summaries", "⏳ Uses spaced repetition and active recall for effective review", "🔗 Organizes notes with links and cleans duplicates for a tidy knowledge base"]
 ---
 
 # Learn Mode — A Claude Code Skill for Growing Developers

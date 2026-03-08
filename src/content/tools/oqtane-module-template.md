@@ -11,6 +11,8 @@ language: "c#"
 license: "MIT"
 date_added: "2026-03-05"
 featured: false
+ai_summary: "Kickstart your Oqtane module development straight from the command line and skip the GUI fuss—scaffold a complete module file stack in seconds and get coding faster! This tool makes adding new modules a breeze with zero manual wiring needed."
+ai_features: ["🚀 Scaffold full module file structure from CLI", "🎨 Generates client, server, and shared code with proper conventions", "🤖 Auto-registers services with Oqtane’s DI system", "🛠️ Compatible with existing Oqtane.Application solutions"]
 ---
 
 

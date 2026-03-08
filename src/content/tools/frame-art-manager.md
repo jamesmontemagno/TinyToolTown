@@ -9,6 +9,8 @@ tags: ["web", "photo"]
 language: "Python, HTML"
 date_added: "2026-03-05"
 featured: false
+ai_summary: "Turn your Samsung Frame TV into a personalized art gallery with this nifty tool that effortlessly preps and uploads your favorite images right from your browser—no servers required! It’s like giving your TV a creative makeover with zero hassle."
+ai_features: ["🎨 Auto-resize and crop images to perfect 4K Frame dimensions", "🤹‍♂️ Combine portrait shots side-by-side with smart pairing", "🚀 Upload directly to your TV or download as a ZIP archive", "🖼️ Manage and delete art stored on the TV with ease"]
 ---
 
 A minimal, browser‑based editor that resizes, crops and uploads pictures to a Samsung Frame TV. Everything runs locally.
