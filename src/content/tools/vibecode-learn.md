@@ -4,6 +4,7 @@ tagline: "A skill for anyone who wants to train their muscles while vibe coding"
 author: "Sunny Yuan"
 author_github: "ZichenYuan"
 github_url: "https://github.com/ZichenYuan/vibecode_learn"
+thumbnail: "/thumbnails/vibecode-learn.png"
 tags: ["learn", "claude", "vibe code"]
 date_added: "2026-03-06"
 featured: false

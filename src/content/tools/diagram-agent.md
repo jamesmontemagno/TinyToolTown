@@ -4,7 +4,7 @@ tagline: "Takes user input in natural language to create architecture diagrams"
 author: "Rahul Jangda"
 author_github: "outbackops"
 github_url: "https://github.com/outbackops/DiagramAgent"
-thumbnail: "/thumbnails/diagram-agent.png"
+thumbnail: "/thumbnails/diagram-agent.svg"
 tags: ["architecture", "diagrams", "llm", "agent"]
 language: "TypeScript"
 license: "MIT"

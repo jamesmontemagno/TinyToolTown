@@ -4,6 +4,7 @@ tagline: "Decode In Case of Emergency"
 author: "Jayson Harshbarger"
 author_github: "Hypercubed"
 github_url: "https://github.com/Hypercubed/dice"
+thumbnail: "/thumbnails/dice.png"
 website_url: "https://hypercubed.github.io/dice/"
 tags: ["privacy-tools", "encryption", "qr-code", "backup-codes"]
 language: "TypeScript"

@@ -4,6 +4,7 @@ tagline: "CLI tool to install reusable AI coding agent packages (agents, skills,
 author: "Will Velida"
 author_github: "willvelida"
 github_url: "https://github.com/willvelida/code-minions"
+thumbnail: "/thumbnails/code-minions.png"
 tags: ["cli", "golang"]
 language: "Go"
 license: "Apache-2.0"

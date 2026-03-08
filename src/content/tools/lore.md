@@ -4,6 +4,7 @@ tagline: "LORE transforms your software catalog into a living, breathing 16-bit 
 author: "Pete H"
 author_github: "moochin"
 github_url: "https://github.com/moochin/lore"
+thumbnail: "/thumbnails/lore.png"
 website_url: "https://lore-1os.pages.dev/"
 tags: ["fun", "backstage", "quest", "game"]
 language: "React, TypeScript, Vite, Phaser"

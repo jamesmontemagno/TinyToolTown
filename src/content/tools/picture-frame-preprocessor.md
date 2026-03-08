@@ -4,7 +4,7 @@ tagline: "Intelligent image preprocessor for e-ink picture frames."
 author: "Antoine Cellerier"
 author_github: "antoinecellerier"
 github_url: "https://github.com/antoinecellerier/picture-frame-preprocessor"
-thumbnail: "/thumbnails/picture-frame-preprocessor.jpg"
+thumbnail: "/thumbnails/picture-frame-preprocessor.png"
 tags: ["eink", "art", "frame"]
 language: "Python"
 license: "MIT"
