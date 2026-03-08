@@ -4,6 +4,7 @@ tagline: "A clean, open-source tool to quickly find and redeem Destiny 2 emblem 
 author: "Maximilian Stein"
 author_github: "Manaiakalani"
 github_url: "https://github.com/Manaiakalani/destiny-code-finder"
+thumbnail: "/thumbnails/destiny-code-finder.png"
 website_url: "https://manaiakalani.github.io/destiny-code-finder/"
 tags: ["destiny2", "gaming"]
 language: "JavaScript"
