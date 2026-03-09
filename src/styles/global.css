@@ -410,6 +410,78 @@
   --font-display: 'Courier New', monospace;
 }
 
+/* YOLO: maximum chaos, no regrets 🤙 */
+[data-theme="yolo"] {
+  --color-bg: #0d0d0d;
+  --color-bg-card: #1a0030;
+  --color-bg-hover: #2b0050;
+  --color-text: #ffff00;
+  --color-text-muted: #ff9900;
+  --color-primary: #ff003c;
+  --color-secondary: #ff00ff;
+  --color-tertiary: #00ffff;
+  --color-accent: #39ff14;
+  --color-green: #39ff14;
+  --color-tag-bg: rgba(57, 255, 20, 0.15);
+  --color-tag-text: #39ff14;
+  --color-border: rgba(255, 0, 60, 0.4);
+  --color-header-bg: rgba(13, 13, 13, 0.92);
+  --font-body: Impact, 'Arial Black', 'Arial Bold', sans-serif;
+  --font-display: Impact, 'Arial Black', 'Arial Bold', sans-serif;
+  --radius: 0px;
+  --radius-lg: 4px;
+}
+
+@keyframes yolo-pulse {
+  0%, 100% { border-color: #ff003c; box-shadow: 0 0 12px #ff003c, 0 0 24px #ff003c; }
+  33% { border-color: #ff00ff; box-shadow: 0 0 12px #ff00ff, 0 0 24px #ff00ff; }
+  66% { border-color: #00ffff; box-shadow: 0 0 12px #00ffff, 0 0 24px #00ffff; }
+}
+
+@keyframes yolo-bg {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+[data-theme="yolo"] body {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(255, 0, 60, 0.03) 40px,
+      rgba(255, 0, 60, 0.03) 80px
+    );
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ctext y='20' font-size='20'%3E🤙%3C/text%3E%3C/svg%3E"), auto;
+}
+
+[data-theme="yolo"] .site-header {
+  background: rgba(13, 13, 13, 0.95) !important;
+  backdrop-filter: none;
+  border-bottom: 3px solid #ff003c;
+  box-shadow: 0 2px 20px rgba(255, 0, 60, 0.5);
+}
+
+[data-theme="yolo"] .tool-card {
+  border: 2px solid #ff003c !important;
+  animation: yolo-pulse 3s ease-in-out infinite;
+}
+
+[data-theme="yolo"] .tool-card:hover {
+  transform: skew(-2deg) scale(1.04);
+  animation: none;
+  box-shadow: 0 0 30px #ff00ff, 0 0 60px #ff003c;
+}
+
+[data-theme="yolo"] .gradient-text {
+  background: linear-gradient(90deg, #ff003c, #ff00ff, #00ffff, #39ff14, #ffff00);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: yolo-bg 2s linear infinite;
+}
+
 *, *::before, *::after {
   margin: 0;
   padding: 0;
