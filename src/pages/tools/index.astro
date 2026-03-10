@@ -256,10 +256,10 @@ const moreTags = [...tagCounts.entries()]
     }
   }
 
-  // Sort button handler
-  document.querySelectorAll('.sort-btn').forEach(btn => {
+  // Sort button handler — exclude favorites-only button which has no data-sort
+  document.querySelectorAll('.sort-btn:not(.favorites-only-btn)').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.sort-btn').forEach(b => {
+      document.querySelectorAll('.sort-btn:not(.favorites-only-btn)').forEach(b => {
         b.classList.remove('active');
         b.setAttribute('aria-pressed', 'false');
       });

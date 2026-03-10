@@ -21,7 +21,11 @@ export function writeFavorites(favorites: string[]): void {
   if (typeof window === 'undefined') return;
 
   const normalized = Array.from(new Set(favorites.filter(value => typeof value === 'string')));
-  window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(normalized));
+  try {
+    window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(normalized));
+  } catch {
+    // Storage unavailable or quota exceeded — still notify with in-memory state
+  }
   notifyFavoritesChanged(normalized);
 }
 
