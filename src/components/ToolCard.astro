@@ -31,56 +31,109 @@ const langColors: Record<string, string> = {
 const langColor = language ? langColors[language] || '#8b949e' : null;
 ---
 
-<a href={`/tools/${slug}/`} class:list={["tool-card", { featured }]}>
-  <div class="card-thumbnail">
-    {thumbnail ? (
-      <img src={thumbnail} alt={`Screenshot of ${name}`} loading="lazy" />
-    ) : (
-      <div class="card-placeholder">
-        <span class="placeholder-emoji">🔧</span>
-      </div>
-    )}
-  </div>
-  <div class="card-body">
-    <h3 class="card-title">{name}</h3>
-    <p class="card-tagline">{tagline}</p>
-    <div class="card-meta">
-      <div class="card-tags">
-        {tags.slice(0, 3).map(tag => (
-          <span class="tag">{tag}</span>
-        ))}
-      </div>
-      {language && (
-        <span class="card-lang">
-          <span class="lang-dot" style={`background: ${langColor}`}></span>
-          {language}
-        </span>
+<article class="tool-card-shell" data-tool-card data-tool={slug}>
+  <button class="tool-favorite-btn" data-tool={slug} data-tool-name={name} type="button" aria-pressed="false" aria-label={`Add ${name} to favorites`}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  </button>
+
+  <a href={`/tools/${slug}/`} class:list={["tool-card", { featured }]}>
+    <div class="card-thumbnail">
+      {thumbnail ? (
+        <img src={thumbnail} alt={`Screenshot of ${name}`} loading="lazy" />
+      ) : (
+        <div class="card-placeholder">
+          <span class="placeholder-emoji">🔧</span>
+        </div>
       )}
     </div>
-    <div class="card-author">
-      <img
-        src={`https://avatars.githubusercontent.com/${author_github}?s=24`}
-        alt={author}
-        class="author-avatar"
-        loading="lazy"
-      />
-      <span class="author-name" data-author-search={author.toLowerCase()}>{author}</span>
-      {typeof stars === 'number' ? (
-        <span class="card-stars-count">⭐ {stars.toLocaleString()}</span>
-      ) : repo ? (
+    <div class="card-body">
+      <h3 class="card-title">{name}</h3>
+      <p class="card-tagline">{tagline}</p>
+      <div class="card-meta">
+        <div class="card-tags">
+          {tags.slice(0, 3).map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+        {language && (
+          <span class="card-lang">
+            <span class="lang-dot" style={`background: ${langColor}`}></span>
+            {language}
+          </span>
+        )}
+      </div>
+      <div class="card-author">
         <img
-          src={`https://img.shields.io/github/stars/${repo}?style=flat&label=%E2%AD%90`}
-          alt={`GitHub stars for ${name}`}
-          class="card-stars"
+          src={`https://avatars.githubusercontent.com/${author_github}?s=24`}
+          alt={author}
+          class="author-avatar"
           loading="lazy"
-          onerror="this.style.display='none'"
         />
-      ) : null}
+        <span class="author-name" data-author-search={author.toLowerCase()}>{author}</span>
+        {typeof stars === 'number' ? (
+          <span class="card-stars-count">⭐ {stars.toLocaleString()}</span>
+        ) : repo ? (
+          <img
+            src={`https://img.shields.io/github/stars/${repo}?style=flat&label=%E2%AD%90`}
+            alt={`GitHub stars for ${name}`}
+            class="card-stars"
+            loading="lazy"
+            onerror="this.style.display='none'"
+          />
+        ) : null}
+      </div>
     </div>
-  </div>
-</a>
+  </a>
+</article>
 
 <script>
+  import { FAVORITES_CHANGED_EVENT, readFavorites, toggleFavorite } from '../lib/favorites';
+
+  function updateCardFavoriteStates(): void {
+    const favorites = new Set(readFavorites());
+
+    document.querySelectorAll<HTMLElement>('.tool-card-shell[data-tool-card]').forEach(card => {
+      const slug = card.dataset.tool;
+      if (!slug) return;
+
+      const button = card.querySelector<HTMLButtonElement>('.tool-favorite-btn[data-tool]');
+      if (!button) return;
+      const toolName = button.dataset.toolName || slug;
+
+      const favorited = favorites.has(slug);
+      card.dataset.favorited = String(favorited);
+      button.classList.toggle('favorited', favorited);
+      button.setAttribute('aria-pressed', String(favorited));
+      button.setAttribute('aria-label', `${favorited ? 'Remove' : 'Add'} ${toolName} ${favorited ? 'from' : 'to'} favorites`);
+    });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.tool-favorite-btn[data-tool]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const slug = btn.dataset.tool;
+      if (!slug) return;
+      const toolName = btn.dataset.toolName || slug;
+
+      const isFavorited = toggleFavorite(slug);
+      btn.classList.toggle('favorited', isFavorited);
+      btn.setAttribute('aria-pressed', String(isFavorited));
+      btn.setAttribute('aria-label', `${isFavorited ? 'Remove' : 'Add'} ${toolName} ${isFavorited ? 'from' : 'to'} favorites`);
+
+      const svg = btn.querySelector('svg');
+      if (svg) {
+        svg.style.animation = 'heartbeat 0.35s ease';
+        setTimeout(() => {
+          svg.style.animation = '';
+        }, 350);
+      }
+    });
+  });
+
   document.querySelectorAll('.author-name[data-author-search]').forEach(el => {
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -88,9 +141,17 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
       window.location.href = `/tools/?q=${encodeURIComponent((el as HTMLElement).dataset.authorSearch!)}`;
     });
   });
+
+  updateCardFavoriteStates();
+  window.addEventListener(FAVORITES_CHANGED_EVENT, updateCardFavoriteStates);
 </script>
 
 <style>
+  .tool-card-shell {
+    position: relative;
+    height: 100%;
+  }
+
   .tool-card {
     display: flex;
     flex-direction: column;
@@ -109,6 +170,50 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
     border-color: var(--color-primary);
     box-shadow: 0 8px 30px rgba(255, 137, 6, 0.15);
     color: var(--color-text);
+  }
+
+  .tool-favorite-btn {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    z-index: 3;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(15, 14, 23, 0.55);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .tool-favorite-btn:hover,
+  .tool-favorite-btn:focus-visible {
+    transform: scale(1.08);
+    border-color: var(--color-primary);
+    background: rgba(15, 14, 23, 0.8);
+    outline: none;
+  }
+
+  .tool-favorite-btn.favorited {
+    border-color: var(--color-secondary);
+    background: rgba(242, 95, 76, 0.25);
+    color: #ffd6cf;
+  }
+
+  .tool-favorite-btn.favorited svg {
+    fill: currentColor;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.18); }
+    50% { transform: scale(0.95); }
+    75% { transform: scale(1.1); }
   }
 
   .tool-card.featured {
@@ -248,5 +353,17 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
     color: var(--color-text-muted);
     margin-left: auto;
     flex-shrink: 0;
+  }
+
+  [data-theme="light"] .tool-favorite-btn {
+    background: rgba(255, 255, 255, 0.85);
+    color: #752400;
+    border-color: rgba(117, 36, 0, 0.3);
+  }
+
+  [data-theme="light"] .tool-favorite-btn.favorited {
+    background: rgba(217, 74, 58, 0.15);
+    border-color: rgba(217, 74, 58, 0.55);
+    color: #a1291b;
   }
 </style>

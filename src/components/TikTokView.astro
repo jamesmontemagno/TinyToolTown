@@ -73,6 +73,8 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
 </template>
 
 <script>
+  import { FAVORITES_CHANGED_EVENT, isFavorited, toggleFavorite as toggleToolFavorite } from '../lib/favorites';
+
   const SWIPE_MIN = 60;
   const HUE_OFFSET_PRIMARY = 37;
   const HUE_OFFSET_SECONDARY = 53;
@@ -269,22 +271,15 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
 
   function toggleFavorite(e: Event) {
     const btn = e.currentTarget as HTMLElement;
-    const nowOn = btn.classList.toggle('favorited');
+    const toolId = btn.getAttribute('data-tool');
+    if (!toolId) return;
+    const isNowFavorited = toggleToolFavorite(toolId);
+    btn.classList.toggle('favorited', isNowFavorited);
+    btn.setAttribute('aria-label', `${isNowFavorited ? 'Remove from' : 'Add to'} favorites`);
     const svgEl = btn.querySelector('svg');
     if (svgEl) {
       svgEl.style.animation = 'heartbeat 0.35s ease';
       setTimeout(() => { svgEl.style.animation = ''; }, 350);
-    }
-    const toolId = btn.getAttribute('data-tool');
-    if (toolId) {
-      const favs: string[] = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-      if (nowOn) {
-        if (!favs.includes(toolId)) favs.push(toolId);
-      } else {
-        const ix = favs.indexOf(toolId);
-        if (ix > -1) favs.splice(ix, 1);
-      }
-      localStorage.setItem('ttt-favorites', JSON.stringify(favs));
     }
   }
 
@@ -313,9 +308,12 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
   }
 
   function loadFavoriteStates() {
-    const favs: string[] = JSON.parse(localStorage.getItem('ttt-favorites') || '[]');
-    favs.forEach(id => {
-      document.querySelector(`.favorite-action[data-tool="${id}"]`)?.classList.add('favorited');
+    document.querySelectorAll<HTMLElement>('.favorite-action[data-tool]').forEach(btn => {
+      const toolId = btn.dataset.tool;
+      if (!toolId) return;
+      const favorited = isFavorited(toolId);
+      btn.classList.toggle('favorited', favorited);
+      btn.setAttribute('aria-label', `${favorited ? 'Remove from' : 'Add to'} favorites`);
     });
   }
 
@@ -351,6 +349,9 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
   } else {
     setupViewerFrame();
   }
+
+  // Keep favorites in sync when toggled from ToolCard or detail page
+  window.addEventListener(FAVORITES_CHANGED_EVENT, loadFavoriteStates);
 
   // Fetch GitHub star counts once, when viewer first becomes visible
   const starCache = new Map<string, string>();
