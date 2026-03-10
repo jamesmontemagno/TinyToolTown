@@ -193,7 +193,12 @@ jobs:
                   }
                 }
 
-                if (website_url && website_url !== '_No response_' && !/^https?:\/\/.+/.test(website_url)) {
+                // Clean website_url: strip HTML tags and normalize empty/no-response values
+                let website_url_clean = (website_url || '').replace(/<[^>]*>/g, '').trim();
+                if (!website_url_clean || website_url_clean === '_No response_') {
+                  website_url_clean = '';
+                }
+                if (website_url_clean && !/^https?:\/\/.+/.test(website_url_clean)) {
                   throw new Error('Website URL is invalid');
                 }
 
@@ -236,8 +241,8 @@ jobs:
                   `author_github: "${sanitize(author_github).replace(/[^a-zA-Z0-9_-]/g, '')}"`,
                   `github_url: ${yamlStr(github_url)}`,
                 ];
-                if (website_url && website_url !== '_No response_') {
-                  lines.push(`website_url: ${yamlStr(website_url)}`);
+                if (website_url_clean) {
+                  lines.push(`website_url: ${yamlStr(website_url_clean)}`);
                 }
                 lines.push(`tags: [${tags.map(t => `"${t.replace(/"/g, '')}"`).join(', ')}]`);
                 if (language && language !== '_No response_') {
