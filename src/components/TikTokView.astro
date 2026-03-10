@@ -8,7 +8,8 @@ interface Props {
 
 const { tools } = Astro.props;
 
-// Serialize only the fields needed to build each panel client-side
+// Serialize only the fields needed to build each panel client-side.
+// Replace < with \u003c to prevent </script> injection in the JSON data island.
 const shortsToolsData = tools.map((tool) => ({
   slug: tool.id.replace(/\.md$/, ''),
   name: tool.data.name,
@@ -20,6 +21,7 @@ const shortsToolsData = tools.map((tool) => ({
   repo: getGitHubRepo(tool.data.github_url),
   tags: tool.data.tags.slice(0, 3),
 }));
+const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c');
 ---
 
 <div id="shorts-viewer" class="viewer-hidden" role="dialog" aria-label="Tool shorts viewer" aria-modal="true">
@@ -28,7 +30,7 @@ const shortsToolsData = tools.map((tool) => ({
 </div>
 
 {/* Tool data island — consumed by buildPanels() when Shorts is first opened */}
-<script type="application/json" id="shorts-tools-data" set:html={JSON.stringify(shortsToolsData)} />
+<script type="application/json" id="shorts-tools-data" set:html={shortsToolsJson} />
 
 <template id="shorts-panel-tpl">
   <section class="tool-panel">
