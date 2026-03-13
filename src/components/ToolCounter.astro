@@ -1,13 +1,23 @@
 ---
 interface Props {
   count: number;
+  label?: string;
+  variant?: 'default' | 'compact';
+  id?: string;
+  animate?: boolean;
 }
-const { count } = Astro.props;
+const {
+  count,
+  label = 'tiny tools and counting',
+  variant = 'default',
+  id,
+  animate = true,
+} = Astro.props;
 ---
 
-<div class="tool-counter">
-  <span class="counter-number" data-target={count}>0</span>
-  <span class="counter-label">tiny tools and counting</span>
+<div id={id} class:list={['tool-counter', { 'tool-counter-compact': variant === 'compact' }]}>
+  <span class="counter-number" data-target={count} data-animate={animate ? 'true' : 'false'}>{animate ? '0' : String(count)}</span>
+  <span class="counter-label">{label}</span>
 </div>
 
 <script>
@@ -27,7 +37,7 @@ const { count } = Astro.props;
     requestAnimationFrame(update);
   }
 
-  const counters = document.querySelectorAll<HTMLElement>('.counter-number');
+  const counters = document.querySelectorAll<HTMLElement>('.counter-number[data-animate="true"]');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -65,5 +75,39 @@ const { count } = Astro.props;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-weight: 500;
+  }
+
+  .tool-counter-compact {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.55rem;
+    margin: 0.75rem auto;
+  }
+
+  .tool-counter-compact .counter-number {
+    font-size: clamp(1.8rem, 4.2vw, 2.6rem);
+    line-height: 1;
+  }
+
+  .tool-counter-compact .counter-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 640px) {
+    .tool-counter-compact {
+      gap: 0.45rem;
+      margin: 0.5rem auto;
+    }
+
+    .tool-counter-compact .counter-number {
+      font-size: clamp(1.55rem, 7.2vw, 2.1rem);
+    }
+
+    .tool-counter-compact .counter-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+    }
   }
 </style>

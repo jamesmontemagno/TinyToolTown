@@ -1,0 +1,510 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ToolCard from '../../components/ToolCard.astro';
+import ToolCounter from '../../components/ToolCounter.astro';
+import { getCollection } from 'astro:content';
+import { getGitHubRepo, fetchStarCounts } from '../../lib/github';
+
+const allTools = await getCollection('tools');
+const tools = allTools.sort((a, b) =>
+  new Date(b.data.date_added).getTime() - new Date(a.data.date_added).getTime()
+);
+
+const repoMap = new Map<string, string>();
+for (const tool of tools) {
+  const repo = getGitHubRepo(tool.data.github_url);
+  if (repo) repoMap.set(tool.id, repo);
+}
+
+const starCounts = await fetchStarCounts([...repoMap.values()]);
+const toolStars = new Map<string, number>();
+for (const [slug, repo] of repoMap) {
+  toolStars.set(slug, starCounts.get(repo) || 0);
+}
+---
+
+<BaseLayout title="Favorites - Tiny Tool Town" description="Your saved favorites in Tiny Tool Town.">
+  <Header />
+
+  <main id="main" class="container">
+    <section class="browse-header" id="browse-header">
+      <h1>Your Favorites ❤</h1>
+      <ToolCounter id="favorites-counter" count={0} label="favorites saved" variant="compact" animate={false} />
+    </section>
+
+    <div class="filter-bar">
+      <div class="search-box">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <label for="search" class="visually-hidden">Search favorites</label>
+        <input
+          type="text"
+          id="search"
+          placeholder="Search favorites..."
+          class="search-input"
+          autocomplete="off"
+        />
+      </div>
+      <div class="sort-bar" role="group" aria-label="Sort favorites">
+        <span class="sort-label">Sort by</span>
+        <button class="sort-btn active" data-sort="newest" aria-pressed="true">Newest</button>
+        <button class="sort-btn" data-sort="oldest" aria-pressed="false">Oldest</button>
+        <button class="sort-btn" data-sort="stars" aria-pressed="false">Stars</button>
+      </div>
+    </div>
+
+    <div class="tool-grid" id="tool-grid">
+      {tools.map(tool => (
+        <div
+          class="tool-item"
+          data-tool={tool.id.replace(/\.md$/, '')}
+          data-name={tool.data.name.toLowerCase()}
+          data-tagline={tool.data.tagline.toLowerCase()}
+          data-tags={tool.data.tags.map(t => t.toLowerCase()).join(',')}
+          data-author={tool.data.author.toLowerCase()}
+          data-date-added={tool.data.date_added}
+          data-stars={toolStars.get(tool.id) || 0}
+          data-favorited="false"
+          data-favorited-at=""
+          data-repo={repoMap.get(tool.id) || ''}
+        >
+          <p class="favorited-meta" data-favorited-meta hidden></p>
+          <ToolCard
+            name={tool.data.name}
+            slug={tool.id.replace(/\.md$/, '')}
+            tagline={tool.data.tagline}
+            author={tool.data.author}
+            author_github={tool.data.author_github}
+            tags={tool.data.tags}
+            language={tool.data.language}
+            featured={tool.data.featured}
+            thumbnail={tool.data.thumbnail}
+            github_url={tool.data.github_url}
+            stars={toolStars.get(tool.id) ?? undefined}
+          />
+        </div>
+      ))}
+    </div>
+
+    <div id="no-results" class="no-results" style="display: none;" aria-live="polite" aria-atomic="true">
+      <p id="empty-message">❤ No favorites to show yet.</p>
+      <p><a href="/tools/">Browse tools and save a few favorites</a>.</p>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { FAVORITES_CHANGED_EVENT, readFavorites, readFavoriteTimestamps } from '../../lib/favorites';
+
+  const search = document.getElementById('search') as HTMLInputElement;
+  const grid = document.getElementById('tool-grid');
+  const noResults = document.getElementById('no-results');
+  const emptyMessage = document.getElementById('empty-message');
+  const counterNumber = document.querySelector<HTMLElement>('#favorites-counter .counter-number');
+  const counterLabel = document.querySelector<HTMLElement>('#favorites-counter .counter-label');
+
+  if (!grid || !noResults || !emptyMessage || !counterNumber || !counterLabel) {
+    throw new Error('Favorites page failed to initialize required elements.');
+  }
+
+  const items = grid.querySelectorAll('.tool-item');
+  let activeSort = 'newest';
+
+  function formatFavoritedDate(timestamp: number): string {
+    return new Date(timestamp).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
+
+  function syncFavoriteFlags(): void {
+    const favorites = new Set(readFavorites());
+    const favoriteTimestamps = readFavoriteTimestamps();
+
+    items.forEach(item => {
+      const el = item as HTMLElement;
+      const slug = el.dataset.tool || '';
+      const isFavorited = favorites.has(slug);
+      const favoritedAt = favoriteTimestamps[slug] || 0;
+      const meta = el.querySelector<HTMLElement>('[data-favorited-meta]');
+
+      el.dataset.favorited = String(isFavorited);
+      el.dataset.favoritedAt = favoritedAt > 0 ? String(favoritedAt) : '';
+
+      if (meta) {
+        if (isFavorited && favoritedAt > 0) {
+          meta.hidden = false;
+          meta.textContent = `Favorited ${formatFavoritedDate(favoritedAt)}`;
+        } else {
+          meta.hidden = true;
+          meta.textContent = '';
+        }
+      }
+    });
+  }
+
+  function updateUrlState(): void {
+    const url = new URL(window.location.href);
+
+    if (activeSort === 'newest') {
+      url.searchParams.delete('sort');
+    } else {
+      url.searchParams.set('sort', activeSort);
+    }
+
+    const query = search.value.trim();
+    if (query) {
+      url.searchParams.set('q', query);
+    } else {
+      url.searchParams.delete('q');
+    }
+
+    history.replaceState(null, '', url.toString());
+  }
+
+  function getSortValue(item: HTMLElement): number {
+    const favoritedAt = Number(item.dataset.favoritedAt || '0');
+    if (Number.isFinite(favoritedAt) && favoritedAt > 0) {
+      return favoritedAt;
+    }
+
+    const fallback = Date.parse(item.dataset.dateAdded || '');
+    return Number.isFinite(fallback) ? fallback : 0;
+  }
+
+  function sortTools() {
+    const itemsArray = Array.from(grid.querySelectorAll('.tool-item')) as HTMLElement[];
+
+    itemsArray.sort((a, b) => {
+      if (activeSort === 'newest') {
+        return getSortValue(b) - getSortValue(a);
+      }
+
+      if (activeSort === 'oldest') {
+        return getSortValue(a) - getSortValue(b);
+      }
+
+      if (activeSort === 'stars') {
+        return Number(b.dataset.stars || '0') - Number(a.dataset.stars || '0');
+      }
+
+      return 0;
+    });
+
+    itemsArray.forEach(item => {
+      grid.appendChild(item);
+    });
+  }
+
+  function filterTools() {
+    const query = search.value.toLowerCase().trim();
+    let visible = 0;
+    let totalFavorited = 0;
+
+    items.forEach(item => {
+      const el = item as HTMLElement;
+      const name = el.dataset.name || '';
+      const tagline = el.dataset.tagline || '';
+      const tags = el.dataset.tags || '';
+      const author = el.dataset.author || '';
+      const favorited = el.dataset.favorited === 'true';
+
+      if (favorited) totalFavorited++;
+
+      const matchesSearch = !query ||
+        name.includes(query) ||
+        tagline.includes(query) ||
+        tags.includes(query) ||
+        author.includes(query);
+
+      if (favorited && matchesSearch) {
+        el.style.display = '';
+        visible++;
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
+    counterNumber.textContent = String(visible);
+    counterLabel.textContent = visible === 1 ? 'favorite saved' : 'favorites saved';
+
+    noResults.style.display = visible === 0 ? 'block' : 'none';
+    if (visible === 0 && totalFavorited > 0) {
+      emptyMessage.textContent = 'No favorites match your search.';
+    } else {
+      emptyMessage.textContent = '❤ No favorites to show yet.';
+    }
+  }
+
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+      activeSort = (btn as HTMLElement).dataset.sort || 'newest';
+
+      sortTools();
+      filterTools();
+      updateUrlState();
+    });
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  const urlQ = params.get('q');
+  const urlSort = params.get('sort');
+
+  if (urlSort && ['newest', 'oldest', 'stars'].includes(urlSort)) {
+    activeSort = urlSort;
+    document.querySelectorAll('.sort-btn').forEach(b => {
+      const isActive = (b as HTMLElement).dataset.sort === activeSort;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-pressed', String(isActive));
+    });
+  }
+
+  if (urlQ) {
+    search.value = urlQ;
+  }
+
+  search.addEventListener('input', () => {
+    filterTools();
+    updateUrlState();
+  });
+
+  syncFavoriteFlags();
+  sortTools();
+  filterTools();
+  updateUrlState();
+
+  window.addEventListener(FAVORITES_CHANGED_EVENT, () => {
+    syncFavoriteFlags();
+    sortTools();
+    filterTools();
+  });
+
+  const STAR_CACHE_PREFIX = 'ttt_stars_';
+  const STAR_TTL_MS = 60 * 60 * 1000;
+  const MAX_FETCHES = 30;
+  let fetchBudget = MAX_FETCHES;
+
+  function getCachedStars(repo: string): number | null {
+    try {
+      const raw = localStorage.getItem(STAR_CACHE_PREFIX + repo);
+      if (!raw) return null;
+      const entry = JSON.parse(raw);
+      if (entry === null || typeof entry !== 'object') {
+        localStorage.removeItem(STAR_CACHE_PREFIX + repo);
+        return null;
+      }
+      const ts = Number(entry.ts);
+      const stars = Number(entry.stars);
+      if (!Number.isFinite(ts) || !Number.isFinite(stars)) {
+        localStorage.removeItem(STAR_CACHE_PREFIX + repo);
+        return null;
+      }
+      if (Date.now() - ts > STAR_TTL_MS) {
+        localStorage.removeItem(STAR_CACHE_PREFIX + repo);
+        return null;
+      }
+      return stars;
+    } catch {
+      return null;
+    }
+  }
+
+  function setCachedStars(repo: string, stars: number): void {
+    try {
+      localStorage.setItem(STAR_CACHE_PREFIX + repo, JSON.stringify({ stars, ts: Date.now() }));
+    } catch {
+      // Ignore quota/unavailable storage issues.
+    }
+  }
+
+  function updateCardStars(item: HTMLElement, stars: number): void {
+    item.dataset.stars = String(stars);
+    const countEl = item.querySelector('.card-stars-count');
+    if (countEl) countEl.textContent = `⭐ ${stars.toLocaleString()}`;
+  }
+
+  async function refreshStars(item: HTMLElement): Promise<void> {
+    const repo = item.dataset.repo;
+    if (!repo) return;
+
+    const cached = getCachedStars(repo);
+    if (cached !== null) {
+      updateCardStars(item, cached);
+      return;
+    }
+
+    if (fetchBudget <= 0) return;
+    fetchBudget--;
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        const res = await fetch(`https://api.github.com/repos/${repo}`, {
+          headers: { Accept: 'application/vnd.github.v3+json' },
+          signal: controller.signal,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const stars = data.stargazers_count || 0;
+        setCachedStars(repo, stars);
+        updateCardStars(item, stars);
+      } finally {
+        clearTimeout(timeout);
+      }
+    } catch {
+      // Keep build-time star values on errors.
+    }
+  }
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          observer.unobserve(entry.target);
+          refreshStars(entry.target as HTMLElement);
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    items.forEach(item => observer.observe(item));
+  }
+</script>
+
+<style>
+  .browse-header {
+    padding: 2.5rem 0 1.5rem;
+  }
+
+  .browse-header h1 {
+    font-size: 2rem;
+    font-weight: 900;
+  }
+
+  .filter-bar {
+    margin-bottom: 2rem;
+  }
+
+  .search-box {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.75rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-text);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .sort-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-right: 0.25rem;
+  }
+
+  .sort-btn {
+    padding: 0.4rem 0.9rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 50px;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .sort-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .sort-btn.active {
+    background: var(--color-primary);
+    color: var(--color-bg);
+    border-color: var(--color-primary);
+  }
+
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .tool-item {
+    position: relative;
+  }
+
+  .favorited-meta {
+    position: absolute;
+    top: 0.65rem;
+    left: 0.65rem;
+    z-index: 4;
+    margin: 0;
+    font-size: 0.72rem;
+    color: var(--color-text);
+    background: color-mix(in srgb, var(--color-bg-card) 78%, transparent);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+    opacity: 0.92;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+  }
+
+  .no-results a {
+    color: var(--color-primary);
+  }
+</style>

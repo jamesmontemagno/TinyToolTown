@@ -89,7 +89,7 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
 </article>
 
 <script>
-  import { FAVORITES_CHANGED_EVENT, readFavorites, toggleFavorite } from '../lib/favorites';
+  import { FAVORITES_CHANGED_EVENT, confirmFavoriteRemoval, readFavorites, toggleFavorite } from '../lib/favorites';
 
   function updateCardFavoriteStates(): void {
     const favorites = new Set(readFavorites());
@@ -111,13 +111,19 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
   }
 
   document.querySelectorAll<HTMLButtonElement>('.tool-favorite-btn[data-tool]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
 
       const slug = btn.dataset.tool;
       if (!slug) return;
       const toolName = btn.dataset.toolName || slug;
+
+      const isCurrentlyFavorited = btn.classList.contains('favorited');
+      if (isCurrentlyFavorited) {
+        const shouldRemove = await confirmFavoriteRemoval(toolName);
+        if (!shouldRemove) return;
+      }
 
       const isFavorited = toggleFavorite(slug);
       btn.classList.toggle('favorited', isFavorited);

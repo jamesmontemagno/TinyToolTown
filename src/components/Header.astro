@@ -8,17 +8,39 @@ const currentPath = Astro.url.pathname;
       <span class="logo-icon">🏘️</span>
       <span class="logo-text">Tiny Tool Town</span>
     </a>
-    <nav class="nav">
-      <a href="/tools/" class:list={["nav-link", { active: currentPath.startsWith('/tools') }]}>Browse</a>
-      <a href="/submit/" class:list={["nav-link", { active: currentPath === '/submit/' }]}>Submit</a>
-      <a href="/about/" class:list={["nav-link", { active: currentPath === '/about/' }]}>About</a>
-      <a href="https://github.com/shanselman/TinyToolTown" class="nav-link github-link" target="_blank" rel="noopener">
+    <nav class="nav" aria-label="Primary navigation">
+      <div class="nav-links">
+        <a href="/tools/" class:list={["nav-link", { active: currentPath.startsWith('/tools') }]}>Browse</a>
+        <a href="/favorites/" class:list={["nav-link", { active: currentPath.startsWith('/favorites') }]}>Favorites</a>
+        <a href="/submit/" class:list={["nav-link", { active: currentPath === '/submit/' }]}>Submit</a>
+        <a href="/about/" class:list={["nav-link", { active: currentPath === '/about/' }]}>About</a>
+      </div>
+      <a href="https://github.com/shanselman/TinyToolTown" class="nav-link github-link" target="_blank" rel="noopener" aria-label="Tiny Tool Town on GitHub">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
       </a>
       <button class="theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
         <span class="theme-icon" id="theme-icon">🌙</span>
       </button>
+      <button
+        class="menu-toggle"
+        id="menu-toggle"
+        type="button"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span class="menu-icon" aria-hidden="true">☰</span>
+      </button>
     </nav>
+  </div>
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <div class="container mobile-menu-inner">
+      <a href="/tools/" class:list={["mobile-nav-link", { active: currentPath.startsWith('/tools') }]}>Browse</a>
+      <a href="/favorites/" class:list={["mobile-nav-link", { active: currentPath.startsWith('/favorites') }]}>Favorites</a>
+      <a href="/submit/" class:list={["mobile-nav-link", { active: currentPath === '/submit/' }]}>Submit</a>
+      <a href="/about/" class:list={["mobile-nav-link", { active: currentPath === '/about/' }]}>About</a>
+      <a href="https://github.com/shanselman/TinyToolTown" class="mobile-nav-link" target="_blank" rel="noopener">GitHub</a>
+    </div>
   </div>
 </header>
 
@@ -60,6 +82,12 @@ const currentPath = Astro.url.pathname;
   .nav {
     display: flex;
     align-items: center;
+    gap: 1rem;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
     gap: 1.5rem;
   }
 
@@ -80,11 +108,6 @@ const currentPath = Astro.url.pathname;
   .github-link {
     display: flex;
     align-items: center;
-  }
-
-  @media (max-width: 640px) {
-    .nav { gap: 1rem; }
-    .logo-text { display: none; }
   }
 
   .theme-toggle {
@@ -109,6 +132,79 @@ const currentPath = Astro.url.pathname;
   .theme-icon {
     font-size: 1.1rem;
     line-height: 1;
+  }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    color: var(--color-text);
+  }
+
+  .menu-toggle:hover,
+  .menu-toggle:focus-visible {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    outline: none;
+  }
+
+  .menu-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .mobile-menu {
+    display: none;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-header-bg, rgba(15, 14, 23, 0.95));
+  }
+
+  .mobile-menu-inner {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 0.75rem;
+    padding-bottom: 1rem;
+  }
+
+  .mobile-nav-link {
+    color: var(--color-text);
+    text-decoration: none;
+    opacity: 0.8;
+    font-weight: 600;
+    padding: 0.5rem 0;
+  }
+
+  .mobile-nav-link.active,
+  .mobile-nav-link:hover {
+    color: var(--color-primary);
+    opacity: 1;
+  }
+
+  .site-header.menu-open .mobile-menu {
+    display: block;
+  }
+
+  @media (max-width: 640px) {
+    .nav-links,
+    .github-link {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: inline-flex;
+    }
+
+    .logo-text {
+      display: none;
+    }
   }
 </style>
 
@@ -147,5 +243,56 @@ const currentPath = Astro.url.pathname;
     const current = getTheme();
     const next = themes[(themes.indexOf(current) + 1) % themes.length];
     setTheme(next);
+  });
+
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const menu = document.getElementById('mobile-menu');
+  const menuToggle = document.getElementById('menu-toggle');
+  const menuIcon = menuToggle?.querySelector<HTMLElement>('.menu-icon');
+
+  function closeMenu(): void {
+    if (!header || !menu || !menuToggle || !menuIcon) return;
+
+    header.classList.remove('menu-open');
+    menu.hidden = true;
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuIcon.textContent = '☰';
+  }
+
+  function openMenu(): void {
+    if (!header || !menu || !menuToggle || !menuIcon) return;
+
+    header.classList.add('menu-open');
+    menu.hidden = false;
+    menuToggle.setAttribute('aria-expanded', 'true');
+    menuIcon.textContent = '✕';
+  }
+
+  menuToggle?.addEventListener('click', () => {
+    if (!header) return;
+
+    if (header.classList.contains('menu-open')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  menu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      closeMenu();
+    });
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeMenu();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 640) {
+      closeMenu();
+    }
   });
 </script>

@@ -468,7 +468,7 @@ const langColor = tool.data.language ? langColors[tool.data.language] || '#8b949
 </style>
 
 <script>
-  import { FAVORITES_CHANGED_EVENT, isFavorited, toggleFavorite } from '../../lib/favorites';
+  import { FAVORITES_CHANGED_EVENT, confirmFavoriteRemoval, isFavorited, toggleFavorite } from '../../lib/favorites';
 
   const detailFavoriteBtn = document.getElementById('detail-favorite-btn') as HTMLButtonElement | null;
   const detailFavoriteLabel = document.getElementById('detail-favorite-label');
@@ -487,9 +487,16 @@ const langColor = tool.data.language ? langColors[tool.data.language] || '#8b949
     detailFavoriteLabel.textContent = favorited ? 'Favorited' : 'Favorite';
   }
 
-  detailFavoriteBtn?.addEventListener('click', () => {
+  detailFavoriteBtn?.addEventListener('click', async () => {
     const slug = detailFavoriteBtn.dataset.tool;
     if (!slug) return;
+
+    const toolName = detailFavoriteBtn.dataset.toolName || 'this tool';
+    const isCurrentlyFavorited = isFavorited(slug);
+    if (isCurrentlyFavorited) {
+      const shouldRemove = await confirmFavoriteRemoval(toolName);
+      if (!shouldRemove) return;
+    }
 
     toggleFavorite(slug);
     updateDetailFavoriteState();

@@ -73,7 +73,7 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
 </template>
 
 <script>
-  import { FAVORITES_CHANGED_EVENT, isFavorited, toggleFavorite as toggleToolFavorite } from '../lib/favorites';
+  import { FAVORITES_CHANGED_EVENT, confirmFavoriteRemoval, isFavorited, toggleFavorite as toggleToolFavorite } from '../lib/favorites';
 
   const SWIPE_MIN = 60;
   const HUE_OFFSET_PRIMARY = 37;
@@ -269,10 +269,18 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
     }
   }
 
-  function toggleFavorite(e: Event) {
+  async function toggleFavorite(e: Event) {
     const btn = e.currentTarget as HTMLElement;
     const toolId = btn.getAttribute('data-tool');
     if (!toolId) return;
+
+    const isCurrentlyFavorited = btn.classList.contains('favorited');
+    if (isCurrentlyFavorited) {
+      const toolTitle = btn.getAttribute('data-tool-title') || 'this tool';
+      const shouldRemove = await confirmFavoriteRemoval(toolTitle);
+      if (!shouldRemove) return;
+    }
+
     const isNowFavorited = toggleToolFavorite(toolId);
     btn.classList.toggle('favorited', isNowFavorited);
     btn.setAttribute('aria-label', `${isNowFavorited ? 'Remove from' : 'Add to'} favorites`);
