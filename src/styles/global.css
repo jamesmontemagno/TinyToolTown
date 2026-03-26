@@ -390,6 +390,37 @@
   --font-display: Georgia, 'Times New Roman', serif;
 }
 
+/* Xbox: iconic black and green */
+[data-theme="xbox"] {
+  --color-bg: #0e0e0e;
+  --color-bg-card: #1a1a1a;
+  --color-bg-hover: #252525;
+  --color-text: #ffffff;
+  --color-text-muted: #aaaaaa;
+  --color-primary: #107C10;
+  --color-secondary: #52B043;
+  --color-tertiary: #7fba00;
+  --color-accent: #52B043;
+  --color-green: #52B043;
+  --color-tag-bg: rgba(16, 124, 16, 0.2);
+  --color-tag-text: #52B043;
+  --color-border: rgba(82, 176, 67, 0.2);
+  --color-header-bg: rgba(14, 14, 14, 0.95);
+}
+
+[data-theme="xbox"] .site-header {
+  border-bottom: 1px solid rgba(82, 176, 67, 0.3);
+}
+
+[data-theme="xbox"] .tool-card {
+  border: 1px solid rgba(82, 176, 67, 0.15);
+}
+
+[data-theme="xbox"] .tool-card:hover {
+  border-color: rgba(82, 176, 67, 0.5);
+  box-shadow: 0 0 16px rgba(16, 124, 16, 0.25);
+}
+
 /* Retro: amber CRT monitor */
 [data-theme="retro"] {
   --color-bg: #1a1200;
