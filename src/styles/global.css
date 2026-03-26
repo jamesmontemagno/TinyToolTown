@@ -390,6 +390,45 @@
   --font-display: Georgia, 'Times New Roman', serif;
 }
 
+/* Nintendo Switch: dark console with Neon Red & Neon Blue Joy-Con accents */
+[data-theme="switch"] {
+  --color-bg: #1a1a1a;
+  --color-bg-card: #2d2d2d;
+  --color-bg-hover: #3a3a3a;
+  --color-text: #ffffff;
+  --color-text-muted: #aaaaaa;
+  --color-primary: #e60012;
+  --color-secondary: #0ab9e6;
+  --color-tertiary: #ff4d4d;
+  --color-accent: #0ab9e6;
+  --color-green: #39c939;
+  --color-tag-bg: rgba(0, 169, 230, 0.15);
+  --color-tag-text: #0ab9e6;
+  --color-border: rgba(230, 0, 18, 0.25);
+  --color-header-bg: rgba(26, 26, 26, 0.95);
+}
+
+[data-theme="switch"] .site-header {
+  border-bottom: 2px solid #e60012;
+}
+
+[data-theme="switch"] .tool-card {
+  border: 1px solid rgba(230, 0, 18, 0.3) !important;
+}
+
+[data-theme="switch"] .tool-card:hover {
+  border-color: #e60012 !important;
+  box-shadow: 0 0 0 1px #e60012, 4px 4px 0 0 #0ab9e6;
+}
+
+[data-theme="switch"] .btn-primary {
+  background: #e60012;
+}
+
+[data-theme="switch"] .btn-primary:hover {
+  background: #ff1a2b;
+}
+
 /* Retro: amber CRT monitor */
 [data-theme="retro"] {
   --color-bg: #1a1200;
