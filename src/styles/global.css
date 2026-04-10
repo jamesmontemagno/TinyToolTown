@@ -390,6 +390,24 @@
   --font-display: Georgia, 'Times New Roman', serif;
 }
 
+/* Portland: City of Roses — Pacific Northwest mossy greens and rose pinks */
+[data-theme="portland"] {
+  --color-bg: #1e2b1c;
+  --color-bg-card: #263522;
+  --color-bg-hover: #30422c;
+  --color-text: #e8edd6;
+  --color-text-muted: #93a87f;
+  --color-primary: #cc5577;
+  --color-secondary: #7fb050;
+  --color-tertiary: #e08c3c;
+  --color-accent: #5a99c8;
+  --color-green: #7fb050;
+  --color-tag-bg: rgba(204, 85, 119, 0.12);
+  --color-tag-text: #cc5577;
+  --color-border: rgba(204, 85, 119, 0.18);
+  --color-header-bg: rgba(30, 43, 28, 0.9);
+}
+
 /* Retro: amber CRT monitor */
 [data-theme="retro"] {
   --color-bg: #1a1200;
