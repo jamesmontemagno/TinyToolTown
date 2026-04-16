@@ -95,6 +95,7 @@ const moreTags = [...tagCounts.entries()]
           data-tagline={tool.data.tagline.toLowerCase()}
           data-tags={tool.data.tags.map(t => t.toLowerCase()).join(',')}
           data-author={tool.data.author.toLowerCase()}
+          data-author-github={tool.data.author_github.toLowerCase()}
           data-date-added={tool.data.date_added}
           data-stars={toolStars.get(tool.id) || 0}
           data-repo={repoMap.get(tool.id) || ''}
@@ -141,6 +142,7 @@ const moreTags = [...tagCounts.entries()]
   const favoritesOnlyBtn = document.getElementById('favorites-only-btn') as HTMLButtonElement | null;
   const tagButtons = document.querySelectorAll('.tag-btn:not(.more-tags-toggle)');
   const noResults = document.getElementById('no-results')!;
+  const noResultsMessage = noResults.querySelector('p');
   const moreToggle = document.getElementById('more-tags-toggle');
   const moreTags = document.getElementById('more-tags');
 
@@ -152,6 +154,18 @@ const moreTags = [...tagCounts.entries()]
   let activeTag = 'all';
   let activeSort = 'newest';
   let favoritesOnly = false;
+  const cinnamonAuthor = 'cinnamon';
+
+  function applySearchTheme(query: string): boolean {
+    const isCinnamonMode = query === 'cinnamon';
+    if (isCinnamonMode) {
+      document.documentElement.setAttribute('data-search-theme', 'cinnamon');
+    } else {
+      document.documentElement.removeAttribute('data-search-theme');
+    }
+
+    return isCinnamonMode;
+  }
 
   function syncFavoriteFlags(): void {
     const favorites = new Set(readFavorites());
@@ -215,6 +229,7 @@ const moreTags = [...tagCounts.entries()]
 
   function filterTools() {
     const query = search.value.toLowerCase().trim();
+    const isCinnamonMode = applySearchTheme(query);
     let visible = 0;
 
     items.forEach(item => {
@@ -223,10 +238,13 @@ const moreTags = [...tagCounts.entries()]
       const tagline = el.dataset.tagline || '';
       const tags = (el.dataset.tags || '').toLowerCase();
       const author = el.dataset.author || '';
+      const authorGithub = el.dataset.authorGithub || '';
       const favorited = el.dataset.favorited === 'true';
 
-      const matchesSearch = !query || name.includes(query) || tagline.includes(query) || tags.includes(query) || author.includes(query);
-      const matchesTag = activeTag === 'all' || tags.split(',').includes(activeTag);
+      const matchesSearch = isCinnamonMode
+        ? author.includes(cinnamonAuthor) || authorGithub.includes(cinnamonAuthor)
+        : !query || name.includes(query) || tagline.includes(query) || tags.includes(query) || author.includes(query);
+      const matchesTag = isCinnamonMode || activeTag === 'all' || tags.split(',').includes(activeTag);
       const matchesFavorites = !favoritesOnly || favorited;
 
       if (matchesSearch && matchesTag && matchesFavorites) {
@@ -238,14 +256,24 @@ const moreTags = [...tagCounts.entries()]
     });
 
     noResults.style.display = visible === 0 ? 'block' : 'none';
+    if (noResultsMessage) {
+      noResultsMessage.textContent = isCinnamonMode
+        ? '🍂 No Cinnamon tools found. Try adding Kayla\'s author name to a tool first.'
+        : '🔍 No tools found. Try a different search?';
+    }
     if (subtitle) {
-      subtitle.textContent = (visible === totalCount)
-        ? `${totalCount} tiny tools and counting`
-        : `Showing ${visible} of ${totalCount} tools`;
+      subtitle.textContent = isCinnamonMode
+        ? `Showing ${visible} Cinnamon picks`
+        : (visible === totalCount)
+          ? `${totalCount} tiny tools and counting`
+          : `Showing ${visible} of ${totalCount} tools`;
     }
     if (counterNumber && counterLabel) {
       counterNumber.style.webkitTextFillColor = '';
-      if (visible === totalCount) {
+      if (isCinnamonMode) {
+        counterNumber.textContent = String(visible);
+        counterLabel.textContent = visible === 1 ? 'Kayla special' : 'Kayla specials';
+      } else if (visible === totalCount) {
         counterNumber.textContent = String(totalCount);
         counterNumber.style.webkitTextFillColor = '';
         counterLabel.textContent = 'tiny tools and counting';

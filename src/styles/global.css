@@ -84,6 +84,52 @@
   transform: rotate(-2deg) scale(1.05);
 }
 
+/* Hidden Cinnamon search mode: New Hampshire fall foliage */
+[data-search-theme="cinnamon"] {
+  --color-bg: #2a1b14;
+  --color-bg-card: #3a261c;
+  --color-bg-hover: #4b3224;
+  --color-text: #fff4df;
+  --color-text-muted: #d7bfa2;
+  --color-primary: #d97706;
+  --color-secondary: #b45309;
+  --color-tertiary: #dc2626;
+  --color-accent: #f59e0b;
+  --color-green: #84cc16;
+  --color-tag-bg: rgba(245, 158, 11, 0.15);
+  --color-tag-text: #ffd58a;
+  --color-border: rgba(255, 213, 138, 0.14);
+  --color-header-bg: rgba(42, 27, 20, 0.9);
+}
+
+[data-search-theme="cinnamon"] body {
+  background-image:
+    radial-gradient(circle at top left, rgba(220, 38, 38, 0.2), transparent 30%),
+    radial-gradient(circle at top right, rgba(132, 204, 22, 0.16), transparent 25%),
+    linear-gradient(180deg, rgba(245, 158, 11, 0.08), transparent 35%);
+}
+
+[data-search-theme="cinnamon"] .site-header,
+[data-search-theme="cinnamon"] .site-footer {
+  border-color: rgba(255, 213, 138, 0.18);
+}
+
+[data-search-theme="cinnamon"] .tool-card,
+[data-search-theme="cinnamon"] .search-input,
+[data-search-theme="cinnamon"] .sort-btn,
+[data-search-theme="cinnamon"] .tag-btn {
+  box-shadow: 0 10px 30px rgba(42, 27, 20, 0.22);
+}
+
+[data-search-theme="cinnamon"] .tool-card:hover {
+  transform: translateY(-6px) rotate(-0.5deg);
+}
+
+[data-search-theme="cinnamon"] .gradient-text,
+[data-search-theme="cinnamon"] .counter-number {
+  background-image: linear-gradient(135deg, #f59e0b, #dc2626, #84cc16);
+}
+
 /* Shared button styles */
 .btn {
   display: inline-flex;
