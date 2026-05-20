@@ -175,6 +175,48 @@
   animation: geocities-blink 1s step-end infinite;
 }
 
+/* PlayStation mode 🎮 */
+[data-theme="playstation"] {
+  --color-bg: #07142b;
+  --color-bg-card: #0f2044;
+  --color-bg-hover: #17305d;
+  --color-text: #f4f8ff;
+  --color-text-muted: #9bb1d9;
+  --color-primary: #0050f0;
+  --color-secondary: #ff4f8b;
+  --color-tertiary: #ffd53d;
+  --color-accent: #00c3ff;
+  --color-green: #47d7ac;
+  --color-tag-bg: rgba(0, 195, 255, 0.14);
+  --color-tag-text: #8be8ff;
+  --color-border: rgba(139, 175, 255, 0.18);
+  --color-header-bg: rgba(7, 20, 43, 0.92);
+}
+
+[data-theme="playstation"] body {
+  background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2300c3ff' stroke-opacity='.16' stroke-width='3'%3E%3Ccircle cx='34' cy='42' r='12'/%3E%3Cpath d='M92 30l14 14-14 14-14-14z'/%3E%3Cpath d='M136 24h24v24h-24z'/%3E%3Cpath d='M30 114l24 24M54 114l-24 24'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+[data-theme="playstation"] .site-header {
+  box-shadow: 0 0 24px rgba(0, 80, 240, 0.18);
+}
+
+[data-theme="playstation"] .btn-primary {
+  background: linear-gradient(135deg, #0050f0, #00c3ff);
+  color: #f4f8ff;
+  box-shadow: 0 10px 30px rgba(0, 80, 240, 0.28);
+}
+
+[data-theme="playstation"] .btn-primary:hover {
+  background: linear-gradient(135deg, #0b64ff, #40d6ff);
+  box-shadow: 0 14px 36px rgba(0, 80, 240, 0.34);
+}
+
+[data-theme="playstation"] .hero-title,
+[data-theme="playstation"] .logo-text {
+  letter-spacing: 0.03em;
+}
+
 @keyframes geocities-blink {
   50% { opacity: 0; }
 }
