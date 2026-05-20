@@ -1,0 +1,172 @@
+---
+import { getCollection } from 'astro:content';
+
+const allTools = await getCollection('tools');
+const totalTools = allTools.length;
+---
+
+<div class="tool-counter-container" data-count={totalTools} id="tool-counter-wrapper">
+  <div class="tool-counter-box">
+    <span class="population-label">🏘️ TOWN POPULATION:</span>
+    <span class="population-number" id="population-count">0</span>
+    <span class="population-suffix">TINY TOOLS</span>
+  </div>
+</div>
+
+<script>
+  function setupCounterAnimation() {
+    const counterWrapper = document.getElementById('tool-counter-wrapper');
+    const counterElement = document.getElementById('population-count');
+    
+    if (!counterWrapper || !counterElement) return;
+
+    const targetCount = parseInt(counterWrapper.getAttribute('data-count') || '0', 10);
+    
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      counterElement.textContent = targetCount.toLocaleString();
+      return;
+    }
+
+    const duration = 1500; // Animation duration in ms
+    let startTime: number | null = null;
+
+    function easeOutQuad(t: number): number {
+      return t * (2 - t);
+    }
+
+    function animate(currentTime: number) {
+      if (startTime === null) startTime = currentTime;
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      
+      const easedProgress = easeOutQuad(progress);
+      const currentCount = Math.floor(easedProgress * targetCount);
+      
+      counterElement!.textContent = currentCount.toLocaleString();
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        counterElement!.textContent = targetCount.toLocaleString();
+      }
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entries[0].isIntersecting) {
+          requestAnimationFrame(animate);
+          observer.unobserve(counterWrapper);
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    observer.observe(counterWrapper);
+  }
+
+  // Setup on initial page load
+  setupCounterAnimation();
+
+  // Support Astro View Transitions if enabled
+  document.addEventListener('astro:after-swap', setupCounterAnimation);
+</script>
+
+<style>
+  .tool-counter-container {
+    margin: 1.5rem 0 0.5rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+  }
+
+  .tool-counter-box {
+    background: rgba(26, 25, 50, 0.4);
+    border: 1px solid var(--color-border);
+    padding: 0.75rem 1.75rem;
+    border-radius: var(--radius-lg, 20px);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .tool-counter-box:hover {
+    transform: translateY(-2px) scale(1.02);
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 30px rgba(255, 137, 6, 0.15);
+  }
+
+  .population-label {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: var(--color-text-muted);
+  }
+
+  .population-number {
+    font-weight: 900;
+    font-size: 2.25rem;
+    font-family: var(--font-display);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-tertiary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    line-height: 1;
+    min-width: 3.5rem;
+    text-align: center;
+  }
+
+  .population-suffix {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: var(--color-text-muted);
+  }
+
+  /* Light Theme Adjustments */
+  :global([data-theme="light"]) .tool-counter-box {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  /* GeoCities Retro Theme overrides 🌈 */
+  :global([data-theme="geocities"]) .tool-counter-box {
+    background: #c0c0c0 !important;
+    border: 3px double #ffff00 !important;
+    border-radius: 0 !important;
+    box-shadow: 5px 5px 0px #000000 !important;
+    padding: 0.5rem 1rem !important;
+    color: #000000 !important;
+  }
+
+  :global([data-theme="geocities"]) .population-label {
+    color: #ff0000 !important;
+    font-family: inherit !important;
+    font-weight: bold !important;
+    font-shadow: none !important;
+  }
+
+  :global([data-theme="geocities"]) .population-number {
+    -webkit-text-fill-color: #ff00ff !important;
+    background: none !important;
+    font-size: 2.5rem !important;
+    text-shadow: 2px 2px 0px #00ffff !important;
+    font-family: inherit !important;
+    animation: geocities-blink 1s step-end infinite;
+  }
+
+  :global([data-theme="geocities"]) .population-suffix {
+    color: #0000ff !important;
+    font-family: inherit !important;
+    font-weight: bold !important;
+  }
+</style>
