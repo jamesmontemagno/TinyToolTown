@@ -15,20 +15,6 @@ npm run preview    # Preview production build locally
 
 There are no tests or linters configured for the Astro site.
 
-### .NET Tools
-
-Two .NET CLI tools live in `tools/`:
-
-```bash
-# TinyToolSummarizer — generates AI summaries for tool pages
-cd tools/TinyToolSummarizer && dotnet run
-
-# TinyToolSubmitter — CLI for submitting tools via GitHub Issues
-cd tools/TinyToolSubmitter && dotnet run -- [path-to-repo]
-```
-
-Both require .NET 10 SDK and GitHub Copilot CLI on PATH.
-
 ## Architecture
 
 - **Content-driven static site**: Tools are Astro content collections. Each tool is a markdown file in `src/content/tools/` with YAML frontmatter. The schema is defined in `src/content/config.ts` using Zod.
