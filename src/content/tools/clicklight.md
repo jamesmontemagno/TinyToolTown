@@ -4,7 +4,7 @@ tagline: "A macOS menu bar app that highlights your clicks for demos, recordings
 author: "Aurora Scharff"
 author_github: "aurorascharff"
 github_url: "https://github.com/aurorascharff/ClickLight"
-thumbnail: "/thumbnails/clicklight.webp"
+thumbnail: "/thumbnails/clicklight.gif"
 tags: ["pointer", "devrel", "accessibility", "video", "education"]
 language: "Swift"
 license: "MIT"
