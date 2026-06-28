@@ -68,7 +68,8 @@ body:
     id: author
     attributes:
       label: Your Name
-      placeholder: "e.g., Jane Developer"
+      description: Enter one name, or multiple names separated by commas in the same order as GitHub usernames below.
+      placeholder: "e.g., Jane Developer, John Builder"
     validations:
       required: true
 
@@ -76,7 +77,8 @@ body:
     id: author_github
     attributes:
       label: Your GitHub Username
-      placeholder: "e.g., janedev"
+      description: Enter one username, or multiple usernames separated by commas to match the names above.
+      placeholder: "e.g., janedev, johnbuilder"
     validations:
       required: true
 
