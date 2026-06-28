@@ -1,6 +1,7 @@
 ---
 // Shorts-style viewer for TinyToolTown
 import { getGitHubRepo } from '../lib/github';
+import { getToolAuthors } from '../lib/authors';
 
 interface Props {
   tools: any[];
@@ -14,8 +15,7 @@ const shortsToolsData = tools.map((tool) => ({
   slug: tool.id.replace(/\.md$/, ''),
   name: tool.data.name,
   tagline: tool.data.tagline,
-  author: tool.data.author,
-  authorGithub: tool.data.author_github,
+  authors: getToolAuthors(tool.data),
   thumbnail: tool.data.thumbnail ?? null,
   githubUrl: tool.data.github_url,
   repo: getGitHubRepo(tool.data.github_url),
@@ -94,7 +94,7 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
 
     type ShortsToolEntry = {
       slug: string; name: string; tagline: string;
-      author: string; authorGithub: string;
+      authors: { name: string; github: string }[];
       thumbnail: string | null; githubUrl: string;
       repo: string | null; tags: string[];
     };
@@ -127,9 +127,17 @@ const shortsToolsJson = JSON.stringify(shortsToolsData).replace(/</g, '\\u003c')
       sec.querySelector('.tool-description')!.textContent = t.tagline;
 
       const av = sec.querySelector<HTMLImageElement>('.creator-avatar')!;
-      av.src = `https://avatars.githubusercontent.com/${t.authorGithub}?s=32`;
-      av.alt = t.author;
-      sec.querySelector('.creator-handle')!.textContent = `@${t.author}`;
+      const primaryAuthor = t.authors[0];
+      if (primaryAuthor) {
+        av.src = `https://avatars.githubusercontent.com/${primaryAuthor.github}?s=32`;
+        av.alt = primaryAuthor.name;
+        sec.querySelector('.creator-handle')!.textContent = t.authors.length > 1
+          ? `${primaryAuthor.name} + ${t.authors.length - 1} more`
+          : primaryAuthor.name;
+      } else {
+        av.remove();
+        sec.querySelector('.creator-handle')!.textContent = 'Unknown author';
+      }
 
       const tagsEl = sec.querySelector('.metadata-tags')!;
       t.tags.forEach(tag => {

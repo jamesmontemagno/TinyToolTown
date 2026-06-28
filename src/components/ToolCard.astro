@@ -1,6 +1,6 @@
 ---
 import { getGitHubRepo } from '../lib/github';
-import { getAuthorPath, getAvatarUrl } from '../lib/authors';
+import { getAuthorPath, getAvatarUrl, getToolAuthors } from '../lib/authors';
 
 interface Props {
   name: string;
@@ -18,7 +18,7 @@ interface Props {
 
 const { name, slug, tagline, author, author_github, tags, language, featured, thumbnail, github_url, stars } = Astro.props;
 const repo = getGitHubRepo(github_url);
-const authorPath = getAuthorPath(author_github);
+const authors = getToolAuthors({ author, author_github });
 
 const langColors: Record<string, string> = {
   'C#': '#178600',
@@ -75,16 +75,20 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
         )}
       </div>
       <div class="card-author">
-        <a href={authorPath} class="author-link" aria-label={`View author page for ${author}`}>
-          <img
-            src={getAvatarUrl(author_github, 24)}
-            alt=""
-            class="author-avatar"
-            loading="lazy"
-            decoding="async"
-          />
-          <span class="author-name">{author}</span>
-        </a>
+        <div class="author-links">
+          {authors.map((toolAuthor) => (
+            <a href={getAuthorPath(toolAuthor.github)} class="author-link" aria-label={`View author page for ${toolAuthor.name}`}>
+              <img
+                src={getAvatarUrl(toolAuthor.github, 24)}
+                alt=""
+                class="author-avatar"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="author-name">{toolAuthor.name}</span>
+            </a>
+          ))}
+        </div>
         {typeof stars === 'number' ? (
           <span class="card-stars-count">⭐ {stars.toLocaleString()}</span>
         ) : repo ? (
@@ -355,6 +359,13 @@ const langColor = language ? langColors[language] || '#8b949e' : null;
     width: 20px;
     height: 20px;
     border-radius: 50%;
+  }
+
+  .author-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-width: 0;
   }
 
   .author-link {

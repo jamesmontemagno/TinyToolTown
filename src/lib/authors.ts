@@ -1,4 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
+import { extractPrimaryHandle, getToolAuthors, normalizeGitHubHandle, splitCommaDelimited } from './author-utils.js';
 
 export type ToolEntry = CollectionEntry<'tools'>;
 
@@ -16,6 +17,16 @@ export interface AuthorSummary {
   languages: CountedValue[];
   latestDateAdded: string;
   latestTool: ToolEntry;
+}
+
+export interface ToolAuthor {
+  name: string;
+  github: string;
+}
+
+export interface ToolAuthorData {
+  author: string;
+  author_github: string;
 }
 
 export interface AuthorProfileSection {
@@ -77,35 +88,44 @@ export const customAuthorProfiles: Record<string, AuthorProfile> = {
   },
 };
 
-export function normalizeGitHubHandle(handle: string): string {
-  return handle.trim().replace(/^@+/, '').toLowerCase();
-}
+export { getToolAuthors, normalizeGitHubHandle, splitCommaDelimited };
 
 export function getAuthorPath(handle: string): string {
-  return `/authors/${normalizeGitHubHandle(handle)}/`;
+  return `/authors/${normalizeGitHubHandle(extractPrimaryHandle(handle))}/`;
 }
 
 export function getAvatarUrl(handle: string, size = 96): string {
-  return `https://avatars.githubusercontent.com/${normalizeGitHubHandle(handle)}?s=${size}`;
+  return `https://avatars.githubusercontent.com/${normalizeGitHubHandle(extractPrimaryHandle(handle))}?s=${size}`;
 }
 
 export function slugForTool(tool: ToolEntry): string {
   return tool.id.replace(/\.md$/, '');
 }
 
+export function formatToolAuthors(data: ToolAuthorData): string {
+  const authors = getToolAuthors(data);
+  if (authors.length === 0) return data.author;
+  return authors.map(author => `${author.name} (@${author.github})`).join(', ');
+}
+
 export function buildAuthors(tools: ToolEntry[]): AuthorSummary[] {
   const groups = new Map<string, ToolEntry[]>();
+  const authorNames = new Map<string, string[]>();
 
   for (const tool of tools) {
-    const github = normalizeGitHubHandle(tool.data.author_github);
-    if (!github) continue;
-    const group = groups.get(github) || [];
-    group.push(tool);
-    groups.set(github, group);
+    for (const toolAuthor of getToolAuthors(tool.data)) {
+      const group = groups.get(toolAuthor.github) || [];
+      group.push(tool);
+      groups.set(toolAuthor.github, group);
+
+      const names = authorNames.get(toolAuthor.github) || [];
+      names.push(toolAuthor.name);
+      authorNames.set(toolAuthor.github, names);
+    }
   }
 
   return [...groups.entries()]
-    .map(([github, authorTools]) => buildAuthorSummary(github, authorTools))
+    .map(([github, authorTools]) => buildAuthorSummary(github, authorTools, authorNames.get(github) || []))
     .sort((a, b) =>
       b.toolCount - a.toolCount
       || a.name.localeCompare(b.name)
@@ -122,7 +142,7 @@ export function buildAuthorIntro(author: AuthorSummary): string {
   return `${author.name} has shared ${author.toolCount} ${pluralize('tiny tool', author.toolCount)} here${tagText}.${languageText}`;
 }
 
-function buildAuthorSummary(github: string, tools: ToolEntry[]): AuthorSummary {
+function buildAuthorSummary(github: string, tools: ToolEntry[], names: string[]): AuthorSummary {
   const sortedTools = [...tools].sort((a, b) =>
     b.data.date_added.localeCompare(a.data.date_added)
     || a.data.name.localeCompare(b.data.name)
@@ -131,7 +151,7 @@ function buildAuthorSummary(github: string, tools: ToolEntry[]): AuthorSummary {
 
   return {
     github,
-    name: chooseCanonicalName(tools),
+    name: chooseCanonicalName(github, tools, names),
     tools: sortedTools,
     toolCount: tools.length,
     tags: countValues(tools.flatMap(tool => tool.data.tags)),
@@ -141,8 +161,17 @@ function buildAuthorSummary(github: string, tools: ToolEntry[]): AuthorSummary {
   };
 }
 
-function chooseCanonicalName(tools: ToolEntry[]): string {
-  return countValues(tools.map(tool => tool.data.author))[0]?.name || tools[0]?.data.author || 'Unknown author';
+function chooseCanonicalName(github: string, tools: ToolEntry[], names: string[]): string {
+  const frequentName = countValues(names)[0]?.name;
+  if (frequentName) return frequentName;
+
+  const firstTool = tools[0];
+  if (firstTool) {
+    const firstToolAuthorName = getToolAuthors(firstTool.data).find(author => author.github === github)?.name;
+    if (firstToolAuthorName) return firstToolAuthorName;
+  }
+
+  return firstTool?.data.author || 'Unknown author';
 }
 
 function countValues(values: string[]): CountedValue[] {

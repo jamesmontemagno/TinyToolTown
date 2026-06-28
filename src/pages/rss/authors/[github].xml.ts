@@ -1,7 +1,7 @@
 import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
-import { buildAuthorIntro, buildAuthors, slugForTool, type AuthorSummary } from '../../../lib/authors';
+import { buildAuthorIntro, buildAuthors, formatToolAuthors, slugForTool, type AuthorSummary } from '../../../lib/authors';
 import { getToolReleaseLink } from '../../../lib/github';
 
 export async function getStaticPaths() {
@@ -32,7 +32,7 @@ export async function GET(context: APIContext) {
 
       parts.push(tool.data.tagline);
       parts.push('');
-      parts.push(`By ${tool.data.author} (@${tool.data.author_github})`);
+      parts.push(`By ${formatToolAuthors(tool.data)}`);
       if (tool.data.language) parts.push(`Language: ${tool.data.language}`);
       if (tool.data.license) parts.push(`License: ${tool.data.license}`);
       parts.push(`GitHub: ${tool.data.github_url}`);

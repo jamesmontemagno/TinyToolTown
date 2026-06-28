@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ToolEntry } from '../authors';
-import { buildAuthorIntro, buildAuthors, getAuthorPath, getAvatarUrl, normalizeGitHubHandle, slugForTool } from '../authors';
+import { buildAuthorIntro, buildAuthors, formatToolAuthors, getAuthorPath, getAvatarUrl, getToolAuthors, normalizeGitHubHandle, slugForTool } from '../authors';
 
 function tool(id: string, data: Partial<ToolEntry['data']> & Pick<ToolEntry['data'], 'name' | 'author' | 'author_github' | 'tags' | 'date_added'>): ToolEntry {
   return {
@@ -58,6 +58,36 @@ describe('author helpers', () => {
       { name: 'cli', count: 1 },
     ]);
     expect(authors[0].languages.map(language => language.name)).toEqual(['C#', 'PowerShell']);
+  });
+
+  it('supports comma-delimited co-authors', () => {
+    const [burke, james] = getToolAuthors({
+      author: 'Burke Holland, James Montemagno',
+      author_github: 'burkeholland,jamesmontemagno',
+    });
+
+    expect(burke).toEqual({ name: 'Burke Holland', github: 'burkeholland' });
+    expect(james).toEqual({ name: 'James Montemagno', github: 'jamesmontemagno' });
+    expect(formatToolAuthors({
+      author: 'Burke Holland, James Montemagno',
+      author_github: 'burkeholland,jamesmontemagno',
+    })).toBe('Burke Holland (@burkeholland), James Montemagno (@jamesmontemagno)');
+
+    const authors = buildAuthors([
+      tool('resize.md', {
+        name: 'ResizeMe',
+        author: 'Burke Holland, James Montemagno',
+        author_github: 'burkeholland,jamesmontemagno',
+        tags: ['windows'],
+        language: 'Swift & Go',
+        date_added: '2026-06-28',
+      }),
+    ]);
+
+    expect(authors.map(author => author.github).sort()).toEqual(['burkeholland', 'jamesmontemagno']);
+    expect(authors.find(author => author.github === 'burkeholland')?.name).toBe('Burke Holland');
+    expect(authors.find(author => author.github === 'burkeholland')?.languages).toEqual([{ name: 'Swift & Go', count: 1 }]);
+    expect(authors.find(author => author.github === 'jamesmontemagno')?.tools[0].data.name).toBe('ResizeMe');
   });
 
   it('builds concrete fallback intros from aggregated tool data', () => {
