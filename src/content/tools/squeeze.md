@@ -2,7 +2,7 @@
 name: "Squeeze"
 tagline: "Squeeze your videos into optimal bitrates"
 author: "Andrea Griffiths"
-author_github: "andreargiffiths11"
+author_github: "AndreaGriffiths11"
 github_url: "https://github.com/AndreaGriffiths11/squeeze"
 thumbnail: "/thumbnails/squeeze.webp"
 website_url: "https://andreagriffiths11.github.io/squeeze/"
