@@ -4,7 +4,7 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { getCollection, render } from 'astro:content';
 import { getGitHubRepo, getToolReleaseLink } from '../../lib/github';
-import { getAuthorPath, getAvatarUrl } from '../../lib/authors';
+import { getAuthorPath, getAvatarUrl, getToolAuthors } from '../../lib/authors';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -20,7 +20,7 @@ const { tool } = Astro.props;
 const { Content } = await render(tool);
 const repo = getGitHubRepo(tool.data.github_url);
 const slug = tool.id.replace(/\.md$/, '');
-const authorPath = getAuthorPath(tool.data.author_github);
+const authors = getToolAuthors(tool.data);
 const releaseLink = getToolReleaseLink(tool.data);
 
 function stripMarkdown(markdown: string) {
@@ -85,17 +85,19 @@ const ogImage = hasSocialCard ? `/social/${slug}.png` : undefined;
           <p class="tool-tagline">{tool.data.tagline}</p>
 
           <div class="tool-meta">
-            <div class="tool-author">
-              <img
-                src={getAvatarUrl(tool.data.author_github, 40)}
-                alt={tool.data.author}
-                class="author-avatar"
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <a href={authorPath} class="author-name">{tool.data.author}</a>
-              </div>
+            <div class="tool-authors">
+              {authors.map((toolAuthor) => (
+                <a href={getAuthorPath(toolAuthor.github)} class="tool-author">
+                  <img
+                    src={getAvatarUrl(toolAuthor.github, 40)}
+                    alt={toolAuthor.name}
+                    class="author-avatar"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="author-name">{toolAuthor.name}</span>
+                </a>
+              ))}
             </div>
 
             <div class="tool-badges">
@@ -253,10 +255,19 @@ const ogImage = hasSocialCard ? `/social/${slug}.png` : undefined;
     margin-bottom: 1rem;
   }
 
+  .tool-authors {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
   .tool-author {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    color: var(--color-text);
+    text-decoration: none;
   }
 
   .author-avatar {

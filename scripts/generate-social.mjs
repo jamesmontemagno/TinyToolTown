@@ -28,6 +28,7 @@ import {
 } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getToolAuthors } from '../src/lib/author-utils.js';
 import { renderSocialCard, renderAuthorSocialCard } from './social-card.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -71,20 +72,21 @@ function parseToolFile(content) {
   };
 }
 
-function normalizeHandle(handle) {
-  return (handle || '').trim().replace(/^@+/, '').toLowerCase();
-}
-
 // Aggregate tool data into one entry per author handle, mirroring
 // src/lib/authors.ts buildAuthors() (name/tags/languages by frequency).
 function buildAuthors(tools) {
   const groups = new Map();
+  const authorNames = new Map();
   for (const tool of tools) {
-    const github = normalizeHandle(tool.data.author_github);
-    if (!github) continue;
-    const group = groups.get(github) || [];
-    group.push(tool);
-    groups.set(github, group);
+    for (const toolAuthor of getToolAuthors(tool)) {
+      const group = groups.get(toolAuthor.github) || [];
+      group.push(tool);
+      groups.set(toolAuthor.github, group);
+
+      const names = authorNames.get(toolAuthor.github) || [];
+      names.push(toolAuthor.name);
+      authorNames.set(toolAuthor.github, names);
+    }
   }
 
   const mostFrequent = (values) => {
@@ -104,9 +106,14 @@ function buildAuthors(tools) {
 
   const authors = [];
   for (const [github, authorTools] of groups) {
-    const name = mostFrequent(authorTools.map((tool) => tool.data.author))[0]
-      || authorTools[0].data.author
-      || `@${github}`;
+    let name = mostFrequent(authorNames.get(github) || [])[0];
+    const firstTool = authorTools[0];
+    if (!name && firstTool) {
+      name = getToolAuthors(firstTool).find((author) => author.github === github)?.name;
+    }
+    if (!name) {
+      name = firstTool?.data.author || `@${github}`;
+    }
     authors.push({
       github,
       name,

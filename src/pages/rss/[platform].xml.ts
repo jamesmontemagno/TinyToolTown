@@ -2,6 +2,7 @@ import rss from '@astrojs/rss';
 import { getCollection } from 'astro:content';
 import type { APIContext } from 'astro';
 import { getToolReleaseLink } from '../../lib/github';
+import { formatToolAuthors } from '../../lib/authors';
 
 type Platform = {
   slug: string;
@@ -67,7 +68,7 @@ export async function GET(context: APIContext) {
       }
 
       parts.push('');
-      parts.push(`By ${tool.data.author} (@${tool.data.author_github})`);
+      parts.push(`By ${formatToolAuthors(tool.data)}`);
       if (tool.data.language) parts.push(`Language: ${tool.data.language}`);
       if (tool.data.license) parts.push(`License: ${tool.data.license}`);
       parts.push(`GitHub: ${tool.data.github_url}`);

@@ -1,8 +1,8 @@
 ---
 name: "ResizeMe"
 tagline: "Intelligent window resizer for Windows and macOS"
-author: "James Montemagno & Burke Holland"
-author_github: "burkeholland"
+author: "Burke Holland, James Montemagno"
+author_github: "burkeholland,jamesmontemagno"
 github_url: "https://github.com/burkeholland/resize-me"
 thumbnail: "/thumbnails/resizeme.gif"
 tags: []
