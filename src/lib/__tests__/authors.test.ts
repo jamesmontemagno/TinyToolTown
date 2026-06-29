@@ -90,6 +90,18 @@ describe('author helpers', () => {
     expect(authors.find(author => author.github === 'jamesmontemagno')?.tools[0].data.name).toBe('ResizeMe');
   });
 
+  it('preserves comma-delimited display names for a single organization handle', () => {
+    expect(getToolAuthors({
+      author: 'Aymen, Tamas, Sanjay',
+      author_github: 'microsoft',
+    })).toEqual([{ name: 'Aymen, Tamas, Sanjay', github: 'microsoft' }]);
+
+    expect(formatToolAuthors({
+      author: 'Aymen, Tamas, Sanjay',
+      author_github: 'microsoft',
+    })).toBe('Aymen, Tamas, Sanjay (@microsoft)');
+  });
+
   it('builds concrete fallback intros from aggregated tool data', () => {
     const [author] = buildAuthors([
       tool('timer.md', {

@@ -11,8 +11,8 @@ export function extractPrimaryHandle(handle) {
 }
 
 export function getToolAuthors(data) {
-  const names = splitCommaDelimited(data.author);
   const handles = splitCommaDelimited(data.author_github).map(normalizeGitHubHandle).filter(Boolean);
+  const names = handles.length > 1 ? splitCommaDelimited(data.author) : [(data.author || '').trim()].filter(Boolean);
   const authors = [];
 
   for (let i = 0; i < handles.length; i++) {
