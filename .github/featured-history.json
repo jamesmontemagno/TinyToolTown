@@ -1,23 +1,26 @@
 {
-  "lastRun": "2026-04-14",
+  "lastRun": "2026-07-06",
   "selectedSlugs": [
+    "balizasspain",
+    "resizeme",
     "peekdesktop",
-    "bluetoothwave",
     "simple-icon-file-maker",
     "tally",
+    "textream",
     "toasty",
-    "fancygist",
-    "3d-maze",
-    "textream"
+    "hurl"
   ],
   "lastFeatured": {
-    "peekdesktop": "2026-04-14",
+    "peekdesktop": "2026-07-06",
     "bluetoothwave": "2026-04-14",
-    "simple-icon-file-maker": "2026-04-14",
-    "tally": "2026-04-14",
-    "toasty": "2026-04-14",
+    "simple-icon-file-maker": "2026-07-06",
+    "tally": "2026-07-06",
+    "toasty": "2026-07-06",
     "fancygist": "2026-04-14",
     "3d-maze": "2026-04-14",
-    "textream": "2026-04-14"
+    "textream": "2026-07-06",
+    "balizasspain": "2026-07-06",
+    "resizeme": "2026-07-06",
+    "hurl": "2026-07-06"
   }
 }

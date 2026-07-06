@@ -9,7 +9,7 @@ tags: []
 language: "Swift & Go"
 license: "MIT"
 date_added: "2026-06-28"
-featured: false
+featured: true
 ai_summary: "Effortlessly resize your windows like a pro with this intelligent tool that works seamlessly on both Windows and macOS—making multitasking and screen management a breeze!"
 ai_features: ["🔥 Cross-platform support for Windows and macOS", "⚡ Native SwiftUI menu-bar app for macOS", "🎯 Easy installation and updates via winget and Homebrew", "🚀 Intelligent window resizing for perfect screen layouts"]
 ---
