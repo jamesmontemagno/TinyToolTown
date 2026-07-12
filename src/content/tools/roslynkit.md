@@ -10,6 +10,8 @@ language: "C#"
 license: "MIT"
 date_added: "2026-07-09"
 featured: false
+ai_summary: "Navigate your C#/.NET code like a wizard with a Roslyn-powered CLI that lets you explore projects, symbols, and references without the messy guesswork of grep—IDE-level insights straight from your terminal!"
+ai_features: ["🔥 Load and inspect .NET projects with MSBuild", "⚡ Find definitions, references, and implementations with precision", "🎯 View compiler diagnostics and symbol info instantly", "📜 Generate stable terminal output perfect for scripting and bug reports"]
 ---
 
 RoslynKit is a Roslyn-powered command-line tool for inspecting C#/.NET solutions from the terminal. It loads .slnx, .sln, or .csproj files with MSBuild, then asks Roslyn for real source information: projects, documents, symbols, definitions, references, implementations, signatures, documentation, source ranges, and diagnostics.

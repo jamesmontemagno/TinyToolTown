@@ -10,6 +10,8 @@ language: "C#"
 license: "MIT"
 date_added: "2026-07-09"
 featured: false
+ai_summary: "Keep an eye on your GitHub Copilot AI credit spending with a charming taxi meter-style tray app that shows your usage in real time—because watching your credits tick away should be fun, not scary!"
+ai_features: ["🚕 Taxi meter-style popup shows current AI credit burn", "🎨 Color-coded tray icon for quick usage status", "🔒 Encrypted local storage for your GitHub token", "🏢 Supports both personal and organization billing scopes"]
 ---
 
 CreditMeter is a tiny Windows tray app that shows your GitHub Copilot AI-credit usage like a little taxi meter.

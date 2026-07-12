@@ -10,6 +10,8 @@ language: "TypeScript"
 license: "AGPL-3.0"
 date_added: "2026-07-08"
 featured: false
+ai_summary: "Craft your perfect resume in Markdown with real-time preview and effortless ATS-friendly formatting that looks great to humans too—no design stress, just job-winning vibes!"
+ai_features: ["🔥 Real-time Markdown resume writing and preview", "⚡ Export to PDF, HTML, and DOCX with self-contained images", "🎯 Offline PWA with local data and image storage", "🎨 Customizable themes, fonts, and page settings for polished looks"]
 ---
 
 This tool helps anyone to write their Resume / CV in plain Markdown, so you don't have to worry about styling. It can be exported as PDF, HTML, and even DOCX.
