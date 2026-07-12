@@ -4,6 +4,7 @@ tagline: "ATS and Human-friendly Resume Writer in Markdown"
 author: "Junian Triajianto"
 author_github: "junian"
 github_url: "https://github.com/junian/markdown-resume/"
+thumbnail: "/thumbnails/markdown-resume.webp"
 tags: []
 language: "TypeScript"
 license: "AGPL-3.0"
