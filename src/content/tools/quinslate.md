@@ -9,6 +9,8 @@ tags: []
 language: "C#"
 date_added: "2026-07-17"
 featured: false
+ai_summary: "Wave goodbye to cluttered notes apps and say hello to a speedy, always-ready scratchpad that lives in your system tray with five color-coded slates for jotting, calculating, and clipping on the fly!"
+ai_features: ["🔥 Five persistent color-coded slates autosaved as plain text", "⚡ Global hotkey for instant summon from anywhere", "🎯 Inline calculator for quick math without leaving your notes", "📌 Pin on top with launch-on-login for nonstop access"]
 ---
 
 I simply got tired of putting all my temp notes into a NP++ or new Sublime tab. So I built QuinSlate - quick, jot-focused notepad for Windows.

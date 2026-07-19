@@ -10,6 +10,8 @@ language: "Go"
 license: "MIT"
 date_added: "2026-07-13"
 featured: false
+ai_summary: "Manage your Azure DevOps and GitHub pull requests, work items, and pipelines all from a sleek terminal interface that blends backends like a pro—because who says you can't multitask in style right from your command line?"
+ai_features: ["🔥 Unified multi-backend TUI for Azure DevOps & GitHub", "⚡ Multi-tab interface for PRs, work items, and pipelines", "🎯 Backend-aware pull request voting and filtering", "🚀 Quick install scripts for all platforms with config auto-setup"]
 ---
 
 For terminal-suckers, manage PRs, Pipelines, Workitems right in the terminal via a TUI.

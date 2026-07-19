@@ -10,6 +10,8 @@ language: "Typescript, Javascript"
 license: "MIT"
 date_added: "2026-07-16"
 featured: false
+ai_summary: "Craft one perfect post and watch it magically transform to fit all your favorite social platforms with rich formatting and optional AI sparkle—talk about social media multitasking made fun and effortless!"
+ai_features: ["🔥 Live multi-platform previews with character and formatting rules", "⚡ Platform-specific edits with easy syncing", "🎯 Smart @mentions that adapt per network", "🤖 Optional AI-assisted writing with your own API key"]
 ---
 
 Draft a post once and format it for every platform at the same time. The main editor uses TipTap for word-processor-style editing, and a live preview rail shows your post on LinkedIn, X, Bluesky, Threads, Mastodon, Facebook, and Instagram, each with its own character limit, counting rule, and formatting applied.
