@@ -4,6 +4,7 @@ tagline: "An MCP server... for your other MCP servers."
 author: "Sebastian Larsson"
 author_github: "Byggarepop"
 github_url: "https://github.com/Byggarepop/dotnet-mcp-orchestrator"
+thumbnail: "/thumbnails/mcporchestrator.webp"
 tags: []
 language: "C#"
 license: "MIT"
