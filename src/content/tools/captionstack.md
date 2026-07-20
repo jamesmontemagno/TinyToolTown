@@ -4,12 +4,14 @@ tagline: "A growing collection of private, browser-based caption tools"
 author: "James Montemagno"
 author_github: "jamesmontemagno"
 github_url: "https://github.com/jamesmontemagno/captionstack"
+website_url: "https://captionstack.app"
 thumbnail: "/thumbnails/captionstack.webp"
-tags: []
+tags: ["caption", "video", "web"]
 language: "TypeScript"
 license: "MIT"
 date_added: "2026-07-08"
 featured: false
+theme: "candy"
 ai_summary: "Tired of juggling caption files? This browser-based wizard lets you privately read, preview, and convert your captions in all the popular formats without ever uploading a thing—privacy and convenience in perfect harmony!"
 ai_features: ["🔒 Fully private browser-based caption handling", "🔄 Supports import and export of 9 popular caption formats", "🚀 No server uploads, all processing local", "🎉 Easy plain-text imports with automatic timing"]
 ---
