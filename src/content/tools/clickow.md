@@ -9,6 +9,8 @@ language: "C#"
 license: "MIT"
 date_added: "2026-07-23"
 featured: false
+ai_summary: "Make your mouse clicks impossible to miss with a lightweight Windows tray app that highlights every click live—perfect for dazzling demos, screen shares, and teaching moments without any post-editing fuss!"
+ai_features: ["🖱️ Real-time click highlights across all apps and monitors", "🎨 Customizable color themes and sizes for visual flair", "🔦 Laser pointer mode to draw attention with fading strokes", "⌨️ Global shortcuts to toggle features without missing a beat"]
 ---
 
 Clickow makes your mouse clicks visible - perfect for live demos, screen shares, UX reviews, and teaching. Unlike screen recorders that add click effects *after* recording, Clickow works in the moment. No editing, no interruptions, just clarity.

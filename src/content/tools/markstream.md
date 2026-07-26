@@ -10,6 +10,8 @@ language: "Vue / TypeScript"
 license: "MIT"
 date_added: "2026-07-20"
 featured: false
+ai_summary: "Wave goodbye to awkward half-rendered AI markdown! This tool turns messy, streaming AI text into sleek, polished markdown in real time, making your chat and code displays look flawless before they’re even finished."
+ai_features: ["🔥 Supports Vue 3, React, Svelte, Angular, and more", "⚡ Handles streaming and incomplete Markdown like a pro", "🎯 Renders Mermaid diagrams and KaTeX math on the fly", "🚀 Perfect for long AI responses and live token streams"]
 ---
 
 Markstream is a free, open-source renderer for Markdown that arrives token by token in AI chat interfaces. It keeps incomplete Markdown stable while streaming, then progressively renders code highlighting, Mermaid diagrams, KaTeX math, and other rich blocks without the usual broken syntax or jumpy layout.

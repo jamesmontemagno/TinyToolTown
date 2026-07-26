@@ -10,6 +10,8 @@ language: "javascript, html"
 license: "MIT"
 date_added: "2026-07-20"
 featured: false
+ai_summary: "Turn your Markdown into beautifully formatted Teams messages with a clever tool that transforms plain text into Teams-friendly HTML—no more awkward paste jobs, just smooth, stylish posts every time!"
+ai_features: ["🔥 Smart heading transformations for perfect Teams sizing", "⚡ Local rendering with privacy-first clipboard copying", "🎯 Preserves nested lists and spacing like a pro", "🛠️ Multiple heading modes to fit your style"]
 ---
 
 Microsoft Teams understands some Markdown as you type, but pasted Markdown stays as literal text. Teams does accept a limited set of rich HTML from the clipboard.
