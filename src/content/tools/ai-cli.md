@@ -4,6 +4,7 @@ tagline: "AI CLI translates natural language into shell commands using LLMs (Ope
 author: "https://agingcoder.com/posts/i-built-a-thing/"
 author_github: "kriserickson"
 github_url: "https://github.com/kriserickson/ai-cli"
+thumbnail: "/thumbnails/ai-cli.webp"
 tags: ["llm", "cli"]
 language: "Go"
 license: "MIT"
