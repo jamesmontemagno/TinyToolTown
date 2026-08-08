@@ -29,19 +29,36 @@ const FIELD_LABELS = {
   theme: 'Page Theme (optional)',
 };
 
+// Earlier versions of the issue form omitted "(optional)" and
+// "(comma-separated)" from several rendered headings. Keep accepting those
+// bodies so already-open submissions can move through the current importer.
+const FIELD_LABEL_ALIASES = {
+  website_url: ['Website or Demo URL'],
+  thumbnail_url: ['Thumbnail image URL'],
+  tags: ['Tags'],
+  theme: ['Page Theme'],
+};
+
+function labelsForKey(key) {
+  return [FIELD_LABELS[key], ...(FIELD_LABEL_ALIASES[key] || [])];
+}
+
 // Extract the value of a single issue-form field by its rendered label.
 // GitHub renders each form field as `### <label>` followed by the user's value.
 // Stop only at another known form field (or the checklist), not at any arbitrary
 // markdown heading the submitter includes inside a textarea.
 function getField(body, label) {
   const text = body || '';
-  const startRegex = new RegExp(`^### ${escapeRegExp(label)}\\s*$\\n?`, 'm');
+  const fieldKey = Object.keys(FIELD_LABELS).find((key) => labelsForKey(key).includes(label));
+  const startLabels = fieldKey ? labelsForKey(fieldKey) : [label];
+  const startRegex = new RegExp(`^### (?:${startLabels.map(escapeRegExp).join('|')})\\s*$\\n?`, 'm');
   const startMatch = text.match(startRegex);
   if (!startMatch || startMatch.index === undefined) return '';
 
   const rest = text.slice(startMatch.index + startMatch[0].length);
-  const nextLabels = Object.values(FIELD_LABELS)
-    .filter((fieldLabel) => fieldLabel !== label)
+  const nextLabels = Object.keys(FIELD_LABELS)
+    .filter((key) => key !== fieldKey)
+    .flatMap(labelsForKey)
     .map(escapeRegExp)
     .concat('Checklist');
   const nextRegex = new RegExp(`^### (?:${nextLabels.join('|')})\\s*$`, 'm');
@@ -82,4 +99,5 @@ module.exports = {
   parseToolSubmission,
   normalizeRepoFromUrl,
   FIELD_LABELS,
+  FIELD_LABEL_ALIASES,
 };

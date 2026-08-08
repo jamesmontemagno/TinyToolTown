@@ -71,6 +71,14 @@ jobs:
               body: `✅ Author page for @${claim.github} has been added! It will be live at https://www.tinytooltown.com/authors/${claim.github}/ once the site rebuilds.\n\nThanks for being part of Tiny Tool Town! 🏘️`,
             });
 
+            for (const label of ['queued-author', 'needs-maintainer-review']) {
+              await github.rest.issues.removeLabel({
+                owner, repo, issue_number: issue.number, name: label,
+              }).catch(error => {
+                if (error.status !== 404) throw error;
+              });
+            }
+
             const refreshedIssue = await github.rest.issues.get({
               owner, repo, issue_number: issue.number,
             });

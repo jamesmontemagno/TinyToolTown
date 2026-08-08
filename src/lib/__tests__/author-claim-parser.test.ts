@@ -110,5 +110,6 @@ describe('author claim workflows', () => {
     const workflow = readFileSync('.github/workflows/process-author-claim.yml', 'utf8');
     expect(workflow).toContain('scripts/author-claim-parser.cjs');
     expect(workflow).toContain("refreshedIssue.data.state !== 'closed'");
+    expect(workflow).toContain("['queued-author', 'needs-maintainer-review']");
   });
 });

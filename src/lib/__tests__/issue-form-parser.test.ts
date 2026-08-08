@@ -60,6 +60,42 @@ terminal
 
 - [X] This tool is free and open source`;
 
+const LEGACY_BODY = `### Tool Name
+
+Steam Market Fee Calculator
+
+### One-line description
+
+See a fee breakdown.
+
+### GitHub Repository URL
+
+https://github.com/hyunjun12312/steam-market-fee-calculator
+
+### Website or Demo URL
+
+https://steamvaults.org/tools/steam-market-fee-calculator
+
+### Your Name
+
+hyunjun12312
+
+### Your GitHub Username
+
+hyunjun12312
+
+### Tags
+
+steam, calculator
+
+### Page Theme
+
+terminal
+
+### Checklist
+
+- [x] Confirmed`;
+
 describe('issue-form-parser getField', () => {
   it('keeps an empty optional website URL field empty', () => {
     const body = `### Tool Name
@@ -133,6 +169,14 @@ describe('parseToolSubmission', () => {
     expect(fields.tagline).toBe('');
     expect(fields.github_url).toBe('');
   });
+
+  it('parses legacy headings without absorbing later fields into the GitHub URL', () => {
+    const fields = parseToolSubmission(LEGACY_BODY);
+    expect(fields.github_url).toBe('https://github.com/hyunjun12312/steam-market-fee-calculator');
+    expect(fields.website_url).toBe('https://steamvaults.org/tools/steam-market-fee-calculator');
+    expect(fields.tags).toBe('steam, calculator');
+    expect(fields.theme).toBe('terminal');
+  });
 });
 
 describe('normalizeRepoFromUrl', () => {
@@ -157,6 +201,7 @@ describe('workflows use the shared parser', () => {
   it('batch-approve.yml requires the shared parser module', () => {
     const workflow = readFileSync('.github/workflows/batch-approve.yml', 'utf8');
     expect(workflow).toContain('scripts/issue-form-parser.cjs');
+    expect(workflow).not.toContain("getField(body, 'Tags \\\\(comma-separated\\\\)')");
   });
 
   it('triage-tool.yml requires the shared parser module', () => {

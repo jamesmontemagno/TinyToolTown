@@ -235,14 +235,14 @@ jobs:
                 const tagline = getField(body, 'One-line description');
                 const description = getField(body, 'Tell us about your tool');
                 let github_url = getField(body, 'GitHub Repository URL');
-                const website_url = getField(body, 'Website or Demo URL \\(optional\\)');
-                const thumbnail_url = getField(body, 'Thumbnail image URL \\(optional\\)');
+                const website_url = getField(body, 'Website or Demo URL (optional)');
+                const thumbnail_url = getField(body, 'Thumbnail image URL (optional)');
                 const author = getField(body, 'Your Name');
                 const author_github = getField(body, 'Your GitHub Username');
-                const tagsRaw = getField(body, 'Tags \\(comma-separated\\)');
+                const tagsRaw = getField(body, 'Tags (comma-separated)');
                 const language = getField(body, 'Primary Programming Language');
                 const license = getField(body, 'License');
-                const theme = getField(body, 'Page Theme \\(optional\\)');
+                const theme = getField(body, 'Page Theme (optional)');
 
                 if (!name || !tagline || !github_url || !author || !author_github) {
                   throw new Error('Missing required fields');
