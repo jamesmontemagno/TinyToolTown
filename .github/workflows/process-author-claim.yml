@@ -71,6 +71,11 @@ jobs:
               body: `✅ Author page for @${claim.github} has been added! It will be live at https://www.tinytooltown.com/authors/${claim.github}/ once the site rebuilds.\n\nThanks for being part of Tiny Tool Town! 🏘️`,
             });
 
-            await github.rest.issues.update({
-              owner, repo, issue_number: issue.number, state: 'closed',
+            const refreshedIssue = await github.rest.issues.get({
+              owner, repo, issue_number: issue.number,
             });
+            if (refreshedIssue.data.state !== 'closed') {
+              await github.rest.issues.update({
+                owner, repo, issue_number: issue.number, state: 'closed',
+              });
+            }
