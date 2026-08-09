@@ -4,6 +4,7 @@ tagline: "A gentle, offline-first daily tracker for people who just need three t
 author: "Akshay Sharma"
 author_github: "akshay2996"
 github_url: "https://github.com/Akshay2996/barely"
+thumbnail: "/thumbnails/barely.webp"
 tags: []
 language: "Typescript, CSS"
 license: "MIT"
